@@ -6,20 +6,20 @@
 % These macros employ a little dirty trick to convince LaTeX to typeset
 % chapter headings sanely, without lots of empty space above them.
 % Feel free to ignore.
-\makeatletter
-\def\@makechapterhead#1{
-  {\parindent \z@ \raggedright \normalfont
-   \Huge\bfseries \thechapter. #1
-   \par\nobreak
-   \vskip 20\p@
-}}
-\def\@makeschapterhead#1{
-  {\parindent \z@ \raggedright \normalfont
-   \Huge\bfseries #1
-   \par\nobreak
-   \vskip 20\p@
-}}
-\makeatother
+%\makeatletter
+%\def\@makechapterhead#1{
+  %{\parindent \z@ \raggedright \normalfont
+   %\Huge\bfseries \thechapter. #1
+   %\par\nobreak
+   %\vskip 20\p@
+%}}
+%\def\@makeschapterhead#1{
+  %{\parindent \z@ \raggedright \normalfont
+   %\Huge\bfseries #1
+   %\par\nobreak
+   %\vskip 20\p@
+%}}
+%\makeatother
 
 % This macro defines a chapter, which is not numbered, but is included
 % in the table of contents.
@@ -30,6 +30,7 @@
 
 % Draw black "slugs" whenever a line overflows, so that we can spot it easily.
 \overfullrule=1mm
+\setlength{\emergencystretch}{2em}
 
 %%% Macros for definitions, theorems, claims, examples, ... (requires amsthm package)
 
