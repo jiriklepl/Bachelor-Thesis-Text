@@ -1,0 +1,31 @@
+{
+	"folders": [
+		{
+			"path": "./"
+		}
+	],
+	"settings": {
+        "bookmarks.saveBookmarksInProject": true,
+        "files.trimTrailingWhitespace": true,
+		"files.insertFinalNewline": true,
+		"todo-tree.regex.regex": "((//|--|#|<!--|;|/\\*|^|%)\\s*($TAGS)|^\\s*- \\[ \\])",
+		"todo-tree.general.tags": [
+			"BUG",
+			"HACK",
+			"FIXME",
+			"TODO",
+			"TIP",
+			"XXX"
+		],
+		"cSpell.words": [
+			"Hindley",
+			"Milner"
+		],
+	},
+    "extensions": {
+        "recommendations": [
+            "alefragnani.Bookmarks",
+            "Gruntfuggly.todo-tree"
+        ]
+	}
+}
