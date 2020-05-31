@@ -1,0 +1,33 @@
+\chapter{Functional programming with types}
+
+\xxx{O cem je funkcionalni programovani (vypocet je modelovanej substituci, diky tomu se v tom substitucni veci delaj skvele)}
+
+\section{Simply-typed lambda calculus}
+
+In this thesis we will use lambda calculus as described in Introduction to Lambda Calculus.  % TODO: insert something
+
+Lambda calculus is formally described as:
+
+variable = v | variable'
+term = variable | '(' term term ')' |  '(\' variable term ')'
+
+It is a simple language in which we can formally describe any computational problem
+
+
+\section{Hindley-Milner polymorphism}
+
+Pure HM system allows for finding the principal (most general) type of any program, however
+the pure HM system doesn't allow us to type the '*' multiplication function if it is used both
+in context where it operates over integers and over reals (as described in PTSFFPWOAS). % FIXME: fix this
+
+
+\section{Overloading with type classes}
+
+
+\xxx{zhruba popsat jak to vysvihnul \citet{jones1999typing}.}
+
+\xxx{test normalni citace: \cite{jones1999typing}.}
+
+\section{Haskell type system}
+
+\xxx{Teoretickej skok do budoucnosti --- mirnej review o tom jak se to ve skutecnosti dela v haskelu. Treba ukazat ze MPTCs jsou nerozhodnutelny protoze umej simulovat prolog.}
