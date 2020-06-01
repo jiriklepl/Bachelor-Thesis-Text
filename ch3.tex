@@ -20,7 +20,7 @@ through a list of items to do some action on them.
 Polytyped structures can mainly serve as generic containers.
 One example of this being % TODO: give an example
 
-Typeclasses together with polytyped functions allow us to give different
+Type-classes together with polytyped functions allow us to give different
 implementations to some functions depending on their parameters or return
 types, this is especially useful in situations where the same implementation
 for different data could lead to some slow-down or it could be even
@@ -54,13 +54,31 @@ statically expressed in HM type system in any sensible way.
 \section{Monomorphization}
 
 Monomorphization of functions is solved by recursive instantiation of symbols used in bodies of functions
-starting from monotype functions. Same applies to types and structures because in C types are not just
-annotations of functions, but also they have physical meaning.
+starting from monotype functions.
+
+Same applies to structures.
+
+We will describe the process only on functions, but the principles of it carry to structures as well.
+
+We start with monotype functions as we can already determine their monomorphic type. We replace all polymorphic
+symbols in their definitions with unique symbols (distinct even if the original symbol was the same) with each
+assigned a new unique type variable. We run the inference algorithm on this rewritten definition and then if
+we successfully determined each monotype (for example we cannot if we have a type variable `a` in the declaration `a x;`
+and `a' is never used again) we instantiate each of the original symbols given the new inferred type (unless we have done already).
 
 \subsection{Overloading resolution}
 
+Overloading is resolved by remembering which symbols belong to methods (or type families), then we look with which type of an
+instance it can unify to determine which definition of the function (structure) we want to instantiate.
+
 \subsection{Recursion limits}
-\xxx{Jak se zabrani zacykleni monomorfizace?} % C++: list<list<list<list<....>>>>
+
+It is indeterminable whether instantiation of something continues forever. We can prove this using post correspondence problem % FIXME: prove it
+
+So there is a limit of type depth set to 500 (this limit shouldn't affect any sensible program).
+% FIXME: Changing this limit is possible by adding an option --type-depth=N to the compiler (it can be also used to make stricter constraint as well).
+If some type exceeds this limit, an compilation error will be outputted stating what the compiler was instantiating
+at that time.
 
 \subsection{Comparison to C++ template instantiation}
 

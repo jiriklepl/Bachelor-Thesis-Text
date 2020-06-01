@@ -17,16 +17,42 @@ Then we can implement its methods as follows:
 <a : b ~ struct List : <a> >
 void push(b *head, a value)
 {
-    b *item = new(sizeof(b));
+    b *item = new(b); // new(b) is an stl function behaving as malloc(sizeof(b))
+    item->value = value;
+    item->next = head;
+    return item;
 }
 
-\section{Example: Operator overloading}
-\xxx{pokud nevyjdou operatory, dat neco jinyho}
+void pull(b *head)
+{
+    b *next = head->next;
+    delete(head);
+    return next;
+}
+
+In C we could create a similar structure using <queue.h>'s standardized SLIST_... macros.
+This requires us to create each list type instance separately which is easy to forget
+and in invocations of its functions it requires use of macros taking for example the name of the field that
+contains the next entry or the type of the entries in the list (on top of obvious parameters like the head).
 
 \section{Future work}
 
+If this project proves itself, the future work has to include extending the stl library and also
+it should implement a compiler which wouldn't rely on gcc and C.
+
+The project also needs extend its support on all C types, there are only some of them (the main ones)
+supported currently.
+
 \subsection{Better support for record fields}
-\xxx{Ukazat jak to udelat spravne}
+
+The current specification of a record field of two different structures in CHM is that if they share name, they have to share the type as well
+(which can be ambiguous).
+
+In the future the specification for the polymorphic fields should be that their types reflect their dependencies on the type
+parameters of the struct which they are fields of in the exact same order (counted from the back) to each other and for all possible types of those parameters they
+still share the type.
+
+There should be a compiler option that would forbid fields from sharing their names completely and another that would just trigger a warning.
 
 \subsection{Data type specializations}
 \xxx{Ukazat ze v haskelu se to dela typovejma funkcema aka type families}
