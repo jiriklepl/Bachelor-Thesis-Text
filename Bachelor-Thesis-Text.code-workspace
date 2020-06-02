@@ -19,7 +19,10 @@
 		],
 		"cSpell.words": [
 			"Hindley",
-			"Milner"
+			"Milner",
+			"Monomorphization",
+			"malloc",
+			"struct"
 		],
 	},
     "extensions": {
