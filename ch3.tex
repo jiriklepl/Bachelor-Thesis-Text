@@ -37,6 +37,15 @@ amount of pre/post-processing of the code.
 
 \subsection{Typeclass preprocessing}
 
+All typeclasses are just language construct, they are not manifested in the resulting code and thus they
+count as a zero abstraction feature. There are some built-in typeclasses, % TODO
+implicit typeclasses for each field of a structure (and a union) and then user=defined typeclasses.
+
+Definitions of user-defined typeclasses are stored in the compiler as lists their methods are not important
+for type-checking. All methods defined in type classes are replaced by functions with a constraint on the type
+parameter of the typeclass. Then in instantiation the compiler checks whether they are methods and acts accordingly,
+replacing them with the correct specialization, if indeed they are methods.
+
 \subsection{Record fields}
 
 Implementing support for record fields was difficult as in functional programming the way
