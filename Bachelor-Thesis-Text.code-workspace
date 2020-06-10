@@ -24,6 +24,9 @@
 			"malloc",
 			"struct"
 		],
+		"latex-workshop.latex.autoBuild.run": "never",
+		"latex-workshop.latex.autoBuild.cleanAndRetry.enabled": false,
+		"latex-workshop.latex.build.forceRecipeUsage": false
 	},
     "extensions": {
         "recommendations": [
