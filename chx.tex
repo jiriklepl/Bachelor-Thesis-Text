@@ -1,9 +1,12 @@
+\chapter{XXX}
+
 \section{CHM specification}
 
 \subsection{CHM headers}
 
 Polymorphic functions and structures are constructed using special annotations (called CHM headers) following grammar:
 
+\begin{lstlisting}
 chm_head := '<' new_typevar_list '>' | '<' new_typevar_list ':' constraint_list '>'| '<' constraint_list '>'
 
 new_typevar_list := new_typevar | new_typevar_list ',' new_typevar
@@ -16,13 +19,14 @@ unification := IDENT '~' type
 
 predicate := CLASS '<' type_list '>'
 type_list := DECLARATION | type_list ',' DECLARATION
+\end{lstlisting}
 
 This is a simplified version of a piece of the actual grammar used in the implementation,
 where we used all-caps for tokens that are not local to the scope of chm heads: `IDENT' means a new variable,
 `CLASS' is a name of a type-class, % TODO: link
 `DECLARATION' is as described in the C standard.
 
-token new_typevar syntactically behaves as defining a new typedef.
+token \lstinline{new_typevar} syntactically behaves as defining a new typedef.
 
 A unification provides a way of creating a type alias akin to typedefs (syntactically equal) with the benefit of being local to the definition
 it precedes, but without creating an actual typedef which would interfere with any following code.
@@ -33,7 +37,7 @@ The other addition CHM brings to C are classes.
 
 They are defined (simplified version) as follows:
 
-class := 'class' IDENT chm_head '{' EXT_DECLARATIONS '}'
-instance := 'instance' IDENT '<' type_list '>' '{' EXT_DECLARATIONS '}'
-
-
+\begin{lstlisting}
+    class := 'class' IDENT chm_head '{' EXT_DECLARATIONS '}'
+    instance := 'instance' IDENT '<' type_list '>' '{' EXT_DECLARATIONS '}'
+\end{lstlisting}

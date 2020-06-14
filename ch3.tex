@@ -97,6 +97,7 @@ non-matching types.
 
 One example of this would be:
 
+\begin{lstlisting}
 template<typename>
 struct function_type;
 
@@ -120,6 +121,7 @@ int function<int*>(int *value) { return *value; }
 
 template<>
 int *function<int**>(int value) { return &value; }
+\end{lstlisting}
 
 C++ allows different instances to have the same type signature which can make any type inference or type deduction
 impossible.
@@ -141,7 +143,7 @@ their CHM counterparts which currently complicates debugging of CHM programs (th
 
 \chapter{Results and discussion}
 
-
+\iffalse
 Instead, try some of the following:
 \begin{itemize}
 \item State a hypothesis and prove it statistically
@@ -183,3 +185,4 @@ Separate discussion sections are common in life sciences where ambiguity is comm
 \end{itemize}
 
 If you do not know the answers, you may want to ask the supervisor. Also, do not worry if the discussion section is half-empty or completely pointless; you may remove it completely without much consequence. It is just a bachelor thesis, not a world-saving avenger thesis.
+\fi

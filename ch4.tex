@@ -5,6 +5,7 @@
 
 Polymorphic lists can be implemented as follows:
 
+\begin{lstlisting}
 <a : b ~ struct List : <a> >
 struct List
 {
@@ -30,8 +31,9 @@ b *pull(b *head)
     delete(head);
     return next;
 }
+\end{lstlisting}
 
-In C we could create a similar structure using <queue.h>'s standardized SLIST_... macros.
+In C we could create a similar structure using \lstinline{<queue.h>}'s standardized \lstinline{SLIST_...} macros.
 This requires us to create each list type instance separately which is easy to forget
 and in invocations of its functions it requires use of macros taking for example the name of the field that
 contains the next entry or the type of the entries in the list (on top of obvious parameters like the head).
@@ -48,7 +50,7 @@ supported currently.
 
 The current specification of a record field of two different structures in CHM is that if they share name, they shall share the type as well
 (which can be ambiguous). The compiler then creates an implicit class having specializations for each structure containing the field
-named `Has_<field>' which states it is possible to access `<field>' on this structure.
+named \lstinline{Has_<field>} which states it is possible to access `<field>' on this structure.
 
 In the future the specification for the polymorphic fields should be that their types reflect their dependencies on the type
 parameters of the struct which they are fields of in the exact same order (counted from the back) to each other and for all possible types of those parameters they
@@ -58,7 +60,7 @@ There should be a compiler option that would forbid fields from sharing their na
 
 Then another sharing of names of fields should be defining fields in type family definitions, where all specializations would
 have these fields without any warning or error even under the effect of the option stated above. Different specializations would
-then still be able to add their own field on top of the shared ones. The implicit `Has_<field>' class would apply here as well.
+then still be able to add their own field on top of the shared ones. The implicit \lstinline{Has_<field>} class would apply here as well.
 
 \subsection{Modules}
 
