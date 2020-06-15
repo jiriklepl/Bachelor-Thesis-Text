@@ -4,18 +4,57 @@
 
 \section{Simply-typed lambda calculus}
 
-Describing lambda calculus is important in both the context of type inference and
+Describing lambda calculus is important in both the context of type inference and in the context of (functional)
+programming as a whole.
 
 In this thesis we will use lambda calculus as described in Introduction to Lambda Calculus.  % TODO: insert something
 
 Lambda calculus is formally described as:
 
 $
-    variable = v | variable' \\
-    term = variable | '(' term term ')' |  '(\lambda' variable term ')'
+    variable ::= 'v' | variable ''' \\
+    \lambda-term ::= variable | '(' \lambda-term \lambda-term ')' |  '(\lambda' variable \lambda-term ')'
 $
 
-It is a simple language in which we can formally describe any computational problem
+It is a simple language in which we can formally describe any computational problem.
+
+Choosing lambda calculus, or its derivatives might seem counterintuitive at first, because it
+is not very efficient in expressing imperative ideas like mutability for example, but for
+purposes of type inference we don't need to know the actual meaning of the code (like for example
+if a loop stops), we can just limit ourselves to modelling type dependencies in the program and
+everything on top of that is just for human readability, debugging purposes, demonstration and
+primarily for possible extension.
+
+Lambda calculus can quite easily model any C program, but one has to be careful at distinguishing
+between initialization and assignment as initialization creates binding (in lambda calculus expressed
+as substitution for a bound variable in an abstraction) and assignment is a function that takes two
+expressions of the same type and returns the first (here we demonstrate that we don't need to
+model the whole behavior of the program, because copying of the value doesn't have any effect on
+the types of the arguments).
+
+Here we will use $\lambda_C$ to denote transformation from C to lambda calculus,
+this transformation can be actually done in a multiple of ways, but in this thesis we will use one that tries to
+reflect the structure of the original code as closely as possible.
+
+Models of some C constructs can be as follows (grammar taken from ): % TODO: http://www.quut.com/c/ANSI-C-grammar-y.html
+
+$
+    \lambda_C\left(additive\_expression '+' multiplicative\_expression\right) = \\
+    plus_C (\lambda_C additive\_expression) (\lambda_C multiplicative\_expression)
+$
+
+This example demonstrates the most simple case where  where we can model the C construct "one to one",
+but there are more tricky examples like the following one:
+
+$
+    \lambda_C\left(declaration\_specifiers IDENTIFIER '=' initializer\right) = \\
+    (\lambda IDENTIFIER : \lambda_C(declaration\_specifiers) .\ \dots) (\lambda_C initializer)
+$
+
+Initialization creates binding (as stated before) so we have to model that by creating a new abstraction and put the whole
+part of the function's body that follows inside this abstraction (this in effect means that all the return values of these nested functions
+and of the function which contains them will share the same type), a similar thing are switch statements where the switch "call" can be modeled
+as an initialization to an anonymous variable and the single case statements as assignments to this variable.
 
 
 \section{Hindley-Milner polymorphism}
