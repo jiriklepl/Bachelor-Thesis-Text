@@ -40,6 +40,10 @@ This approach also requires explicit mention of the instance in the correspondin
 For example in this case we would clear the structure by calling
 \lstinline{void kh_clear_<name>(const kh_<name>_t *h);}
 
+Another example where polymorphism would be of a big benefit is glib's % https://github.com/GNOME/glib/tree/master
+\lstinline{g_slice_new0} which has to be called giving it the target type explicitly and it just
+allocates an char array of the size of the given type initialized with zeros.
+
 % TIP: like queue.h?
 
 But one of the biggest problems with the lack of generic features is the lack of type-checking

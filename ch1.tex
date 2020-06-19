@@ -59,14 +59,45 @@ as an initialization to an anonymous variable and the single case statements as 
 
 \section{Hindley-Milner polymorphism}
 
-Pure HM system allows for finding the principal (most general) type of any program, however
-the pure HM system doesn't allow us to type the '*' multiplication function if it is used both
-in context where it operates over integers and over reals (as described in PTSFFPWOAS). % FIXME: fix this
+(As described in PTSfPwOaS).
+Pure HM allows for just parametric polymorphism without any ad-hoc polymorphism
+or subtyping, this means there is one principal type for every symbol in the program and it has just one definition, this is useful in cases
+where an algorithm works on any types of its algorithms, good example of that would be swapping the values of two pointers (this algorithm cannot
+take advantage of knowing the exact type unless we take into consideration some really nontraditional architectures).
 
+We will then break this one
+rule by introducing type classes and type families, two ideas with the same basis where we put constraints on types and we can
+create non-overlapping instances for them, or we can put these constraints on a regular symbol to denote that the algorithm either works only on
+some types or doesn't make sense on others, this is especially useful in static analysis of the code.
+
+Other solutions of this are overloading and subtyping, but the type inference of the most common form of overloading is undecidable
+as described by, so overloading wouldn't be a good solution in our case. % TODO: NP overload
+
+It also contradicts the idea of parametric polymorphism used in this thesis, where every implementation of an function can be
+described as a proof of a special case of a theorem described by the principal type of the function and this type is therefore
+valid for all its implementations.
+
+Subtyping % TODO: finish this
 
 \section{Overloading with type classes}
 
+Type classes, as stated above, are good for stating an algorithm makes sense only for some types or that it requires a different implementation for
+different types, usually to enhance performance by writing specialized algorithms for common or critical types instead of writing a general slow algorithm,
+this was the main motivation behind developing those, % TODO
+viz different physical instructions for comparing common numeric values.
 
+Usefulness of classes can be shown on `Ord', this constraints requires that two variables of type $\alpha$ s.t. $Ord(\alpha)$, we can say `$\alpha$ is (in) Ord'.
+But not everything can be partially ordered, take directed graphs, for example, where the reachability of one vertex from another is in `Ord' only
+if the graph is a directed acyclic graph, in which case we can use algorithms expecting `Ord' on problems concerning reachability, but not otherwise.
+
+`Ord' can also show how we could want different instances for different types.
+Let's say `Ord' has one method $<=$ of type $a -> a -> Bool$ with the expected behavior. % TODO: explain a method
+
+For two `Int's we just compare them and return whether the first is lower than the other,
+but if we have, let's say `Customer's, with different Id numbers as keys in some map (or dictionary) then we don't need to compare whole customers,
+but just their Ids.
+
+method: a function which is defined inside a class and is expected to be instantiated alongside the class. % TODO
 
 \xxx{zhruba popsat jak to vysvihnul \citet{jones1999typing}.}
 
