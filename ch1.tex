@@ -1,9 +1,5 @@
 \chapter{Functional programming with types}
 
-\xxx{O cem je funkcionalni programovani (vypocet je modelovanej substituci, diky tomu se v tom substitucni veci delaj skvele)}
-
-\section{Simply-typed lambda calculus}
-
 Describing lambda calculus is important in both the context of type inference and in the context of (functional)
 programming as a whole.
 
@@ -15,6 +11,8 @@ $
     variable ::= 'v' | variable ''' \\
     \lambda-term ::= variable | '(' \lambda-term \lambda-term ')' |  '(\lambda' variable \lambda-term ')'
 $
+
+% TODO: insert rules
 
 It is a simple language in which we can formally describe any computational problem.
 
@@ -56,6 +54,81 @@ part of the function's body that follows inside this abstraction (this in effect
 and of the function which contains them will share the same type), a similar thing are switch statements where the switch "call" can be modeled
 as an initialization to an anonymous variable and the single case statements as assignments to this variable.
 
+\section{Simply-typed lambda calculus}
+
+Just lambda calculus wouldn't be good enough for modeling type inference of the proposed language (We will call it CHM from now on).
+% TODO: clean up this "from now on", it should be in the very top
+So we need to introduce typed lambda calculi.
+
+Simply-typed lambda calculus, described by Church, is one of the first % TODO: the very first? also: add some more info on church
+lambda calculi with type system. Typing of lambda terms helps checking the validity of the program, protecting us from writing
+programs that make little sense like for example adding amperes and volts % TODO: intro to lambda
+and also it makes it easier to think about the program in the bigger picture giving us information about usage of the typed entities
+in some code, typing $f : \alpha \rightarrow \alpha \rightarrow \alpha$, for example, tells us that $f$ is a function taking two arguments
+of some type and returning a value of the same type and from that alone we can assume that applying two parameters of the same type on it
+should be well-defined.
+
+% TODO: add the stuff about variables and syntax and sh like that, also the ,\-> name and stuff, also typing
+
+\subsection{Simply-typed lambda calculus deriving rules}
+
+Simply-typed lambda calculus uses the following rules:
+
+variable: $
+\dfrac{x : \tau \in \Gamma}{\Gamma \vdash x : \tau}
+$
+
+application: $
+\dfrac{\Gamma \vdash e : \sigma \rightarrow \tau \  \Gamma \vdash x : \sigma}{\Gamma \vdash e x : \tau}
+$
+
+abstraction: $
+\dfrac{\Gamma, x : \sigma \vdash e : \tau}{\Gamma \vdash \lambda x . e : \sigma \rightarrow \tau}
+$
+
+We call $\gamma$ either a basis, a context, or a set of assumptions. These names describe pretty well its meaning, in simply-typed lambda calculus it
+is a set of typings we derive the rest of typings from.
+
+The syntax of the rules describes step-by-step derivation of types where the bottom one follows the top one.
+
+% TODO: check it
+Example for $\lambda x . x$:
+
+\begin{listing}
+    \item $\{\} \vdash \lambda x . x : ?$
+    \item $\{x : \tau\} \vdash x : \tau$ (var)
+    \item $\{\} \vdash \lambda x . x : \tau \rightarrow \tau$ (abstraction) from (2), this solves (1)
+\end{listing}
+
+Notice here the context changes during the derivation process, so we can give typing to $\lambda\rightarrow$ terms without any context
+and they can have different typings in different contexts, also one term can have multiple possible typings.
+
+% TODO: maybe say something about church vs curry style and also unification and stuff
+
+\subsection{principal typing}
+
+Every typeable term $e$ in simply-typed lambda calculus has principal type $\tau$ which is computable from $e$ and every other typing
+$e : \sigma$ in the same context is a result of some type substitution $[\overline{\pi} := \overline{\pi}]$, this will be very important
+later when we introduce more advanced type systems as principal type of $e$ is the only information about $e$ we have to consider
+when we see $e$ again as a subterm of some term $e'$ to check $e'$' typability (for typability see below). % TODO: elaborate / provide source
+
+We can think of it as that the principal typing of $e$ is a typing general enough to be substitutable into all other possible typings of $e$
+but not general enough to be substitutable into any impossible typings, this is usually simplified into "the most general type of $e$". % TODO: language and style
+
+The example just above % TODO: maybe use fig notation
+is great fit for showing this as for example $\lambda x . x : \sigma$ would be a possible typing, but not a principal one, because
+$\alpha \rightarrow \alpha \rightarrow \alpha$ would give use $\alpha ~ \alpha \rightarrow \alpha$, which would give us an incomputable
+infinite type % TODO: ask Mirek maybe, I'm not exactly sure about this one
+
+\subsection{Type checking, typability and type inference}
+
+Type checking is the process of validating whether a term can have a given type
+whereas typability is whether the term can be given some type.
+
+Type inference is closely related to typability but has an additional requirement of giving an actual type for the term, and furthermore
+usually what we are interested in is the principal type.
+
+\section{F systems and stuff} % TODO: TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
 
 \section{Hindley-Milner polymorphism}
 
