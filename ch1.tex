@@ -3,16 +3,13 @@
 Describing lambda calculus is important in both the context of type inference and in the context of (functional)
 programming as a whole.
 
-In this thesis we will use lambda calculus as described in Introduction to Lambda Calculus.  % TODO: insert something
+In this thesis we will use lambda calculus as described in Introduction to Lambda Calculus.  % TODO: insert something ABOUT LC
 
 Lambda calculus is formally described as:
 
-$
-    variable ::= 'v' | variable ''' \\
-    \lambda-term ::= variable | '(' \lambda-term \lambda-term ')' |  '(\lambda' variable \lambda-term ')'
-$
+$variable ::= 'v' | variable ''' \\ \lambda\mbox{-}term ::= variable | '(' \lambda\mbox{-}term\ \lambda\mbox{-}term ')' |  '(\lambda' variable\ \lambda\mbox{-}term ')'$
 
-% TODO: insert rules
+% TODO: insert rules for LC
 
 It is a simple language in which we can formally describe any computational problem.
 
@@ -36,18 +33,12 @@ reflect the structure of the original code as closely as possible.
 
 Models of some C constructs can be as follows (grammar taken from ): % TODO: http://www.quut.com/c/ANSI-C-grammar-y.html
 
-$
-    \lambda_C\left(additive\_expression '+' multiplicative\_expression\right) = \\
-    plus_C (\lambda_C additive\_expression) (\lambda_C multiplicative\_expression)
-$
+$\lambda_C\left(additive\_expression '+' multiplicative\_expression\right) = \\ plus_C (\lambda_C additive\_expression) (\lambda_C multiplicative\_expression)$
 
 This example demonstrates the most simple case where  where we can model the C construct "one to one",
 but there are more tricky examples like the following one:
 
-$
-    \lambda_C\left(declaration\_specifiers IDENTIFIER '=' initializer\right) = \\
-    (\lambda IDENTIFIER : \lambda_C(declaration\_specifiers) .\ \dots) (\lambda_C initializer)
-$
+$\lambda_C\left(declaration\_specifiers IDENTIFIER '=' initializer\right) = \\ (\lambda IDENTIFIER : \lambda_C(declaration\_specifiers) .\ \dots) (\lambda_C initializer)$
 
 Initialization creates binding (as stated before) so we have to model that by creating a new abstraction and put the whole
 part of the function's body that follows inside this abstraction (this in effect means that all the return values of these nested functions
@@ -74,17 +65,14 @@ should be well-defined.
 
 Simply-typed lambda calculus uses the following rules:
 
-variable: $
-\dfrac{x : \tau \in \Gamma}{\Gamma \vdash x : \tau}
-$
+variable:
+$\dfrac{x : \tau \in \Gamma}{\Gamma \vdash x : \tau}$
 
-application: $
-\dfrac{\Gamma \vdash e : \sigma \rightarrow \tau \  \Gamma \vdash x : \sigma}{\Gamma \vdash e x : \tau}
-$
+application:
+$\dfrac{\Gamma \vdash e : \sigma \rightarrow \tau \  \Gamma \vdash x : \sigma}{\Gamma \vdash e x : \tau}$
 
-abstraction: $
-\dfrac{\Gamma, x : \sigma \vdash e : \tau}{\Gamma \vdash \lambda x . e : \sigma \rightarrow \tau}
-$
+abstraction:
+$\dfrac{\Gamma, x : \sigma \vdash e : \tau}{\Gamma \vdash \lambda x . e : \sigma \rightarrow \tau}$
 
 We call $\gamma$ either a basis, a context, or a set of assumptions. These names describe pretty well its meaning, in simply-typed lambda calculus it
 is a set of typings we derive the rest of typings from.
@@ -92,7 +80,7 @@ is a set of typings we derive the rest of typings from.
 The syntax of the rules describes step-by-step derivation of types where the bottom one follows the top one.
 
 % TODO: check it
-Example for $\lambda x . x$:
+Example for $id = \lambda x . x$:
 
 \begin{listing}
     \item $\{\} \vdash \lambda x . x : ?$
@@ -105,20 +93,30 @@ and they can have different typings in different contexts, also one term can hav
 
 % TODO: maybe say something about church vs curry style and also unification and stuff
 
+One thing that is a problem for the simply-typed lambda calculus is that it is not turing complete, % TODO: reference a paper that says so
+because it is strongly normalizing and thus the type inference would have to solve the halting problem,
+this problem will be answered by the following type systems.
+
 \subsection{principal typing}
 
 Every typeable term $e$ in simply-typed lambda calculus has principal type $\tau$ which is computable from $e$ and every other typing
-$e : \sigma$ in the same context is a result of some type substitution $[\overline{\pi} := \overline{\pi}]$, this will be very important
+$e : \sigma$ in the same context is a result of some type substitution $[\overline{\alpha} := \overline{\pi}]$, here we use the overlined symbols
+as an shortcut for many atomic substitutions $[\alpha := \pi]$, where $\pi$ is a type and $\alpha$ an type variable, this will be very important
 later when we introduce more advanced type systems as principal type of $e$ is the only information about $e$ we have to consider
-when we see $e$ again as a subterm of some term $e'$ to check $e'$' typability (for typability see below). % TODO: elaborate / provide source
+when we see $e$ again as a subterm of some term $e'$ to check $e'$' typability (for typability see below). % TODO: elaborate / provide source, check and correct
 
 We can think of it as that the principal typing of $e$ is a typing general enough to be substitutable into all other possible typings of $e$
 but not general enough to be substitutable into any impossible typings, this is usually simplified into "the most general type of $e$". % TODO: language and style
 
 The example just above % TODO: maybe use fig notation
 is great fit for showing this as for example $\lambda x . x : \sigma$ would be a possible typing, but not a principal one, because
-$\alpha \rightarrow \alpha \rightarrow \alpha$ would give use $\alpha ~ \alpha \rightarrow \alpha$, which would give us an incomputable
-infinite type % TODO: ask Mirek maybe, I'm not exactly sure about this one
+$\alpha \rightarrow \alpha \rightarrow \alpha$ would give use $\alpha \sim \alpha \rightarrow \alpha$, which would give us an incomputable
+infinite type.
+
+\subsubsection{type instances}
+
+We will call a type $\tau$ an instance of a type $\sigma$ if there is a type substitution $[\overline{\alpha} := \overline{\pi}]$
+that transforms $\sigma$ into $\tau$ % TODO: do some editing
 
 \subsection{Type checking, typability and type inference}
 
@@ -128,7 +126,44 @@ whereas typability is whether the term can be given some type.
 Type inference is closely related to typability but has an additional requirement of giving an actual type for the term, and furthermore
 usually what we are interested in is the principal type.
 
-\section{F systems and stuff} % TODO: TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+Both type checking and typability of the simply-typed lambda calculus is decidable and its type inference is computable. % TODO: add reference, check wording
+
+\section{F systems and parametric polymorphism} % TODO: TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+
+% TODO: add reference or I don't know
+System F, polymorphic lambda calculus, or second-order lambda calculus (from the idea of quantifying types) introduces
+parametric polymorphism into the lambda calculus. Here we can reuse the example of $id = \lambda x . x$ which can have many typings
+$id : \tau \rightarrow \tau$ which we can state by:
+
+$id : \forall \alpha . \alpha \rightarrow \alpha$
+
+We call terms like $id$ beginning with $\forall$ \textbf{polymorphic} (opposed by \textbf{monomorphic}).
+
+System F uses the rules of the simply-typed lambda calculus, plus the following:
+
+\begin{itemize}
+    \item[$\forall$-elimination] $\dfrac{\Gamma \vdash e : \forall \alpha . \sigma}{\Gamma \vdash e : \sigma [\alpha := \tau]}$
+    \item[$\forall$-introduction] $\dfrac{\Gamma \vdash e : \sigma}{\Gamma \vdash e : \forall \alpha . \sigma}$
+\end{itemize}
+
+In (2) $\alpha$ is not free in any any assumptions on which the premise $e : \sigma$ depends. % TODO: introduce the terms judgement, premise, assumption
+
+System F is still strongly normalizing and thus not turing complete. % TODO: consider rewriting/scrapping this
+
+In system F the type checking is undecidable and thus any general type inference algorithm is impossible.
+The Hindley-Milner type system is a restriction of it % TODO: elaborate on undecidability of F etc.
+that allows for easy type inference algorithm we will base ours on.
+
+\section{Hindley-Milner type system}
+
+The Hindley-Milner type system, we will refer to it simply as HM, is a fairly minimalistic extension of lambda calculus terms being of a form
+
+$expression ::= variable | expression expression | \lambda variable . expression | let variable = expression in expression$
+
+(It differs from the lambda calculus only in the third clause). Semantics of this clause $let x = e in e'$ are the same as in
+$e'[x := e]$, note that this differs from $(\x . e') e$ where all occurrences of $x$ have the same typing. % TODO: oh gosh
+
+% FIXME: continue from here pleeeeaaaaase
 
 \section{Hindley-Milner polymorphism}
 
@@ -150,7 +185,7 @@ It also contradicts the idea of parametric polymorphism used in this thesis, whe
 described as a proof of a special case of a theorem described by the principal type of the function and this type is therefore
 valid for all its implementations.
 
-Subtyping % TODO: finish this
+Subtyping % TODO: finish this (subtyping)
 
 \section{Overloading with type classes}
 
@@ -177,5 +212,7 @@ method: a function which is defined inside a class and is expected to be instant
 \xxx{test normalni citace: \cite{jones1999typing}.}
 
 \section{Haskell type system}
+
+Haskell uses kind system % TODO: finish this (kind system)
 
 \xxx{Teoretickej skok do budoucnosti --- mirnej review o tom jak se to ve skutecnosti dela v haskelu. Treba ukazat ze MPTCs jsou nerozhodnutelny protoze umej simulovat prolog.}
