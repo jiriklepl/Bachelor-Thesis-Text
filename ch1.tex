@@ -65,11 +65,13 @@ should be well-defined.
 
 Simply-typed lambda calculus uses the following rules:
 
+
+% TODO: consistentize this with other rules...
 variable:
 $\dfrac{x : \tau \in \Gamma}{\Gamma \vdash x : \tau}$
 
 application:
-$\dfrac{\Gamma \vdash e : \sigma \rightarrow \tau \  \Gamma \vdash x : \sigma}{\Gamma \vdash e x : \tau}$
+$\dfrac{\Gamma \vdash e : \sigma \rightarrow \tau \quad \Gamma \vdash e' : \sigma}{\Gamma \vdash e e' : \tau}$
 
 abstraction:
 $\dfrac{\Gamma, x : \sigma \vdash e : \tau}{\Gamma \vdash \lambda x . e : \sigma \rightarrow \tau}$
@@ -113,7 +115,7 @@ is great fit for showing this as for example $\lambda x . x : \sigma$ would be a
 $\alpha \rightarrow \alpha \rightarrow \alpha$ would give use $\alpha \sim \alpha \rightarrow \alpha$, which would give us an incomputable
 infinite type.
 
-\subsubsection{type instances}
+\subsubsection{Type Instantiation}
 
 We will call a type $\tau$ an instance of a type $\sigma$ if there is a type substitution $[\overline{\alpha} := \overline{\pi}]$
 that transforms $\sigma$ into $\tau$ % TODO: do some editing
@@ -154,16 +156,72 @@ In system F the type checking is undecidable and thus any general type inference
 The Hindley-Milner type system is a restriction of it % TODO: elaborate on undecidability of F etc.
 that allows for easy type inference algorithm we will base ours on.
 
-\section{Hindley-Milner type system}
+\section{Hindley-Milner Type System}
 
-The Hindley-Milner type system, we will refer to it simply as HM, is a fairly minimalistic extension of lambda calculus terms being of a form
+The Hindley-Milner type system, we will refer to it simply as HM, is a fairly minimalistic extension of lambda calculus, or at least syntactically, however semantically it could be seen rather as a restriction of the system F which answers the undecidability of it, see the subsection Type Schemes. % TODO: doesn't have a good sound to it
 
-$expression ::= variable | expression expression | \lambda variable . expression | let variable = expression in expression$
+Terms in HM have the form:
 
-(It differs from the lambda calculus only in the third clause). Semantics of this clause $let x = e in e'$ are the same as in
-$e'[x := e]$, note that this differs from $(\x . e') e$ where all occurrences of $x$ have the same typing. % TODO: oh gosh
+$e ::= x | e e' | \lambda x . e | \text{let } x = e \text{ in } e'$
 
-% FIXME: continue from here pleeeeaaaaase
+(where $x$ stands for a variable, and $e, e'$ for expressions)
+
+It differs from the syntax of lambda calculus (and that of the system F) only in the addition of the third clause, called the let statement. Meaning of this clause is the same as of $e'[x := e]$, note that this differs from a very similar construct $(\x . e') e$ using abstraction instead of let in that $x$ in this latter construct cannot be polymorphic, see the next two subsections, this connects to the addition of type schemes and restriction of types, both explained later. % TODO: yeah, clarify it a little bit maybe, use shorter sentences?
+
+Then there are two additional expressions completing the language that have no significance in the type system: % TODO: wording pls
+
+$e ::= \cdots | \text{fix } x . e | \text{if } e \text{ then } e' \text{ else } e''$
+($x$ again for a variable, and $e, e', e''$ for some expression)
+
+The latter clause with the expected meaning, and the former being defined as the least fixed point of $\lambda x . expression$. % TODO: explain, also Milner 78
+
+\subsection{Type Schemes}
+
+We will later introduce inference rules very similar to those of the system F with some additions, which wouldn't sound that good (as general inference for the system F is impossible), however we first introduce a strict restriction on type quantification.
+
+That restriction will be removing quantification from types and adding type schemes which replace types in assumption.
+
+Type schemes are defined just like types in the system F. This restriction means just that the type quantification, if there is any, is always at the very front of the type scheme.
+
+Formal definition is given as follows:
+
+$\tau ::= \alpha | \iota | \tau \rightarrow \tau$\\
+$\sigma ::= \tau | \forall \alpha \sigma$
+
+(where $\tau$ stands for a type, $\alpha$ a type variable, $\iota$ a primitive type (type constant), and $sigma$ a type scheme). % TODO: maybe add something to this
+
+\subsection{Type instantiation}
+
+Type instantiation differs from that of system F slightly as well as explained  by... % TODO: Damas and Milner
+
+A notable change being an addition of an \textbf{generic instance} of a type scheme $\sigma = \forall \alpha_1, \alpha_2 \cdots \alpha_n . \tau$ which is defined as $\sigma' = \forall \beta_1, \beta_2 \cdots \beta_m . \tau'$ such that
+$\tau' = \tau S$ for some type substitution $S = [\alpha_1 := \tau_1, \cdots \alpha_n := \tau_n]$.
+
+Note that... % FIXME: Damas and Milner use different order for substitution, but we use one which is reverse to them so we are at least a little bit more consistent.
+
+\subsection{Inference Rules}
+
+% TODO: instantiation
+\begin{itemize}
+    \item[variable] $\dfrac{}{\Gamma \vdash x : \sigma}\tiny{(x : \sigma \in \Gamma)}$
+    \item[instantiation] $\dfrac{\Gamma \vdash e : \sigma}{\Gamma \vdash e : \sigma'}\tiny{(\sigma > \sigma')}$
+    \item[generalization] $\dfrac{\Gamma \vdash e : \sigma}{\Gamma \vdash e : \forall \alpha . \sigma}\tiny{(\alpha \text{ not free in }\Gamma)}$
+    \item[I DONT KNOW THE NAME] $\dfrac{\Gamma \vdash e : \tau' \rightarrow \tau \quad \Gamma \vdash e' : \tau' }{\Gamma \vdash e e' : \tau}$ % TODO: what is the name of this rule? It has to be application
+    \item[abstraction] $\dfrac{\Gamma_x \cup \{x : \tau'\} \vdash e : \tau}{\Gamma \vdash \lambda x . e : \tau' \rightarrow \tau}$ % TODO: what is the name of this rule? It has to be application
+    \item[let polymorphism] $\dfrac{\Gamma \vdash e : \sigma \quad \Gamma_x \cup \{x :\sigma\} \vdash e' : \tau}{\Gamma \vdash \text{let } x = e \text{ in } e' : \tau}$
+\end{itemize}
+
+Here $\Gamma$ stands for the context, $\sigma$ stands for a type scheme, $\tau, \tau'$ for some types, $\alpha$ for a type variable, $x$ for a regular variable, and $e, e'$ for expressions.
+
+$\Gamma_x$ stands for the context $\Gamma$ with any assumption about $x$ removed.
+
+The instantiation rule replaces the $\forall$-elimination rule of the system F and apart from that the let polymorphism rule is the only real extension of the rules.
+
+Let polymorphism balances the type restriction introduced before.
+
+\subsection{Type inference}
+
+% FIXME: continue from here
 
 \section{Hindley-Milner polymorphism}
 
