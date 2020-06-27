@@ -8,6 +8,8 @@
         "bookmarks.saveBookmarksInProject": true,
         "files.trimTrailingWhitespace": true,
 		"files.insertFinalNewline": true,
+		"editor.wordWrap": "bounded",
+		"editor.wordWrapColumn": 80,
 		"todo-tree.regex.regex": "((//|--|#|<!--|;|/\\*|^|%)\\s*($TAGS)|^\\s*- \\[ \\])",
 		"todo-tree.general.tags": [
 			"BUG",
