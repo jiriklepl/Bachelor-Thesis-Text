@@ -107,7 +107,7 @@ Every typeable term $e$ in simply-typed lambda calculus has principal type $\tau
 $e : \sigma$ in the same context is a result of some type substitution $[\overline{\alpha} := \overline{\pi}]$, here we use the overlined symbols
 as an shortcut for many atomic substitutions $[\alpha := \pi]$, where $\pi$ is a type and $\alpha$ an type variable, this will be very important
 later when we introduce more advanced type systems as principal type of $e$ is the only information about $e$ we have to consider
-when we see $e$ again as a subterm of some term $e'$ to check $e'$' typability (for typability see below). % TODO: elaborate / provide source, check and correct, be more consistent with sigmas and stuff
+when we see $e$ again as a subterm of some term $e'$ to check $e'$' typeability (for typeability see below). % TODO: elaborate / provide source, check and correct, be more consistent with sigmas and stuff
 
 We can think of it as that the principal typing of $e$ is a typing general enough to be substitutable into all other possible typings of $e$
 but not general enough to be substitutable into any impossible typings, this is usually simplified into "the most general type of $e$". % TODO: language and style
@@ -129,15 +129,15 @@ $\tau_1$ and $\tau_2$ if $\tau_1 S = \tau_2 S$, then we call $S$ their unifier, 
 
 % TODO: maybe `simplify' the name from unifier to just unification
 
-\subsection{Type Checking, Typability and Type Inference}
+\subsection{Type Checking, Typeability and Type Inference}
 
 Type checking is the process of validating whether a term can have a given type
-whereas typability is whether the term can be given some type.
+whereas typeability is whether the term can be given some type.
 
-Type inference is closely related to typability but has an additional requirement of giving an actual type for the term, and furthermore
+Type inference is closely related to typeability but has an additional requirement of giving an actual type for the term, and furthermore
 usually what we are interested in is the principal type.
 
-Both type checking and typability of the simply-typed lambda calculus is decidable and its type inference is computable. % TODO: add reference, check wording
+Both type checking and typeability of the simply-typed lambda calculus is decidable and its type inference is computable. % TODO: add reference, check wording
 
 \section{System F and Parametric Polymorphism} % TODO: TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
 
@@ -177,12 +177,19 @@ $e ::= x | e e' | \lambda x . e | \text{let } x = e \text{ in } e'$
 
 It differs from the syntax of lambda calculus (and that of the system F) only in the addition of the third clause, called the let statement. Meaning of this clause is the same as of $e' [x := e]$, note that this differs from a very similar construct $(\lambda x . e') e$ using abstraction instead of let in that $x$ in this latter construct cannot be polymorphic, see the next two subsections, this connects to the addition of type schemes and restriction of types, both explained later. % TODO: yeah, clarify it a little bit maybe, use shorter sentences?
 
-Then there are two additional expressions completing the language that have no significance in the type system: % TODO: wording pls
+Then there are two additional expressions completing the language that have no significance in the type system and thus we will not further consider them in any of the typing rules, or the inference algorithm. They are defined as follows: % TODO: wording pls
 
 $e ::= \cdots | \text{fix } x . e | \text{if } e \text{ then } e' \text{ else } e''$
 ($x$ again for a variable, and $e, e', e''$ for some expression)
 
-The latter clause with the expected meaning, and the former being defined as the least fixed point of $\lambda x . expression$. % TODO: explain, also Milner 78
+The latter clause with the expected meaning, and the former being defined as the least fixed point of $\lambda x . expression$. Those two clauses can be seen as any other application using the following type schemes:
+
+$\text{fix}: \forall \alpha . ((\alpha \rightarrow \alpha) \rightarrow \alpha)$ \\
+$\text{if}: \forall \alpha . \text{ bool } \rightarrow \alpha \alpha \alpha$
+
+Note that the if clause is completely redundant in this typing system, the church booleans would be sufficient. % TODO: this is weird
+
+% TODO: explain, also Milner 78
 
 \subsection{Type Schemes}
 
@@ -232,8 +239,9 @@ Let polymorphism balances the type restriction introduced before.
 
 \subsection{Type Inference}
 
-% FIXME: continue from here
 We will introduce the algorithm W described by % TODO: Damas
+it produces the principal type scheme for the given program (expression).
+% TODO: maybe expand on it a little bit
 
 \subsubsection{Most General Unification}
 
@@ -256,12 +264,13 @@ We will further require it to use only variables from $\tau$ and $\tau'$
 
 One of the properties of this almost naive algorithm is that it gives the most general unification and it has the desired attribute of unifying only by using the sub-expressions of $\tau, \tau'$.
 
-\subsubsection{The Type assignment algorithm W}
+\subsubsection{The Type Assignment Algorithm W}
 
-% TODO: specify how to call it and what it returns and what it means
+The algorithm W is a function $W$ which takes a pair $(\Gamma, e)$ where $\Gamma$ is a set of assumptions and $e$ is an expression in the context of $\Gamma$. Then $W$ returns a pair $(S, \tau)$ such that:
 
-The algorithm described by % TODO: Damas and Milner
-first requires the definition of a types closure:
+$\Gamma S \vdash e : \tau$ and furthermore $close_{\Gamma S}(\tau)$ is the principal type scheme of $e$ under $\Gamma S$.
+
+Before we describe the algorithm itself, we first need to define the closure of a type $\tau$:
 
 $close_\Gamma(\tau) := \forall \alpha_1, \dots \alpha_n . \tau$
 
@@ -269,25 +278,25 @@ where $\{\alpha_1, \dots \alpha_n\} := free(\tau) \backslash free(\Gamma)$, $fre
 
 The algorithm is described as follows:
 
-
 \begin{enumerate}
     \item If $e$ is a variable and there is an assumption $e : \forall \overline{\alpha} . \tau'$ in $\Gamma$ then $S = \epsilon$ and $\tau = [\overline{\alpha} := \overline{\beta}]$ where $\overline{\beta}$ are new type variables.
-    \item If $e$ matches $e_1 e_2$ then let $(S_1, \tau_1) := W(\Gamma, e_1)$, $(S_2, \tau_2) := W(\Gamma S_1, e_2)$, and $S_3 := mgu (S_2 \tau_1, \tau_2 \rightarrow \beta)$ where $\beta$ is new; then $S := S_1 S_2 S_3$ and $\tau = \beta S_3$
+    \item If $e$ matches $e_1 e_2$ then let $(S_1, \tau_1) := W(\Gamma, e_1)$, $(S_2, \tau_2) := W(\Gamma S_1, e_2)$, and $S_3 := mgu (\tau_1 S_2, \tau_2 \rightarrow \beta)$ where $\beta$ is new; then $S := S_1 S_2 S_3$ and $\tau = \beta S_3$
     \item If $e$ matches $\lambda x . e_1$ then let $\beta$ be new and $(S, \tau_1) := W(\Gamma_x \cup \{x : \beta\}, e_1)$; then $\tau = \beta S \rightarrow \tau_1$
     \item If $e$ matches $\text{let } x = e_1 \text{ in } e_2$ then let $(S_1, \tau_1) := W(\Gamma, e_1)$ and $(S_2, \tau) := W(\Gamma_x S_1 \cup \{close_{\Gamma S_1}(\tau_1)\}, e_2)$; then $S = S_1 S_2$
 \end{enumerate}
 
-% FIXME: continue from here
+If none of the cases holds, the algorithm fails as $e$ is not typeable and the algorithm can determine the reason why it isn't, that for debug purposes in a real program. % TODO: reference some paper at least
 
-\section{Hindley-Milner Polymorphism}
+\subsection{Extensions of the Type System}
 
 (As described in PTSfPwOaS).
 Pure HM allows for just parametric polymorphism without any ad-hoc polymorphism
-or subtyping, this means there is one principal type for every symbol in the program and it has just one definition, this is useful in cases
-where an algorithm works on any types of its algorithms, good example of that would be swapping the values of two pointers (this algorithm cannot
-take advantage of knowing the exact type unless we take into consideration some really nontraditional architectures).
+or subtyping, this means there is only one principal type for every symbol in the program and it has just one definition, this is useful in cases
+where an algorithm (or a function) works on parameters of any types, a good example of that could be the $K$ combinator.
 
-We will then break this one rule by introducing type classes and type families, two ideas with the same basis where we put constraints on types and we can create non-overlapping instances for them, or we can put these constraints on a regular symbol to denote that the algorithm either works only on some types or doesn't make sense on others, this is especially useful in static analysis of the code.
+% FIXME: continue from here
+
+We will break this by introducing type classes and type families, two ideas with the same basis where we put constraints on types and we can create non-overlapping instances for them, or we can put these constraints on a regular symbol to denote that the algorithm either works only on some types or doesn't make sense on others, this is especially useful in static analysis of the code.
 
 Other solutions of this are overloading and subtyping, but the type inference of the most common form of overloading is undecidable
 as described by, so overloading wouldn't be a good solution in our case. % TODO: NP overload
