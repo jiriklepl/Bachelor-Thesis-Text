@@ -11,6 +11,8 @@ $variable ::= 'v' | variable ''' \\ \lambda\mbox{-}term ::= variable | '(' \lamb
 
 % TODO: insert rules for LC
 
+% TODO what is a sub-expression
+
 It is a simple language in which we can formally describe any computational problem.
 
 Choosing lambda calculus, or its derivatives might seem counterintuitive at first, because it
@@ -45,7 +47,7 @@ part of the function's body that follows inside this abstraction (this in effect
 and of the function which contains them will share the same type), a similar thing are switch statements where the switch "call" can be modeled
 as an initialization to an anonymous variable and the single case statements as assignments to this variable.
 
-\section{Simply-typed lambda calculus}
+\section{Simply-Typed Lambda Calculus}
 
 Just lambda calculus wouldn't be good enough for modeling type inference of the proposed language (We will call it CHM from now on).
 % TODO: clean up this "from now on", it should be in the very top
@@ -61,7 +63,7 @@ should be well-defined.
 
 % TODO: add the stuff about variables and syntax and sh like that, also the ,\-> name and stuff, also typing
 
-\subsection{Simply-typed lambda calculus deriving rules}
+\subsection{Simply-Typed Lambda Calculus Deriving Rules}
 
 Simply-typed lambda calculus uses the following rules:
 
@@ -84,11 +86,11 @@ The syntax of the rules describes step-by-step derivation of types where the bot
 % TODO: check it
 Example for $id = \lambda x . x$:
 
-\begin{listing}
+\begin{enumerate}
     \item $\{\} \vdash \lambda x . x : ?$
     \item $\{x : \tau\} \vdash x : \tau$ (var)
     \item $\{\} \vdash \lambda x . x : \tau \rightarrow \tau$ (abstraction) from (2), this solves (1)
-\end{listing}
+\end{enumerate}
 
 Notice here the context changes during the derivation process, so we can give typing to $\lambda\rightarrow$ terms without any context
 and they can have different typings in different contexts, also one term can have multiple possible typings.
@@ -99,13 +101,13 @@ One thing that is a problem for the simply-typed lambda calculus is that it is n
 because it is strongly normalizing and thus the type inference would have to solve the halting problem,
 this problem will be answered by the following type systems.
 
-\subsection{principal typing}
+\subsection{Principal Typing}
 
 Every typeable term $e$ in simply-typed lambda calculus has principal type $\tau$ which is computable from $e$ and every other typing
 $e : \sigma$ in the same context is a result of some type substitution $[\overline{\alpha} := \overline{\pi}]$, here we use the overlined symbols
 as an shortcut for many atomic substitutions $[\alpha := \pi]$, where $\pi$ is a type and $\alpha$ an type variable, this will be very important
 later when we introduce more advanced type systems as principal type of $e$ is the only information about $e$ we have to consider
-when we see $e$ again as a subterm of some term $e'$ to check $e'$' typability (for typability see below). % TODO: elaborate / provide source, check and correct
+when we see $e$ again as a subterm of some term $e'$ to check $e'$' typability (for typability see below). % TODO: elaborate / provide source, check and correct, be more consistent with sigmas and stuff
 
 We can think of it as that the principal typing of $e$ is a typing general enough to be substitutable into all other possible typings of $e$
 but not general enough to be substitutable into any impossible typings, this is usually simplified into "the most general type of $e$". % TODO: language and style
@@ -120,7 +122,14 @@ infinite type.
 We will call a type $\tau$ an instance of a type $\sigma$ if there is a type substitution $[\overline{\alpha} := \overline{\pi}]$
 that transforms $\sigma$ into $\tau$ % TODO: do some editing
 
-\subsection{Type checking, typability and type inference}
+\subsection{Type Unification}
+
+If $\tau_1, \tau_2$ are types and $S$ is a substitution, we say that $S$ unifies
+$\tau_1$ and $\tau_2$ if $\tau_1 S = \tau_2 S$, then we call $S$ their unifier, and we call $\tau_1$ and $\tau_2$ unifiable. % TODO: Robinson
+
+% TODO: maybe `simplify' the name from unifier to just unification
+
+\subsection{Type Checking, Typability and Type Inference}
 
 Type checking is the process of validating whether a term can have a given type
 whereas typability is whether the term can be given some type.
@@ -130,7 +139,7 @@ usually what we are interested in is the principal type.
 
 Both type checking and typability of the simply-typed lambda calculus is decidable and its type inference is computable. % TODO: add reference, check wording
 
-\section{F systems and parametric polymorphism} % TODO: TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+\section{System F and Parametric Polymorphism} % TODO: TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
 
 % TODO: add reference or I don't know
 System F, polymorphic lambda calculus, or second-order lambda calculus (from the idea of quantifying types) introduces
@@ -166,7 +175,7 @@ $e ::= x | e e' | \lambda x . e | \text{let } x = e \text{ in } e'$
 
 (where $x$ stands for a variable, and $e, e'$ for expressions)
 
-It differs from the syntax of lambda calculus (and that of the system F) only in the addition of the third clause, called the let statement. Meaning of this clause is the same as of $e'[x := e]$, note that this differs from a very similar construct $(\x . e') e$ using abstraction instead of let in that $x$ in this latter construct cannot be polymorphic, see the next two subsections, this connects to the addition of type schemes and restriction of types, both explained later. % TODO: yeah, clarify it a little bit maybe, use shorter sentences?
+It differs from the syntax of lambda calculus (and that of the system F) only in the addition of the third clause, called the let statement. Meaning of this clause is the same as of $e' [x := e]$, note that this differs from a very similar construct $(\lambda x . e') e$ using abstraction instead of let in that $x$ in this latter construct cannot be polymorphic, see the next two subsections, this connects to the addition of type schemes and restriction of types, both explained later. % TODO: yeah, clarify it a little bit maybe, use shorter sentences?
 
 Then there are two additional expressions completing the language that have no significance in the type system: % TODO: wording pls
 
@@ -185,17 +194,19 @@ Type schemes are defined just like types in the system F. This restriction means
 
 Formal definition is given as follows:
 
-$\tau ::= \alpha | \iota | \tau \rightarrow \tau$\\
+$\tau ::= \alpha | \iota | \tau \rightarrow \tau$ \\
 $\sigma ::= \tau | \forall \alpha \sigma$
 
 (where $\tau$ stands for a type, $\alpha$ a type variable, $\iota$ a primitive type (type constant), and $sigma$ a type scheme). % TODO: maybe add something to this
 
-\subsection{Type instantiation}
+\subsection{Type Instantiation}
 
 Type instantiation differs from that of system F slightly as well as explained  by... % TODO: Damas and Milner
 
 A notable change being an addition of an \textbf{generic instance} of a type scheme $\sigma = \forall \alpha_1, \alpha_2 \cdots \alpha_n . \tau$ which is defined as $\sigma' = \forall \beta_1, \beta_2 \cdots \beta_m . \tau'$ such that
-$\tau' = \tau S$ for some type substitution $S = [\alpha_1 := \tau_1, \cdots \alpha_n := \tau_n]$.
+$\tau' = \tau S$ for some type substitution $S = [\alpha_1 := \tau_1, \cdots \alpha_n := \tau_n]$, where type variables $\beta_i$ are not free in $\sigma$. We then write $\sigma > \sigma'$.
+
+Note that $\sigma > \sigma'$ implies $\sigma S > \sigma' S$, however it doesn't imply $\sigma S > \sigma$.
 
 Note that... % FIXME: Damas and Milner use different order for substitution, but we use one which is reverse to them so we are at least a little bit more consistent.
 
@@ -219,11 +230,56 @@ The instantiation rule replaces the $\forall$-elimination rule of the system F a
 
 Let polymorphism balances the type restriction introduced before.
 
-\subsection{Type inference}
+\subsection{Type Inference}
+
+% FIXME: continue from here
+We will introduce the algorithm W described by % TODO: Damas
+
+\subsubsection{Most General Unification}
+
+One of the main parts of the type inference algorithm is the type unification, and since we are usually after principal types, the most general unification.
+We will present a variation Robinson's unification algorithm a modification of which will be used even in the next system.
+
+Most general unifier $S$ of types $\tau_, \tau'$ (we will call it $mgu (\tau_, \tau')$) is a substitution such that for every other unifier $U$ of $\tau$ and $\tau'$  there exists a substitution $R$ such that $U = S R$. % Damas
+We will further require it to use only variables from $\tau$ and $\tau'$
+
+\subsubsection{Unification Algorithm}
+
+% Robinson
+\begin{enumerate}
+    \item Set $S_0 := \epsilon$ and $k = 0$.
+    \item If $\tau S_k = \tau' S_k$ then set $mgu(\tau,\tau) := S_k$ and terminate.
+    \item Let $\tau_k, \tau'_k$ be leftmost well-formed sub-expressions in which $\tau$ and $\tau'$ differ (for clarification: if the expressions are represented by syntactic trees, $\tau_k$ and $\tau'_k$ have the same relative path from their respective roots - then leftmost means having the lowest inorder rank).
+    \item If $\tau_k$ is a variable not occurring in $\tau'_k$, set $S_{k+1} := S_k [\tau_k := \tau'_k]$, otherwise if $\tau'_k$ is a variable not occurring in $\tau_k$, set $S_{k+1} := S_k [\tau'_k := \tau_k]$, otherwise terminate.
+    \item increment $k$ by $1$ and go to step $2$.
+\end{enumerate}
+
+One of the properties of this almost naive algorithm is that it gives the most general unification and it has the desired attribute of unifying only by using the sub-expressions of $\tau, \tau'$.
+
+\subsubsection{The Type assignment algorithm W}
+
+% TODO: specify how to call it and what it returns and what it means
+
+The algorithm described by % TODO: Damas and Milner
+first requires the definition of a types closure:
+
+$close_\Gamma(\tau) := \forall \alpha_1, \dots \alpha_n . \tau$
+
+where $\{\alpha_1, \dots \alpha_n\} := free(\tau) \backslash free(\Gamma)$, $free$ stands for a set of free variables. % TODO: define free variables
+
+The algorithm is described as follows:
+
+
+\begin{enumerate}
+    \item If $e$ is a variable and there is an assumption $e : \forall \overline{\alpha} . \tau'$ in $\Gamma$ then $S = \epsilon$ and $\tau = [\overline{\alpha} := \overline{\beta}]$ where $\overline{\beta}$ are new type variables.
+    \item If $e$ matches $e_1 e_2$ then let $(S_1, \tau_1) := W(\Gamma, e_1)$, $(S_2, \tau_2) := W(\Gamma S_1, e_2)$, and $S_3 := mgu (S_2 \tau_1, \tau_2 \rightarrow \beta)$ where $\beta$ is new; then $S := S_1 S_2 S_3$ and $\tau = \beta S_3$
+    \item If $e$ matches $\lambda x . e_1$ then let $\beta$ be new and $(S, \tau_1) := W(\Gamma_x \cup \{x : \beta\}, e_1)$; then $\tau = \beta S \rightarrow \tau_1$
+    \item If $e$ matches $\text{let } x = e_1 \text{ in } e_2$ then let $(S_1, \tau_1) := W(\Gamma, e_1)$ and $(S_2, \tau) := W(\Gamma_x S_1 \cup \{close_{\Gamma S_1}(\tau_1)\}, e_2)$; then $S = S_1 S_2$
+\end{enumerate}
 
 % FIXME: continue from here
 
-\section{Hindley-Milner polymorphism}
+\section{Hindley-Milner Polymorphism}
 
 (As described in PTSfPwOaS).
 Pure HM allows for just parametric polymorphism without any ad-hoc polymorphism
@@ -231,10 +287,7 @@ or subtyping, this means there is one principal type for every symbol in the pro
 where an algorithm works on any types of its algorithms, good example of that would be swapping the values of two pointers (this algorithm cannot
 take advantage of knowing the exact type unless we take into consideration some really nontraditional architectures).
 
-We will then break this one
-rule by introducing type classes and type families, two ideas with the same basis where we put constraints on types and we can
-create non-overlapping instances for them, or we can put these constraints on a regular symbol to denote that the algorithm either works only on
-some types or doesn't make sense on others, this is especially useful in static analysis of the code.
+We will then break this one rule by introducing type classes and type families, two ideas with the same basis where we put constraints on types and we can create non-overlapping instances for them, or we can put these constraints on a regular symbol to denote that the algorithm either works only on some types or doesn't make sense on others, this is especially useful in static analysis of the code.
 
 Other solutions of this are overloading and subtyping, but the type inference of the most common form of overloading is undecidable
 as described by, so overloading wouldn't be a good solution in our case. % TODO: NP overload
@@ -245,19 +298,16 @@ valid for all its implementations.
 
 Subtyping % TODO: finish this (subtyping)
 
-\section{Overloading with type classes}
+\section{Overloading with Type Classes}
 
-Type classes, as stated above, are good for stating an algorithm makes sense only for some types or that it requires a different implementation for
-different types, usually to enhance performance by writing specialized algorithms for common or critical types instead of writing a general slow algorithm,
+Type classes, as stated above, are good for stating an algorithm makes sense only for some types or that it requires a different implementation for different types, usually to enhance performance by writing specialized algorithms for common or critical types instead of writing a general slow algorithm,
 this was the main motivation behind developing those, % TODO
 viz different physical instructions for comparing common numeric values.
 
 Usefulness of classes can be shown on `Ord', this constraints requires that two variables of type $\alpha$ s.t. $Ord(\alpha)$, we can say `$\alpha$ is (in) Ord'.
-But not everything can be partially ordered, take directed graphs, for example, where the reachability of one vertex from another is in `Ord' only
-if the graph is a directed acyclic graph, in which case we can use algorithms expecting `Ord' on problems concerning reachability, but not otherwise.
+But not everything can be partially ordered, take directed graphs, for example, where the reachability of one vertex from another is in `Ord' only if the graph is a directed acyclic graph, in which case we can use algorithms expecting `Ord' on problems concerning reachability, but not otherwise.
 
-`Ord' can also show how we could want different instances for different types.
-Let's say `Ord' has one method $<=$ of type $a -> a -> Bool$ with the expected behavior. % TODO: explain a method
+`Ord' can also show how we could want different instances for different types. Let's say `Ord' has one method $<=$ of type $a -> a -> Bool$ with the expected behavior. % TODO: explain a method
 
 For two `Int's we just compare them and return whether the first is lower than the other,
 but if we have, let's say `Customer's, with different Id numbers as keys in some map (or dictionary) then we don't need to compare whole customers,
@@ -269,7 +319,7 @@ method: a function which is defined inside a class and is expected to be instant
 
 \xxx{test normalni citace: \cite{jones1999typing}.}
 
-\section{Haskell type system}
+\section{Haskell Type System}
 
 Haskell uses kind system % TODO: finish this (kind system)
 
