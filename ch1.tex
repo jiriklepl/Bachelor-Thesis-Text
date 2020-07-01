@@ -9,11 +9,11 @@ Lambda calculus is formally described as:
 
 $variable ::= 'v' | variable ''' \\ \lambda\mbox{-}term ::= variable | '(' \lambda\mbox{-}term\ \lambda\mbox{-}term ')' |  '(\lambda' variable\ \lambda\mbox{-}term ')'$
 
-% TODO: insert rules for LC
-
-% TODO what is a sub-expression
-
 It is a simple language in which we can formally describe any computational problem.
+
+The whole idea of evaluation of a lambda calculus program is using a simple rewriting rule, $\beta$ reduction:
+
+$(\lambda x . e) e' = e [x := e']$ % TODO: Barendregt reference
 
 Choosing lambda calculus, or its derivatives might seem counterintuitive at first, because it
 is not very efficient in expressing imperative ideas like mutability for example, but for
@@ -46,6 +46,12 @@ Initialization creates binding (as stated before) so we have to model that by cr
 part of the function's body that follows inside this abstraction (this in effect means that all the return values of these nested functions
 and of the function which contains them will share the same type), a similar thing are switch statements where the switch "call" can be modeled
 as an initialization to an anonymous variable and the single case statements as assignments to this variable.
+
+\subsection{Subexpression}
+
+For a well-defined expression $e$ a subexpression is an expression $e'$ such that $e = \lambda x . e'$, $e = e' e''$, $e = e'' e'$, or $e = e'$, and transitively from that.
+
+This definition will extend intuitively to all other syntactic systems.
 
 \section{Simply-Typed Lambda Calculus}
 
@@ -206,6 +212,12 @@ $\sigma ::= \tau | \forall \alpha \sigma$
 
 (where $\tau$ stands for a type, $\alpha$ a type variable, $\iota$ a primitive type (type constant), and $sigma$ a type scheme). % TODO: maybe add something to this
 
+\subsubsection{Typing extensions}
+
+In the HM type system it is common to introduce the following type operators:
+
+Cartesian product (tuples): $\times$; disjoint sum (tagged unions): $+$; and lists. Existence of these is not required for the type system and so we will avoid them going forward, their reintroduction is trivial.
+
 \subsection{Type Instantiation}
 
 Type instantiation differs from that of system F slightly as well as explained  by... % TODO: Damas and Milner
@@ -290,45 +302,61 @@ If none of the cases holds, the algorithm fails as $e$ is not typeable and the a
 \subsection{Extensions of the Type System}
 
 (As described in PTSfPwOaS).
-Pure HM allows for just parametric polymorphism without any ad-hoc polymorphism
-or subtyping, this means there is only one principal type for every symbol in the program and it has just one definition, this is useful in cases
-where an algorithm (or a function) works on parameters of any types, a good example of that could be the $K$ combinator.
+Pure HM allows for just parametric polymorphism. However without any ad-hoc polymorphism or subtyping, this means there is only one principal type for every symbol in the program and it has just one definition, this is useful in cases where an algorithm (or a function) works on parameters of any types, a good example of that could be the $K$ combinator (sometimes callled `const function'). We call these algorithms generic.
 
-% FIXME: continue from here
+The problem is some functions work only on a particular types, for example basic arithmetic functions. We would like to be able to say, that it makes sense to add two integers, or two real numbers, but not adding two boolean values.
 
-We will break this by introducing type classes and type families, two ideas with the same basis where we put constraints on types and we can create non-overlapping instances for them, or we can put these constraints on a regular symbol to denote that the algorithm either works only on some types or doesn't make sense on others, this is especially useful in static analysis of the code.
+A trivial extension would be the introduction of tagged unions % TODO: see Type schemes
+But if we were to define the $+$ operator as: $(+) : Int + Real \rightarrow Int + Real \rightarrow Int + Real$ we solve the problem with booleans, one different problem comes to the surface: we would like to say that adding two integers yields an integer whereas adding two real numbers yields a real number, one more argument could also be that we would like to forbid adding integers to real numbers (maybe we want to require all data conversions be explicit).
 
-Other solutions of this are overloading and subtyping, but the type inference of the most common form of overloading is undecidable
-as described by, so overloading wouldn't be a good solution in our case. % TODO: NP overload
+So what we would like is some way of expressing that $(+)$ takes two parameters of a type we can perform addition on and that the function yields us a result of the same type.
 
-It also contradicts the idea of parametric polymorphism used in this thesis, where every implementation of an function can be
-described as a proof of a special case of a theorem described by the principal type of the function and this type is therefore
-valid for all its implementations.
+And an answer to this can be the introduction of \textbf{type classes}.
+% TODO maybe: note that they are combinable with tagged unions for better expressiveness
 
-Subtyping % TODO: finish this (subtyping)
+\subsubsection{Type classes}
+
+The idea of type classes (parametrized by generic types) is that we put constraints on types of some variables (or functions) we use in our algorithms. Those constraints tell us that the usage of these algorithms is valid only in the context where the constraints are satisfied (this allows us to implement otherwise impossible generic algorithms, for example sorting).
+
+And also the functions defined inside a type class (methods) can have a specialized implementation for each \emph{instance}, this was actually the main motivation for their creation: $Eq$ class with a method $==$ which needs to be specialized for each type. % TODO: reference something
+
+\textbf{Instances} of type classes (parametrized by a type instance of the type of the corresponding type class) are what allows for ad-hoc polymorphism % TODO: add some mention of adhoc poly more above
+in very well controlled matter, they are a limited version of classic overloading where all instances have to share a common supertype and they cannot overlap (share a common type instance).
+
+Type classes can be added to the algorithm $W$ defined above with only little changes. % TODO: reference something, fix wording
+
+\subsubsection{Subtyping and Overloading}
+
+% FIXME: this is just weird
+
+Subtyping and overloading are a slightly different approaches to the same problem we discussed with specifying what types the $(+)$ function can act on.
+
+If we want to use either of those we have to constrain them somehow or they make type inference undecidable. We will use the variant defined by % TODO Smith
+
+Subtyping however doesn't solve that problem very well as if we specify that $Int$ is a subtype of $Real$ then we have to accept that $(+)$ applied to two real operands can still return an integer. That doesn't seem that bad from the mathematical point of view, but it can lead to implicit data conversions which can be undesirable, especially if we were to use the type system in a context of a low level programming. % FIXME
+
+Overloading constrained similarly as before in this context then makes these two approaches very similarly expressive. % TODO: check it, also
+
+For the overloading it is not only undecidable but it also contradicts the ideas of parametric polymorphism used in this thesis, where every implementation of an function can be described as a proof of a special case of a theorem described by the principal type of the function and this type is therefore valid for all its implementations. % FIXME: doesn't sound right
 
 \section{Overloading with Type Classes}
 
-Type classes, as stated above, are good for stating an algorithm makes sense only for some types or that it requires a different implementation for different types, usually to enhance performance by writing specialized algorithms for common or critical types instead of writing a general slow algorithm,
-this was the main motivation behind developing those, % TODO
+Type classes, as stated before, are good for stating an algorithm makes sense only for some types or that it requires a different implementation for different types, usually to enhance performance by writing specialized algorithms for common or critical types instead of writing a general slow algorithm, this was the main motivation behind developing those, % TODO: sounds like a contradiction
 viz different physical instructions for comparing common numeric values.
 
-Usefulness of classes can be shown on `Ord', this constraints requires that two variables of type $\alpha$ s.t. $Ord(\alpha)$, we can say `$\alpha$ is (in) Ord'.
-But not everything can be partially ordered, take directed graphs, for example, where the reachability of one vertex from another is in `Ord' only if the graph is a directed acyclic graph, in which case we can use algorithms expecting `Ord' on problems concerning reachability, but not otherwise.
+Usefulness of classes can be shown on `Ord', this constraints requires that two variables of type $\alpha$ s.t. $Ord(\alpha)$, we can say `$\alpha$ is (in) Ord'. But not everything can be partially ordered, take directed graphs, for example, where the reachability of one vertex from another is in `Ord' only if the graph is a directed acyclic graph, in which case we can use algorithms expecting `Ord' on problems concerning reachability, but not otherwise.
 
 `Ord' can also show how we could want different instances for different types. Let's say `Ord' has one method $<=$ of type $a -> a -> Bool$ with the expected behavior. % TODO: explain a method
 
-For two `Int's we just compare them and return whether the first is lower than the other,
-but if we have, let's say `Customer's, with different Id numbers as keys in some map (or dictionary) then we don't need to compare whole customers,
-but just their Ids.
-
-method: a function which is defined inside a class and is expected to be instantiated alongside the class. % TODO
+For two `Int's we just compare them and return whether the first is lower than the other, but if we have, let's say `Customer's, with different Id numbers as keys in some map (or dictionary) then we don't need to compare whole customers, but just their Ids.
 
 \xxx{zhruba popsat jak to vysvihnul \citet{jones1999typing}.}
 
 \xxx{test normalni citace: \cite{jones1999typing}.}
 
 \section{Haskell Type System}
+
+% FIXME: continue from here....
 
 Haskell uses kind system % TODO: finish this (kind system)
 
