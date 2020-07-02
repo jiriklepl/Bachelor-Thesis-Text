@@ -35,9 +35,11 @@ reflect the structure of the original code as closely as possible.
 
 Models of some C constructs can be as follows (grammar taken from ): % TODO: http://www.quut.com/c/ANSI-C-grammar-y.html
 
+% FIXME: change this part to be rather the second chapter -- it would feel more natural
+
 $\lambda_C\left(additive\_expression '+' multiplicative\_expression\right) = \\ plus_C (\lambda_C additive\_expression) (\lambda_C multiplicative\_expression)$
 
-This example demonstrates the most simple case where  where we can model the C construct "one to one",
+This example demonstrates the most simple case where where we can model the C construct "one to one",
 but there are more tricky examples like the following one:
 
 $\lambda_C\left(declaration\_specifiers IDENTIFIER '=' initializer\right) = \\ (\lambda IDENTIFIER : \lambda_C(declaration\_specifiers) .\ \dots) (\lambda_C initializer)$
@@ -237,7 +239,7 @@ Note that... % FIXME: Damas and Milner use different order for substitution, but
     \item[instantiation] $\dfrac{\Gamma \vdash e : \sigma}{\Gamma \vdash e : \sigma'}\tiny{(\sigma > \sigma')}$
     \item[generalization] $\dfrac{\Gamma \vdash e : \sigma}{\Gamma \vdash e : \forall \alpha . \sigma}\tiny{(\alpha \text{ not free in }\Gamma)}$
     \item[I DONT KNOW THE NAME] $\dfrac{\Gamma \vdash e : \tau' \rightarrow \tau \quad \Gamma \vdash e' : \tau' }{\Gamma \vdash e e' : \tau}$ % TODO: what is the name of this rule? It has to be application
-    \item[abstraction] $\dfrac{\Gamma_x \cup \{x : \tau'\} \vdash e : \tau}{\Gamma \vdash \lambda x . e : \tau' \rightarrow \tau}$ % TODO: what is the name of this rule? It has to be application
+    \item[abstraction] $\dfrac{\Gamma_x \cup \{x : \tau'\} \vdash e : \tau}{\Gamma \vdash \lambda x . e : \tau' \rightarrow \tau}$
     \item[let polymorphism] $\dfrac{\Gamma \vdash e : \sigma \quad \Gamma_x \cup \{x :\sigma\} \vdash e' : \tau}{\Gamma \vdash \text{let } x = e \text{ in } e' : \tau}$
 \end{itemize}
 
@@ -260,7 +262,7 @@ it produces the principal type scheme for the given program (expression).
 One of the main parts of the type inference algorithm is the type unification, and since we are usually after principal types, the most general unification.
 We will present a variation Robinson's unification algorithm a modification of which will be used even in the next system.
 
-Most general unifier $S$ of types $\tau_, \tau'$ (we will call it $mgu (\tau_, \tau')$) is a substitution such that for every other unifier $U$ of $\tau$ and $\tau'$  there exists a substitution $R$ such that $U = S R$. % Damas
+Most general unifier $S$ of types $\tau_, \tau'$ (we will call it $mgu (\tau_, \tau')$) is a substitution such that for every other unifier $U$ of $\tau$ and $\tau'$ there exists a substitution $R$ such that $U = S R$. % Damas
 We will further require it to use only variables from $\tau$ and $\tau'$
 
 \subsubsection{Unification Algorithm}
@@ -354,10 +356,60 @@ For two `Int's we just compare them and return whether the first is lower than t
 
 \xxx{test normalni citace: \cite{jones1999typing}.}
 
-\section{Haskell Type System}
+\section{Haskell Type system}
 
-% FIXME: continue from here....
+For our purposes we will (limit) the haskell language significantly, ignoring any pattern-matching features and almost all syntax sugar, the only important feature for us being the type system. % TODO: find better words for this
 
-Haskell uses kind system % TODO: finish this (kind system)
+\subsection{Type Constructors}
+
+The haskell generalizes the HM type system and the HM syntax mostly via the notion of type constructors. If they take no type arguments then we call them nullary, those are the ones we already call \emph{types} in the HM type system. We call a type constructor n-ary when it takes exactly n type arguments, for example the type constructor $(\rightarrow)$ is binary and constructs the type of a function. % TODO: rewrite it slightly
+
+We can formally define type constructors similarly to functions.
+
+\subsection{Kinds}
+
+The next thing the haskell type system adds to the HM type system is the notion of kinds, kinds are used for classification of type constructors and for checking the validity of their usage in the program.
+
+Kinds reflect the nature of functions and they follow their syntactic rules, but applied to type constructors instead of values. The most simple kind $*$ (star) represents all types capable of having a value: all legal types from the classic HM type system fall to this category.
+
+Then we have kinds of a form $k_1 \rightarrow k_2$ which take a type of a kind $k_1$ and return a type of kind $k_2$. For example a $(\rightarrow)$ type constructor has a kind $* \rightarrow (* \rightarrow *)$, usually written with considering right associativity as $* \rightarrow * \rightarrow *$. This means $(\rightarrow)$ takes two types and returns a new type - this reflects the fact that a type of a function is defined by its parameter's type and its return type.
+
+Kinds are less complex then types as they are defined recursively only from the two rules defined in the previous two paragraphs.
+
+For example we can define a very common type constructor $List: * \rightarrow *$ which takes a type $a$ and returns a type representing a linked list of values of type $a$. We can use this type constructor to show the reason behind the notion of kinds as it wouldn't make much sense for a value to have a type just $List$ without it being applied to any type. % TODO: fix the last part (and possibly the whole subsection)
+
+We will formally define kinds as:
+
+$k := * | k \rightarrow k'$;
+
+where $k, k'$ are kinds.
+
+\subsection{Types}
+
+We will define types formally as
+
+$\tau := x | c : k | \tau \tau'$;
+
+where $\tau, \tau'$ are types, $x$ is a type variable, $c$ is a type constant, and $k$ is a kind. We will, for example consider the $(->)$ type constructor a regular type of the kind $* \rightarrow * \rightarrow *$.
+
+\subsection{Type Schemes}
+
+Type schemes defined similarly to those of the HM type system, differing only in what we consider a type.
+
+\subsection{Type Classes and Their Instances}
+
+This type system uses type classes % TODO: see the subsection `Type Classes' of the HM section
+
+\subsection{Type Inference Rules}
+
+The type inference rules for the haskell type system are almost the same as the type inference rules for the HM type system, but we have to add rules for the inference of the type class constraints:
+
+% FIXME: list da rulez here
+
+\subsection{Type Instances and Type Unification Algorithm}
+
+% FIXME: yeah there is some difference to the HM type system here... we have to check and deduce kinds
+
+\subsection{The Type Inference Algorithm}
 
 \xxx{Teoretickej skok do budoucnosti --- mirnej review o tom jak se to ve skutecnosti dela v haskelu. Treba ukazat ze MPTCs jsou nerozhodnutelny protoze umej simulovat prolog.}
