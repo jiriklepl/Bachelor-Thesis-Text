@@ -394,17 +394,37 @@ where $\tau, \tau'$ are types, $x$ is a type variable, $c$ is a type constant, a
 
 \subsection{Type Schemes}
 
-Type schemes defined similarly to those of the HM type system, differing only in what we consider a type.
+Type schemes defined similarly to those of the HM type system, differing only in what we consider a type and there are constraints that have to be satisfied. It should be also noted that only types of the $*$ kind can be assigned to values.
 
-\subsection{Type Classes and Their Instances}
+We can define the type schemes formally as:
 
-This type system uses type classes % TODO: see the subsection `Type Classes' of the HM section
+$\sigma := \forall \alpha_1, \dots \alpha_n . qt\ |\ qt$
+$qt := \{\beta_1 \in C_1, \beta_2 \in C_2, \dots \beta_m \in C_m\} \Rightarrow \tau\ |\ \tau$
+
+where $\alpha_i, \beta_j$ name type variables and $\{\beta_1, \dots \beta_m\} \subseteq \{\alpha_1, \dots \alpha_n\}$, $C_j$ names a type class, and $\tau$ names a type. We call the pair $\beta_j \in C_j$ a predicate (constraint); we call $qt$ a qualified type.
+
+Going forward we will assume $\forall . qt = qt$ and $\{\} \Rightarrow \tau = \tau$ for simplifying other definitions, this requires only a trivial transformation. % TODO: fix this
+
+\subsubsection{Qualified types}
+
+A qualified type, as defined just above is, is a type qualified by adding a set of predicates.
 
 \subsection{Type Inference Rules}
 
 The type inference rules for the haskell type system are almost the same as the type inference rules for the HM type system, but we have to add rules for the inference of the type class constraints:
 
-% FIXME: list da rulez here
+\begin{enumerate}
+    \item[variable] $\dfrac{}{\Gamma \vdash x : \sigma}\tiny{(x : \sigma \in \Gamma)}$
+    \item[instantiation] $\dfrac{\Gamma \vdash e : \sigma}{\Gamma \vdash e : \sigma'}\tiny{(\sigma > \sigma')}$
+    \item[generalization] $\dfrac{\Gamma \vdash e : \sigma}{\Gamma \vdash e : \forall \alpha . \sigma}\tiny{(\alpha \text{ not free in }\Gamma)}$
+    \item[I DONT KNOW THE NAME] $\dfrac{\Gamma \vdash e : \mathbf{P} \Rightarrow \tau' \rightarrow \tau \quad \Gamma \vdash e' : \mathbf{P'} \Rightarrow \tau' }{\Gamma \vdash e e' : \mathbf{P} \cup \mathbf{P'}  \Rightarrow \tau}$ % TODO: what is the name of this rule? It has to be application
+    \item[abstraction] $\dfrac{\Gamma_x \cup \{x : \mathbf{P'} \Rightarrow \tau'\} \vdash e : \mathbf{P} \Rightarrow \tau}{\Gamma \vdash \lambda x . e : \mathbf{P} \cup \mathbf{P'} \Rightarrow \tau' \rightarrow \tau}$
+    \item[let polymorphism] $\dfrac{\Gamma \vdash e : \forall \bar{\alpha} .  \mathbf{P} \Rightarrow \tau \quad \Gamma_x \cup \{x :\forall \bar{\alpha} .  \mathbf{P} \Rightarrow \tau \} \vdash e' : \mathbf{P'} \Rightarrow \tau'}{\Gamma \vdash \text{let } x = e \text{ in } e' : \mathbf{P} \cup \mathbf{P'} \Rightarrow \tau'}$
+\end{enumerate}
+
+Where $\tau, \tau'$ stand for types, $e, e'$ stand for expressions, $x$ stands for a type variable, $\bar{\alpha}$ stands for a list of type variables, $\Gamma$ stands for the set of assumptions, $\Gamma$ stands for the set of assumptions without any judgement of x, and $\mathbf{P}, \mathbf{P'}$ stand for type predicates.
+
+Those rules are the same as those of the HM type system with only a trivial difference that complex expressions retain predicates of all of their subexpressions.
 
 \subsection{Type Instances and Type Unification Algorithm}
 
