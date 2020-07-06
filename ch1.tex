@@ -15,39 +15,10 @@ The whole idea of evaluation of a lambda calculus program is using a simple rewr
 
 $(\lambda x . e) e' = e [x := e']$ % TODO: Barendregt reference
 
-Choosing lambda calculus, or its derivatives might seem counterintuitive at first, because it
-is not very efficient in expressing imperative ideas like mutability for example, but for
-purposes of type inference we don't need to know the actual meaning of the code (like for example
-if a loop stops), we can just limit ourselves to modelling type dependencies in the program and
-everything on top of that is just for human readability, debugging purposes, demonstration and
-primarily for possible extension.
+Choosing lambda calculus, or its derivatives might seem counterintuitive at first, because it is not very efficient in expressing imperative ideas like mutability for example, but for purposes of type inference we don't need to know the actual meaning of the code (like for example if a loop stops), we can just limit ourselves to modelling type dependencies in the program and everything on top of that is just for human readability, debugging purposes, demonstration and for possible extension.
 
-Lambda calculus can quite easily model any C program, but one has to be careful at distinguishing
-between initialization and assignment as initialization creates binding (in lambda calculus expressed
-as substitution for a bound variable in an abstraction) and assignment is a function that takes two
-expressions of the same type and returns the first (here we demonstrate that we don't need to
-model the whole behavior of the program, because copying of the value doesn't have any effect on
-the types of the arguments).
+Lambda calculus can quite easily model any C program, but one has to be careful at distinguishing between initialization and assignment as initialization creates binding (in lambda calculus expressed as substitution for a bound variable in an abstraction) and assignment is a function that takes two expressions of the same type and returns the first (here we demonstrate that we don't need to model the whole behavior of the program, because copying of the value doesn't have any effect on the types of the arguments).
 
-Here we will use $\lambda_C$ to denote transformation from C to lambda calculus,
-this transformation can be actually done in a multiple of ways, but in this thesis we will use one that tries to
-reflect the structure of the original code as closely as possible.
-
-Models of some C constructs can be as follows (grammar taken from ): % TODO: http://www.quut.com/c/ANSI-C-grammar-y.html
-
-% FIXME: change this part to be rather the second chapter -- it would feel more natural
-
-$\lambda_C\left(additive\_expression '+' multiplicative\_expression\right) = \\ plus_C (\lambda_C additive\_expression) (\lambda_C multiplicative\_expression)$
-
-This example demonstrates the most simple case where where we can model the C construct "one to one",
-but there are more tricky examples like the following one:
-
-$\lambda_C\left(declaration\_specifiers IDENTIFIER '=' initializer\right) = \\ (\lambda IDENTIFIER : \lambda_C(declaration\_specifiers) .\ \dots) (\lambda_C initializer)$
-
-Initialization creates binding (as stated before) so we have to model that by creating a new abstraction and put the whole
-part of the function's body that follows inside this abstraction (this in effect means that all the return values of these nested functions
-and of the function which contains them will share the same type), a similar thing are switch statements where the switch "call" can be modeled
-as an initialization to an anonymous variable and the single case statements as assignments to this variable.
 
 \subsection{Subexpression}
 
@@ -271,7 +242,7 @@ We will further require it to use only variables from $\tau$ and $\tau'$
 \begin{enumerate}
     \item Set $S_0 := \epsilon$ and $k = 0$.
     \item If $\tau S_k = \tau' S_k$ then set $mgu(\tau,\tau) := S_k$ and terminate.
-    \item Let $\tau_k, \tau'_k$ be leftmost well-formed sub-expressions in which $\tau$ and $\tau'$ differ (for clarification: if the expressions are represented by syntactic trees, $\tau_k$ and $\tau'_k$ have the same relative path from their respective roots - then leftmost means having the lowest inorder rank).
+    \item Let $\tau_k, \tau'_k$ be leftmost corresponding well-formed sub-expressions in which $\tau$ and $\tau'$ differ (for clarification: if the expressions are represented by syntactic trees, $\tau_k$ and $\tau'_k$ have the same relative path from their respective roots - then leftmost means having the lowest inorder rank).
     \item If $\tau_k$ is a variable not occurring in $\tau'_k$, set $S_{k+1} := S_k [\tau_k := \tau'_k]$, otherwise if $\tau'_k$ is a variable not occurring in $\tau_k$, set $S_{k+1} := S_k [\tau'_k := \tau_k]$, otherwise terminate.
     \item increment $k$ by $1$ and go to step $2$.
 \end{enumerate}
@@ -323,7 +294,7 @@ The idea of type classes (parametrized by generic types) is that we put constrai
 And also the functions defined inside a type class (methods) can have a specialized implementation for each \emph{instance}, this was actually the main motivation for their creation: $Eq$ class with a method $==$ which needs to be specialized for each type. % TODO: reference something
 
 \textbf{Instances} of type classes (parametrized by a type instance of the type of the corresponding type class) are what allows for ad-hoc polymorphism % TODO: add some mention of adhoc poly more above
-in very well controlled matter, they are a limited version of classic overloading where all instances have to share a common supertype and they cannot overlap (share a common type instance).
+in very well controlled matter, they are a limited (but powerful) version of classic overloading where all instances have to share a common supertype and they cannot overlap (share a common type instance - this can be proven by the unification algorithm).
 
 Type classes can be added to the algorithm $W$ defined above with only little changes. % TODO: reference something, fix wording
 
@@ -351,10 +322,6 @@ Usefulness of classes can be shown on `Ord', this constraints requires that two 
 `Ord' can also show how we could want different instances for different types. Let's say `Ord' has one method $<=$ of type $a -> a -> Bool$ with the expected behavior. % TODO: explain a method
 
 For two `Int's we just compare them and return whether the first is lower than the other, but if we have, let's say `Customer's, with different Id numbers as keys in some map (or dictionary) then we don't need to compare whole customers, but just their Ids.
-
-\xxx{zhruba popsat jak to vysvihnul \citet{jones1999typing}.}
-
-\xxx{test normalni citace: \cite{jones1999typing}.}
 
 \section{Haskell Type system}
 
@@ -401,13 +368,17 @@ We can define the type schemes formally as:
 $\sigma := \forall \alpha_1, \dots \alpha_n . qt\ |\ qt$
 $qt := \{\beta_1 \in C_1, \beta_2 \in C_2, \dots \beta_m \in C_m\} \Rightarrow \tau\ |\ \tau$
 
-where $\alpha_i, \beta_j$ name type variables and $\{\beta_1, \dots \beta_m\} \subseteq \{\alpha_1, \dots \alpha_n\}$, $C_j$ names a type class, and $\tau$ names a type. We call the pair $\beta_j \in C_j$ a predicate (constraint); we call $qt$ a qualified type.
+where $\alpha_i, \beta_j$ name type variables and $\{\beta_1, \dots \beta_m\} \subseteq \{\alpha_1, \dots \alpha_n\}$, $C_j$ names a type class, and $\tau$ names a type. We call the pair $\beta_j \in C_j$ a predicate (constraint); we call $qt$ a qualified type. % TODO: check those betas
 
 Going forward we will assume $\forall . qt = qt$ and $\{\} \Rightarrow \tau = \tau$ for simplifying other definitions, this requires only a trivial transformation. % TODO: fix this
 
 \subsubsection{Qualified types}
 
 A qualified type, as defined just above is, is a type qualified by adding a set of predicates.
+
+\subsection{Type substitution}
+
+With the introduction of qualified types, we should explicitly state that the type substitution applies to qualified types just like as if the type parameters of the predicates were a part of the type itself.
 
 \subsection{Type Inference Rules}
 
@@ -422,14 +393,27 @@ The type inference rules for the haskell type system are almost the same as the 
     \item[let polymorphism] $\dfrac{\Gamma \vdash e : \forall \bar{\alpha} .  \mathbf{P} \Rightarrow \tau \quad \Gamma_x \cup \{x :\forall \bar{\alpha} .  \mathbf{P} \Rightarrow \tau \} \vdash e' : \mathbf{P'} \Rightarrow \tau'}{\Gamma \vdash \text{let } x = e \text{ in } e' : \mathbf{P} \cup \mathbf{P'} \Rightarrow \tau'}$
 \end{enumerate}
 
-Where $\tau, \tau'$ stand for types, $e, e'$ stand for expressions, $x$ stands for a type variable, $\bar{\alpha}$ stands for a list of type variables, $\Gamma$ stands for the set of assumptions, $\Gamma$ stands for the set of assumptions without any judgement of x, and $\mathbf{P}, \mathbf{P'}$ stand for type predicates.
+Where $\tau, \tau'$ stand for types, $e, e'$ stand for expressions, $x$ stands for a type variable, $\bar{\alpha}$ stands for a list of type variables, $\Gamma$ stands for the set of assumptions, $\Gamma_x$ stands for the set of assumptions without any judgement of x, and $\mathbf{P}, \mathbf{P'}$ stand for type predicates.
 
 Those rules are the same as those of the HM type system with only a trivial difference that complex expressions retain predicates of all of their subexpressions.
+
 
 \subsection{Type Instances and Type Unification Algorithm}
 
 % FIXME: yeah there is some difference to the HM type system here... we have to check and deduce kinds
 
+The addition of type constructors and type classes doesn't require any change to the definition of the type unification algorithm.
+
+As for type instances, the definition is without any change.
+
 \subsection{The Type Inference Algorithm}
 
-\xxx{Teoretickej skok do budoucnosti --- mirnej review o tom jak se to ve skutecnosti dela v haskelu. Treba ukazat ze MPTCs jsou nerozhodnutelny protoze umej simulovat prolog.}
+% TODO: zhruba popsat jak to vysvihnul \citet{jones1999typing
+
+% TODO: test normalni citace: \cite{jones1999typing}.
+
+% TODO: FROM MIREK Teoretickej skok do budoucnosti --- mirnej review o tom jak se to ve skutecnosti dela v haskelu. Treba ukazat ze MPTCs jsou nerozhodnutelny protoze umej simulovat prolog.
+
+% TODO: FROM MIREK zhruba popsat jak to vysvihnul \citet{jones1999typing}.
+
+% TODO: FROM MIREK test normalni citace: \cite{jones1999typing}.

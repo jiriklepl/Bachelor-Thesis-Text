@@ -1,22 +1,25 @@
-\chapter{Type inference for C}
+\chapter{Type inference and polymorphism for C}
 
-One of the main problems of C is its weak type system and a lack of support of generic programming.
-This leads to an extensive use of generic pointers and preprocessor macros which solves some of it,
-but this solution does not make programming in C very pleasant. % FIXME: better wording pls
+\subsection{Why Would We Want Type Inference and Polymorphism?}
 
-Generic (void) pointers can point to any data structure and thus they can be used in "generic" code
-to work with virtually any data. But these pointers carry no type information and so that has to be
-done by other means, for example enumerations.
+One of the main problems of C is its weak type system and a lack of support of generic programming. Weak type system in the context of generic programming is a very common source of bugs and misuses. Lack of support of generic programming leads to an extensive use of `void *' pointers and macros. % FIXME: better wording pls
 
-One example of using void pointers can be `malloc' which without any type inference requires the user
-to calculate the required themselves (this can seem to be trivial to do, but it still generates some code
-noise and it is a possible source of bugs).
+Generic (void) pointers can point to any data structure and thus they can be used in "generic" code to work with virtually any data. This makes them a very strong tool, and almost every program relies on them, % TODO: link malloc, free
+But these pointers carry no type information and so to use these pointers one has to either know the actual types when they use them, or the type has to be passed explicitly.
 
-If we implement a generic data structure using macros, creating all required instances of
-it and dedicated procedures working on them have to be instantiated explicitly by the user
-which can lead to bloated and hard to read code.
+One example of using void pointers can be `malloc' which without any type inference requires the user to calculate the required themselves (this can seem to be trivial to do, but it still generates some code noise and it is a possible source of bugs).
 
-One example of making "generic" data structures via macros is kernel's \lstinline{__KHASH_TYPE} macro (in `./khash.h'):
+As we stated before one other common way of implementing generic algorithms and data structures is by using macros, however if we implement a data structure as a macro then all required instances of it and dedicated procedures working on them have to be instantiated explicitly by the user. This can lead to many hard to find bugs.
+
+Thankfully many modern compilers are macro-aware and so if there is a compile-time bug in the program then the compiler can create a user-friendly error output (for example gcc). % TODO: create an error source
+
+But when it comes to debugging there has to be done some nontrivial preprocessing of the source files to make it possible to use conventional debuggers (like gdb) to find bugs in macro expansions. % TODO: link something maybe?
+
+The lack of any type checking in context of macros makes the possible bugs manifest only when the implementations are actually used in some code, and sometimes only in certain contexts, as the compiler should even assume a macro is supposed to represent a code.
+
+And as for generic pointers a bug usually becomes apparent only in the runtime and that by corruption of the memory.
+
+One real-life example of making "generic" data structures via macros is kernel's \lstinline{__KHASH_TYPE} macro (in `./khash.h'):
 
 \begin{lstlisting}
 #define __KHASH_TYPE(name, khkey_t, khval_t) \
@@ -30,45 +33,26 @@ One example of making "generic" data structures via macros is kernel's \lstinlin
 
 If we were to create an instance of this structure where \lstinline{khkey_t=int}, and \lstinline{khval_t=float},
 we would have to use this macro to instantiate the structure explicitly:
-\lstinline{__KHASH_TYPE(name, int, float)} and also to instantiate all the functions using it.
-
-The lack of any type checking in this context allows the user to insert a wrong type/name to the macro
-and all bugs caused by such an error could be very difficult to find.
+\lstinline{__KHASH_TYPE(name, int, float)} and also we would have to instantiate all its functions, though we can wrap this into yet another macro.
 
 This approach also requires explicit mention of the instance in the corresponding function calls
 
 For example in this case we would clear the structure by calling
-\lstinline{void kh_clear_<name>(const kh_<name>_t *h);}
+\lstinline{void kh_clear_<name>(const kh_<name>_t *h);} where \lstinline{<name>} stands for the name we have given for the instance. So if we were to refactor a part of the program and change the type of something, we would have to change the name as well, and sometimes create a new instance by hand or delete the old one if it is no longer useful - which we would have to investigate ourselves. In large projects this can cause a lot of problems in case of even a little miscommunication.
 
-Another example where polymorphism would be of a big benefit is glib's % https://github.com/GNOME/glib/tree/master
-\lstinline{g_slice_new0} which has to be called giving it the target type explicitly and it just
-allocates an char array of the size of the given type initialized with zeros.
+Using type checking and type inference described in this thesis have effect very similar effect to instantiating definitions via macro expansion, but with the benefit of brevity, catching bugs early (due to checking the implementation when it is defined) and having fewer requirements on mindfulness of the user. All of these effect can lead to less error-prone code.
 
-% TIP: like queue.h?
+Adding generic programming features to C thus can help to debug programs written in this language and to make writing generic code more user friendly and easier to maintain/expand. % FIXME: wording is evil here.
 
-But one of the biggest problems with the lack of generic features is the lack of type-checking
-of definitions of these "generic" implementations, result of this being any bugs manifest only
-when the macro holding the definition is expanded.
+\subsection{Why the Hindley-Milner Type System}
 
-Another way of simulating generic features is usage of `unions', those provide better type safety
-than both generic pointers and macros, but if we use them in contexts where they provide no added benefit
-than making it possible to use multiple types, they bring with them the possibility of data size redundancy.
+The C language has a great support for the procedural programming paradigm with records and data are clearly separated from computation in the C code.
 
-Adding generic programming features to C thus can help to debug programs written in this language and
-to make writing generic code more user friendly and easier to maintain/expand. % FIXME: wording is evil here.
+There have been many attempts of adding object-oriented features (most notable being C++).
 
-% TODO: use either the aforementioned  __KHASH_TYPE or queue to demonstrate this
+Adding the features of the HM type system doesn't change the core nature of the language, it just facilitates creating generic abstractions and with the addition of type classes it adds support for both simple and expressive ad-hoc polymorphism.
 
-Using type checking and type inference described in this thesis have effect very similar effect to instantiating
-definitions via macro expansion, but with the benefit of brevity, catching bugs early and having fewer
-requirements on mindfulness of the user (all of these effect can lead to less error-prone code).
-
-% TODO: here demonstration
-
-As we can see in the examples shown above the CHM implementation has semantically the same meaning as the C
-implementation, but is much shorter and less demanding on the user.
-
-\xxx{motivace: kde jsme, jak vypada kernelovej kod s hromadama maker, a kam se chceme dostat. Priklady kodu.}
+We will present only slightly modified syntax of the C language which will give a type-safe alternative for many cases where we would otherwise use the aforementioned \lstinline{void *} pointers or macros.
 
 \section{C99 types}
 
@@ -78,37 +62,102 @@ All C types
 
 \section{C types in Hindley-Milner context}
 
-All main C data types can be modeled as some type constants (with signedness/long specifiers or without)
+In this section we will specify how we will model the type system of C in the HM type system so we could extend it.
 
-Then we can model pointers as type constructors taking one type.
-This approach makes it easy to model reference as a function that takes a type and returns a pointer to this type
-and dereference as a function that takes a pointer to a type and returns the type.
+All main C data types can be trivially modelled as type constants, we can model signed and unsigned versions as either two separate types or by using \lstinline{unsigned} and \lstinline{unsigned} type constructors. We will ignore this part of the C type system (along with \lstinline{long} specifiers) as it is not detrimental for this thesis.
 
-The problem with C types in the context of HM type system is that C uses the const type specifier and its representation
-in HM cannot be compatible with its C meaning.
+However pointers are very significant part of the C language and thus we will model them in the following (intuitive) way:
 
-One reason being that we can assign type `a` to `a` and also `const a' to `a', but not the other way around, and even
-more importantly if we consider a const specifier a part of a type, and we allow applying const to any type, we have
-to deal with reapplying const and that a function can be valid only if, if it has pointer parameters, those parameters
-are pointers to non-const values, as otherwise modifying those values (even in nested calls) would disregard const.
+We will model the pointers as type constructors applied to the types of values they point to (\lstinline{int *} will be modelled as \lstinline{(*) Int}).
 
-Therefore const specifier cannot be part of the type (and so in this thesis we will ignore it as it has no meaning on
-meaning of the code).
+This gives the reference \lstinline{&} and dereference \lstinline{*} functions obvious types $&: \forall a . a \rightarrow (*) a$ and $*: \forall a . (*) a \rightarrow a$.
 
-Types of C functions then can be modeled as functions taking a tuple of parameters and returning the return type of the
-function.
+The problem with C types in the context of HM type system is that C uses the \lstinline{const} type specifier and its representation in HM cannot be compatible with its C meaning.
+
+One reason being that we can assign type `a' to `a' and also `const a' to `a', but not the other way around, so assignment would have to have two different type schemes.
+
+It has to be modelled separately from the type system and so we will omit the \lstinline{const} specifier in this thesis and leave it for future work. % TODO: rephrase this section, split to subsections
+
+Types of C functions then can be modeled in the following way:
+
+We will consider the parameters $p_1, \dots p_n$ of the given function being a tuple of type $T$ and the return value of type $R$, then the type of the function will be modelled as $T \rightarrow R$.
+
+Calls to the function will be modelled as applying the function to the tuple of parameters.
 
 
-\section{Polymorphic C}
+\section{Type classes in C}
 
-There are some data structures and algorithms in the C standard that could be better represented using polymorphism instead of relying on
-macros, an evidence of that could be popularity of languages like c++, d, rust, etc.
-
-\section{Typeclasses in C}
-
-Sometimes the same process we want to make requires different implementation of some parts of the algorithm
-for each type. This can be achieved either by some run-time checking or some kind of overloading, and overloading via
-constraint-based type classes in the context of C is proven to work as this mechanism sees heavy use in C++, for example,
+Sometimes the same process we want to make requires different implementation of some parts of the algorithm for each type. This can be achieved either by some run-time checking or some kind of overloading, and overloading via constraint-based type classes in the context of C is proven to work as this mechanism sees heavy use in C++, for example,
 where it is simulated via partial specializations of templates.
 
 % TODO: https://mail.haskell.org/pipermail/beginners/2010-December/006057.html
+
+\section{Modelling C}
+
+Here we will use $\lambda_C$ to denote transformation from C to the syntax of lambda calculus extended by the haskell version of the HM type system, this transformation can be actually done in a multiple of ways and we will present only one such way, not necessarily the most efficient.
+
+And for keeping the model simple we will allow ourselves to disregard the imperative structure of the code, most notably we will ignore whether a statement is inside a block following a certain control statement, or it is outside of such block - this is not relevant for type checking nor type inference.
+
+We will also allow ourselves to reorder statements as long as they are inside the same function (or in the global scope).
+
+Models of some C constructs can be as follows (grammar taken from ): % TODO: http://www.quut.com/c/ANSI-C-grammar-y.html
+
+\subsection{Expressions and Statements}
+
+We will model most expressions very intuitively:
+
+$\lambda_C(additive\_expression + multiplicative\_expression) = \\ plus_C (\lambda_C\ additive\_expression) (\lambda_C\ multiplicative\_expression)$
+
+This example demonstrates the most simple case where where we can model the C construct "one to one", but there are more tricky examples like the following one (an initialization in a context of a function body):
+
+$\lambda_C(declaration\_specifiers\ \text{IDENTIFIER} = initializer; \dots) = \\ (\lambda\ \text{IDENTIFIER} : \lambda_C(declaration\_specifiers) .\ \lambda_C(\dots)) (\lambda_C\ initializer)$
+
+(The dots represent the rest of the function body)
+
+Initialization creates binding (as stated before) so we have to model that by creating a new abstraction and put the whole part of the function's body that follows this initialization (this in effect means that all the return values of these nested functions will share the same type as the function which contains them - the function the assignment appears in).
+
+This contrasts with assignment which just requires the parameters be of the same type (this will be the type of its return value as well). This means that all initializations have to be represented as abstractions (or equivalently to that) while all assignments are the trivial case.
+
+A similar thing are switch statements where the switch "call" can be modeled as an initialization to an anonymous variable and the single case statements as equality comparisons to this variable.
+
+Apart from switch statements and assignments we can model almost everything in a similar fashion to the first example. One notable exception being return statements, which will be handled separately.
+
+\subsubsection{Control Statements}
+
+We can completely ignore the structure of control statements, disassembling them into separate statements - however we can give their conditions and bodies special names.
+
+The only requirement is that the conditions have to be \emph{zero-comparable}. % FIXME: consult with Mirek
+
+\subsection{Function definitions}
+
+First we will define how we model functions where there are no inner initializations (and switch statements):
+
+We will model those functions as an abstraction of a sequences of nested $\text{let}$ clauses (each for every statement in the function body, every time assigning to a fresh new variable) where the innermost is of a form $\text{let } \dots \text{ in } e$ where $e$ is of the form $\text{return}\ e''\ e'$ where $e''$ is one of the return expressions and $e'$ is defined as $e$ without considering $e''$, the last $e'$ when we have no more return expressions is a new virtual constant of the return type. The $\text{return}$ function has the typing $\forall a . a \rightarrow a \rightarrow a$ and it is used to connect the types of return expressions.
+
+Then we will generalize this definition for the function where there are some inner initializations:
+
+First we move all initializations before all other statements and then we model them as shown in % TODO: Expressions and Statements
+
+\subsubsection{Example}
+
+We would model the function:
+
+\begin{lstlisting}
+int f(int x)
+{
+	x = 10;
+	int y = x - 5;
+
+	if (y) return y;
+
+	return x;
+}
+\end{lstlisting}
+
+as:
+
+$f = \lambda x : int . (\lambda y : int . \text{let}\ expr_1 = (=)\ x\ 10; if_1 = \text{is_zero}\ y\ \text{in}\ \text{return}\ x\ (\text{return}\ y\ (c : int))) ((-)\ x\ 5)$
+
+Here we simplify the sequence of $\text{let}$ clauses into one $\text{let}$ clause with $;$-separated list of assignments.
+
+We can see in this example that the model doesn't necessarily preserve the order of statements, nor the imperative meaning of the code.
