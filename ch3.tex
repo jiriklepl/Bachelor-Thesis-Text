@@ -1,39 +1,71 @@
 \chapter{CHM compiler}
 
-Our implementation of the CHM compiler uses preprocessing and postprocessing by gcc
-with intermediate representation being pure C.
+Our implementation of the CHM compiler uses preprocessing and postprocessing by gcc with the intermediate representation being the C language.
 
-This allows us to focus on type inference and type checking instead of dealing with
-meaning of the code, but the nature of this decision requires implementing some mangling
-of names to give instances unique names.
-
+This allows us to focus on type inference and type checking instead of dealing with the meaning of the code, but the nature of this decision requires implementing some mangling of names to give instances unique names.
 
 \section{Language extensions}
 
-The pure C language is extended by polytyped functions and structures and by
-an addition of typeclasses which allow a way of overloading.
+The C language is extended with polytyped functions and structures for parametric polymorphism and by an addition of type classes which offer a way of controlled ad-hoc polymorphism.
 
-Polytyped functions allow to do the same algorithm on different data
-which is useful in many situations, one such situation being iterating
-through a list of items to do some action on them.
+These extensions are explained more closely in the previous chapters in the context of the type system, here we will describe an actual application of them.
 
-Polytyped structures can mainly serve as generic containers.
-One example of this being % TODO: give an example
+We will borrow the application from the haskell language, however in haskell there is a clear distinction between variables and non-variables. In C we don't have this distinction grounded in the core of the language and we want to preserve it as much as possible.
 
-Type-classes together with polytyped functions allow us to give different
-implementations to some functions depending on their parameters or return
-types, this is especially useful in situations where the same implementation
-for different data could lead to some slow-down or it could be even
-impossible to make such an implementation.
+So to preserve the syntactic principles of the C language we will use a syntax similar to languages like C++, Java, C\#, etc. Those languages have become very popular and so it shouldn't be a bad choice. % FIXME: pls reword this, and upwards
 
-% TODO: one example could be sorting where sorting numbers requires just a simple compare but in strings' case it required char-by-char iteration
+\subsection{Polytyped Definitions}
 
+We will explain polytyped (generic) definition on this example of a definiton of a class:
+
+\begin{lstlisting}
+    <a>
+    class Print
+    {
+        void deref(a);
+    }
+\end{lstlisting}
+
+Here we see the part \lstinline{<a>}, similar to C++'s templates and to Java generics, but in this syntax always preceding the rest of the definition. This part has the following grammar rule: % TODO: give it a name
+
+$:= <type\_declarations> | <type\_declarations : constraints> | < : constraints >$
+
+Where the \emph{type\_declarations} is a list of new type variables and \emph{constraints} is a list of predicates and new type definitions (which are very similar to typedefs).
+
+\subsubsection{Type Classes, Their Instances and Structs}
+
+The previous example shows how we would define a simple \emph{type class}, here we declare only one type we use in declarations of the class's methods and so it is implicitly considered it's type parameter. The type parameter can be specified explicitly following the name of the class:
+
+\begin{lstlisting}
+    <a>
+    class Print<a>
+    {
+        void deref(a);
+    }
+\end{lstlisting}
+
+We will then use similar syntax for application of types to its \emph{instances} (and in other contexts where we apply types to something).
+
+For \emph{structs} we will use a very similar syntax to the first example of a type class definition.
+
+\subsubsection{Functions}
+
+Functions will use the very same syntax, however with a slightly different behavior, they don't have any type parameters and instead they have type schemes such that their qualified types (containing the predicates specified following the type declarations) are quantified over the declared types.
+
+\section{Parsing}
+
+Parsing of the code is handled by the language-c project which is slightly modified into language-chm. % TODO: visq/language-c
 
 \section{Type inference}
 
-For the type inference we use thih, % TODO
-but using it sensibly requires some modifications to be made and also a large
-amount of pre/post-processing of the code.
+For the type inference we use the thih project, % TODO: thih
+but using it sensibly requires some modifications to be made, then there are some more modifications as the original thih project isn't meant to be a real implementation.
+
+Using thih requires a significant pre/post-processing of the code, described in the previous chapter. % TODO: modelling
+
+The main parts of preprocessing the code are in the AST-to-THIH project, postprocessing is then in the CHM-instantiate project which also passes parts of the code to AST-to-THIH. Both of these projects are specifically built for this thesis.
+
+% FIXME: continue from here
 
 \subsection{Typeclass preprocessing}
 
