@@ -3,22 +3,31 @@
 
 \section{Example: Polymorphic lists}
 
-Polymorphic lists can be implemented as follows:
+One example where it would be useful to support polymorphic code are polymorphic lists. There are many implementations of them using macros and requiring the user to explicitly specify the instance's name or type every time they want to use it.
+
+We can encounter such lists in the linux kernel for example, the implementation defined in \emph{./include/linux/list.h}. % TODO: Torvald's git repo
+
+However here we will focus on the standardized QUEUE library's list.
+
+Simple polymorphic lists can be implemented as follows (note this implementation is simplified and the push function is suboptimal for nontrivial data):
 
 \begin{lstlisting}
 <a : b ~ struct List : <a> >
 struct List
 {
-    a value;
     b *next;
+    a value;
 };
+\end{lstlisting}
 
-Then we can implement its methods as follows:
+Then we can implement its functions as follows:
 
+\begin{lstlisting}
 <a : b ~ struct List : <a> >
 b *push(b *head, a value)
 {
-    b *item = new(); // new() is an stl function behaving as malloc(sizeof(b))
+    b *item = new();
+    // new() is an stl function behaving like malloc(sizeof(b))
     item->value = value;
     item->next = head;
     return item;
@@ -33,54 +42,38 @@ b *pull(b *head)
 }
 \end{lstlisting}
 
-In C we could create a similar structure using \lstinline{<queue.h>}'s standardized \lstinline{SLIST_...} macros.
-This requires us to create each list type instance separately which is easy to forget
-and in invocations of its functions it requires use of macros taking for example the name of the field that
-contains the next entry or the type of the entries in the list (on top of obvious parameters like the head).
+In C we could create a similar structure using \lstinline{<queue.h>}'s standardized \lstinline{SLIST_...} macros. This requires us to create each list type instance separately and in invocations of its functions it requires us to pass additional parameters. For example SLIST's equivalent of our \lstinline{pull} function, \lstinline{SLIST_REMOVE_HEAD}, takes as an additional \lstinline{entries} argument (a structure member of the entry node that connects the elements constructed by the \lstinline{SLIST_ENTRY} macro) on top of the expected \lstinline{head} argument. % TODO: queue(3) man page
 
 \section{Future work}
 
-If this project proves itself, the future work has to include extending the stl library and also
-it should implement a compiler which wouldn't rely on gcc and C.
+If this project proves itself, the future work has to include extending the stl library and also it should implement a compiler which wouldn't rely on gcc and C.
 
-The project also needs extend its support on all C types, there are only some of them (the main ones)
-supported currently.
+The project also needs extend its support on all C types, there are only some of them (the main ones) supported currently.
 
 \subsection{Better support for record fields}
 
-The current specification of a record field of two different structures in CHM is that if they share name, they shall share the type as well
-(which can be ambiguous). The compiler then creates an implicit class having specializations for each structure containing the field
-named \lstinline{Has_<field>} which states it is possible to access `<field>' on this structure.
+The current specification of a record field of two different structures in CHM is that if they share name, they shall share the type as well (which can be ambiguous). The compiler then creates an implicit class having specializations for each structure containing the field named \lstinline{Has_<field>} which states it is possible to access `<field>' on this structure.
 
-In the future the specification for the polymorphic fields should be that their types reflect their dependencies on the type
-parameters of the struct which they are fields of in the exact same order (counted from the back) to each other and for all possible types of those parameters they
-still share the type.
+In the future the specification for the polymorphic fields should be that their types reflect their dependencies on the type parameters of the struct which they are fields of in the exact same order (counted from the back) to each other and for all possible types of those parameters they still share the type.
 
 There should be a compiler option that would forbid fields from sharing their names completely and another that would just trigger a warning.
 
-Then another sharing of names of fields should be defining fields in type family definitions, where all specializations would
-have these fields without any warning or error even under the effect of the option stated above. Different specializations would
-then still be able to add their own field on top of the shared ones. The implicit \lstinline{Has_<field>} class would apply here as well.
+Then another sharing of names of fields should be defining fields in type family definitions, where all specializations would have these fields without any warning or error even under the effect of the option stated above. Different specializations would then still be able to add their own field on top of the shared ones. The implicit \lstinline{Has_<field>} class would apply here as well.
 
 \subsection{Modules}
 
-Having a lot of structures with even more of fields and matching procedures would create a problem of having many names being already
-in use and thus this language would prosper from having a module system akin to many modern languages.
+Having a lot of structures with even more of fields and matching procedures would create a problem of having many names being already in use and thus this language would prosper from having a module system akin to many modern languages.
 
 This would allow for hiding fields if they are not important for the future user.
 
 \subsection{Data type specializations}
 
-Data type specialization is not currently supported, but a great candidate matching the current context of the language would be
-type families (for example used in haskell).
+Data type specialization is not currently supported, but a great candidate matching the current context of the language would be type families (for example used in haskell).
 
-Their addition would be hugely beneficial for the language just like partial specialization is for C++ as
-those mechanisms can be considered equivalent in many cases of use.
+Their addition would be hugely beneficial for the language just like partial specialization is for C++ as those mechanisms can be considered equivalent in many cases of use.
 
 Their use would be especially important for optimizing implementations, for example:
 
-If we want to remember arbitrary integral numbers with repetition, we could use a map from numbers to their counts,
-however for some very limited ranges (or for booleans) we could implement the semantically equivalent data structure using
-only few variables or static arrays.
+If we want to remember arbitrary integral numbers with repetition, we could use a map from numbers to their counts, however for some very limited ranges (or for booleans) we could implement the semantically equivalent data structure using only few variables or static arrays.
 
-\xxx{Celkove shrnout ze na to je potreba naimplementovat ten uplnej constraint-solving typesystem z haskelu, coz je mimo scope. :D}
+% TODO: FROM MIREK: Celkove shrnout ze na to je potreba naimplementovat ten uplnej constraint-solving typesystem z haskelu, coz je mimo scope. :D

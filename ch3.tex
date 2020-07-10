@@ -54,7 +54,9 @@ Functions will use the very same syntax, however with a slightly different behav
 
 \section{Parsing}
 
-Parsing of the code is handled by the language-c project which is slightly modified into language-chm. % TODO: visq/language-c
+Parsing of the code is handled by the language-c project, originally meant for c99, which is slightly modified into language-chm. % TODO: visq/language-c
+
+This project is used for output of pretty-printed C code as well.
 
 \section{Type inference}
 
@@ -65,52 +67,36 @@ Using thih requires a significant pre/post-processing of the code, described in 
 
 The main parts of preprocessing the code are in the AST-to-THIH project, postprocessing is then in the CHM-instantiate project which also passes parts of the code to AST-to-THIH. Both of these projects are specifically built for this thesis.
 
-% FIXME: continue from here
+All type inference principles are explained in the first chapter. The basis for the implementation is then explained in % TODO: thih
 
-\subsection{Typeclass preprocessing}
+\section{Monomorphization and Instantiation} % TODO: fix name
 
-All typeclasses are just language construct, they are not manifested in the resulting code and thus they
-count as a zero abstraction feature. There are some built-in typeclasses, % TODO
-implicit typeclasses for each field of a structure (and a union) and then user=defined typeclasses.
+Monomorphization of functions begins with monotype functions and then continues recursively when we determine the monotypes of all occurrences of polytype functions called from them.
 
-Definitions of user-defined typeclasses are stored in the compiler as lists their methods are not important
-for type-checking. All methods defined in type classes are replaced by functions with a constraint on the type
-parameter of the typeclass. Then in instantiation the compiler checks whether they are methods and acts accordingly,
-replacing them with the correct specialization, if indeed they are methods.
-
-\subsection{Record fields}
-
-Implementing support for record fields was difficult as in functional programming the way
-record fields work in C has no real equivalent (pretty close being haskell's object notation or ML's records)
-
-Record fields are implemented in such a way that we require the fields to be named differently
-or to have the exact same type, all other situations are not specified as this cannot be
-statically expressed in HM type system in any sensible way.
-
-\xxx{Rict ze to ve FP nema obdobu takze na to aktualne dost kaslem.}
-
-\subsection{Overloaded operators}
-\xxx{...jen kdyz budes nejak resit operatory.}
-
-\section{Monomorphization}
-
-Monomorphization of functions is solved by recursive instantiation of symbols used in bodies of functions
-starting from monotype functions.
-
-Same applies to structures.
+Similarly for types (and namely structs).
 
 We will describe the process only on functions, but the principles of it carry to structures as well.
 
-We start with monotype functions as we can already determine their monomorphic type. We replace all polymorphic
-symbols in their definitions with unique symbols (distinct even if the original symbol was the same) with each
-assigned a new unique type variable. We run the inference algorithm on this rewritten definition and then if
-we successfully determined each monotype (for example we cannot if we have a type variable `a' in the declaration `a x;'
-and `a' is never used again) we instantiate each of the original symbols given the new inferred type (unless we have done already).
+We start with monotype functions as we can already determine their monomorphic type. We replace all polymorphic symbols in their definitions with unique symbols (distinct even if the original symbol was the same) with each assigned a new unique type variable. We run the type inference algorithm on this rewritten definition and then if we successfully determined each monotype we instantiate each of the original symbols given the new inferred type (unless we have done so already - this implies we have to keep a record of all instances).
 
-\subsection{Overloading resolution}
+Instantiation of polytyped functions is done by simply replacing the quantified type variables with the types so its resulting type scheme matches the one inferred for its occurrence in the caller. From there the process repeats as if the instance was a regular monomorphic function, there is one exception to this being type class methods which we will discuss in the very next part.
 
-Overloading is resolved by remembering which symbols belong to methods (or type families), then we look with which type of an
-instance it can unify to determine which definition of the function (structure) we want to instantiate.
+\subsection{Type class preprocessing}
+
+All type classes are just language constructs, they are not manifested in the resulting code in any shape or form and thus they count as a zero abstraction feature. There are some built-in type classes, % TODO: list the type classes
+implicit type classes for each field of a structure (and a union) and then user-defined type classes before in this chapter.
+
+Definitions of user-defined type classes are stored in the compiler as lists of their methods that act like regular polytypes until we instantiate them. All methods defined in type classes are replaced by functions with a single predicate constraint on the type parameter of the type class.
+
+When a method is instantiated the compiler checks its instances and determines which one matches the type scheme of the intended instance. Then it instantiates this one method instance.
+
+% FIXME: continue from here...
+
+\subsection{Record fields}
+
+Implementing record fields was challenging as the way record fields work in C has no real equivalent in the context of functional programming, although haskell's object notation or ML's records come pretty close to it.
+
+Record fields are implemented in such a way that we require the fields to be named differently or to have the exact same type, all other situations are not specified as this cannot be statically expressed in HM type system in any sensible way.
 
 \subsection{Recursion limits}
 
@@ -118,16 +104,16 @@ It is indeterminable whether instantiation of something continues forever. We ca
 
 So there is a limit of type depth set to 500 (this limit shouldn't affect any sensible program).
 % FIXME: Changing this limit is possible by adding an option --type-depth=N to the compiler (it can be also used to make stricter constraint as well).
-If some type exceeds this limit, an compilation error will be outputted stating what the compiler was instantiating
-at that time.
+If some type exceeds this limit, an compilation error will be outputted stating what the compiler was instantiating at that time.
 
 \subsection{Comparison to C++ template instantiation}
 
-One could say this project just mirrors template instantiation from C++, but any such resemblance is just
-superficial, C++ template instantiation is not strict in type signatures and different instances can have
+One could say this project just mirrors template instantiation from C++, but any such resemblance is just superficial, C++ template instantiation is not strict in type signatures and different instances can have
 non-matching types.
 
 One example of this would be:
+
+% FIXME: continue from here
 
 \begin{lstlisting}
 template<typename>
@@ -164,18 +150,15 @@ The instantiation in CHM follows inferred types by the HM type system.
 
 \section{Code output}
 
-The CHM compiler outputs gcc-compilable code which interprets the CHM code without any runtime overhead. % TODO: or at least so I hope
+The CHM compiler outputs gcc-compilable code which interprets the CHM code without any runtime overhead. % TODO: or at least I hope so
 
-There are options allowing the user to see the inner haskell representation of the CHM code (it blurs some of the semantics
-unnecessary for type inference and leaves others to facilitate the readability of it), this can be used for debugging
-the compiler implementations. % FIXME: list the options (unimplemented yet)
+There are options allowing the user to see the inner haskell representation of the CHM code (it blurs some of the semantics unnecessary for type inference and leaves others to facilitate the readability of it), this can be used for debugging the compiler implementations. % FIXME: list the options (unimplemented yet)
 
-It should be noted that names of symbols of polytype functions actually used in the C interpretation of the CHM code do not match
-their CHM counterparts which currently complicates debugging of CHM programs (this however can be solved easily on the debugger side).
-
-\chapter{Results and discussion}
+It should be noted that names of symbols of polytype functions actually used in the C interpretation of the CHM code do not match their CHM counterparts which currently complicates debugging of CHM programs (this however can be solved easily on the debugger side).
 
 \iffalse
+\chapter{Results and discussion}
+
 Instead, try some of the following:
 \begin{itemize}
 \item State a hypothesis and prove it statistically

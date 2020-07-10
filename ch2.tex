@@ -19,7 +19,7 @@ The lack of any type checking in context of macros makes the possible bugs manif
 
 And as for generic pointers a bug usually becomes apparent only in the runtime and that by corruption of the memory.
 
-One real-life example of making "generic" data structures via macros is kernel's \lstinline{__KHASH_TYPE} macro (in `./khash.h'):
+One real-life example of making "generic" data structures via macros is klib's \lstinline{__KHASH_TYPE} macro (in `./khash.h'): % TODO: https://github.com/attractivechaos/klib
 
 \begin{lstlisting}
 #define __KHASH_TYPE(name, khkey_t, khval_t) \
