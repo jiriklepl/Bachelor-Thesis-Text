@@ -31,9 +31,7 @@ One real-life example of making "generic" data structures via macros is klib's \
 	} kh_##name##_t;
 \end{lstlisting}
 
-If we were to create an instance of this structure where \lstinline{khkey_t=int}, and \lstinline{khval_t=float},
-we would have to use this macro to instantiate the structure explicitly:
-\lstinline{__KHASH_TYPE(name, int, float)} and also we would have to instantiate all its functions, though we can wrap this into yet another macro.
+If we were to create an instance of this structure where \lstinline{khkey_t=int}, and \lstinline{khval_t=float}, we would have to use this macro to instantiate the structure explicitly: \lstinline{__KHASH_TYPE(name, int, float)} and also we would have to instantiate all its functions, though we can wrap this into yet another macro.
 
 This approach also requires explicit mention of the instance in the corresponding function calls
 
@@ -54,35 +52,71 @@ Adding the features of the HM type system doesn't change the core nature of the 
 
 We will present only slightly modified syntax of the C language which will give a type-safe alternative for many cases where we would otherwise use the aforementioned \lstinline{void *} pointers or macros.
 
+\iffalse
 \section{C99 types}
 
 % TODO: http://www.open-std.org/jtc1/sc22/WG14/www/docs/n1256.pdf speaks about them
 
 All C types
+\fi
 
 \section{C types in Hindley-Milner context}
 
-In this section we will specify how we will model the type system of C in the HM type system so we could extend it.
+In this section, we will specify how we will model the type system of C in the HM type system so we could extend it. We will use the $\lambda_C$ function to define the projection of C types to HM formally (we will then extend this function for expressions). The modelling is quite straightforward, but we will give our reasoning and explanation for each case after giving a formal definition.
 
-All main C data types can be trivially modelled as type constants, we can model signed and unsigned versions as either two separate types or by using \lstinline{unsigned} and \lstinline{unsigned} type constructors. We will ignore this part of the C type system (along with \lstinline{long} specifiers) as it is not detrimental for this thesis.
+\subsection{Integral Types}
 
-However pointers are very significant part of the C language and thus we will model them in the following (intuitive) way:
+\begin{defn}[$\lambda_C$ for integral types]
+	If $t$ is an integral type recognized by the C language, we will set $\lambda_C\ t := t$.
+\end{defn}
 
-We will model the pointers as type constructors applied to the types of values they point to (\lstinline{int *} will be modelled as \lstinline{(*) Int}).
+All main C integral types (like \lstinline{int} or \lstinline{char}) can be trivially modelled as type constants, we can model signed and unsigned versions as either two separate types or by using \lstinline{unsigned} and \lstinline{signed} type constructors. Though to make the system as consistent as possible in this matter we propose considering sequences of type specifiers like for example \lstinline{unsigned long long int} as single type constants. This means that type specifier sequences containing \lstinline{unsigned} would be illegal if they are illegal in C (same for the other type specifiers).
+
+This is not considered by the compiler proposed by this thesis as it not an important issue for the demonstration of the effect of the HM type system and polymorphism on the C language. % TODO: side note
+
+\subsection{Pointers}
+
+\begin{defn}[$\lambda_C$ for pointers]
+	$$\lambda_C\ (t\ *) := (*)\ (\lambda_C\ t)$$
+	where $(*)$ is the pointer type constructor.
+\end{defn}
+
+We argued that certain sequences of type specifiers (naming integral types) should be considered as single type constants. But pointers do not fit this mindset and we want to use type constructors for them. That is because, whereas \lstinline{unsigned long long int} and \lstinline{long long int} can be considered unrelated types, we want to easily dereference pointers and a generic dereference function would be impossible if we considered types of pointers unrelated to their value types.
+
+We will model the pointers by applying $(*)$ type constructor applying to the types of values they point to (\lstinline{int *} will be modelled as \lstinline{(*) int}).
 
 This gives the reference \lstinline{&} and dereference \lstinline{*} functions obvious types $\&: \forall a . a \rightarrow (*) a$ and $*: \forall a . (*) a \rightarrow a$.
 
-The problem with C types in the context of HM type system is that C uses the \lstinline{const} type specifier and its representation in HM cannot be compatible with its C meaning.
+\subsection{Const specifiers}
 
-One reason being that we can assign type `a' to `a' and also `const a' to `a', but not the other way around, so assignment would have to have two different type schemes.
+One problem with C types in the context of the HM type system is that C uses the \lstinline{const} type specifier and its representation in HM cannot be compatible with its C meaning, we will discuss it later in this section.
 
-It has to be modelled separately from the type system and so we will omit the \lstinline{const} specifier in this thesis and leave it for future work. % TODO: rephrase this section, split to subsections
+We propose that \lstinline{const} has to be handled separately from the type system and so we will omit the \lstinline{const} specifier in this thesis and leave it for future work.
 
-Types of C functions then can be modeled in the following way:
+One reason for the incompatibility is that we can assign type `a' to `a' and also `const a' to `a', but not the other way around in the latter case. Keeping this behavior, and considering \lstinline{const a} a type, would imply introducing subtyping to the type system (\lstinline{const a} being a subtype of \lstinline{a}) and this has its own issues described in % FIXME: reference subtyping
+
+Handling the \lstinline{const} specifier similarly to the way we handle pointers (this would mean explicit conversion when assigning from \lstinline{const} types) would make a trivial assignment of \lstinline{const} type to a non-\lstinline{const} unnecessarily verbose (which is usually considered a bad language design). Then we would need to prevent assigning \lstinline{const} to another \lstinline{const} of the same type which brings even more issues either making the code even more verbose or checking it during instantiation, which is the thing we want to avoid by type checking.
+
+\subsection{Functions}
+
+\begin{defn}[$\lambda_C$ for functions]
+	$$\lambda_C\ (t(p_1, \dots p_n)) := (\lambda_C\ p_1, \dots \lambda_C\ p_n) \rightarrow \lambda_C\ t$$
+	note that here the parentheses around parameters $p_1$ through $p_n$ on the left side of the assignment are syntactical. $\rightarrow$ is the function type constructor.
+\end{defn}
+
+Types of C functions can be modeled in the following way:
 
 We will consider the parameters $p_1, \dots p_n$ of the given function being a tuple of type $T$ and the return value of type $R$, then the type of the function will be modelled as $T \rightarrow R$.
 
 Calls to the function will be modelled as applying the function to the tuple of parameters.
+
+\subsection{Structs and Unions}
+
+\begin{defn}[$\lambda_C$ for structs]
+	If $s$ is a struct recognized by the C language, we will set $\lambda_C\ s := s$.
+\end{defn}
+
+Structs and Unions are each considered a different type. This approach is common among all languages based on C.
 
 \section{Type classes in C}
 
