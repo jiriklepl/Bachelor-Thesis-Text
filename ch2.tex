@@ -1,17 +1,19 @@
 \chapter{Type inference and polymorphism for C}
 
-\subsection{Why Would We Want Type Inference and Polymorphism?}
+\section{Reasons for Polymorphism Features}
 
-One of the main problems of C is its weak type system and a lack of support of generic programming. Weak type system in the context of generic programming is a very common source of bugs and misuses. Lack of support of generic programming leads to an extensive use of `void *' pointers and macros. % FIXME: better wording pls
+The C language is one of the main languages for system development. It is valued for its simplicity, for its transparency, and for giving the user high control over the memory management.
 
-Generic (void) pointers can point to any data structure and thus they can be used in "generic" code to work with virtually any data. This makes them a very strong tool, and almost every program relies on them, % TODO: link malloc, free
+But then C lacks any support for polymorphism and generic programming. This is often compensated by extensive use of macros and \lstinline{void *} pointers which don't offer any type safety and thus can be easily misused.
+
+\textbf{Generic (\lstinline{void *}) pointers} can point to any data structure and thus they can be used in "generic" code to work with virtually any data. This makes them a very strong tool, and almost every program relies on them, % TODO: link malloc, free
 But these pointers carry no type information and so to use these pointers one has to either know the actual types when they use them, or the type has to be passed explicitly.
 
 One example of using void pointers can be `malloc' which without any type inference requires the user to calculate the required themselves (this can seem to be trivial to do, but it still generates some code noise and it is a possible source of bugs).
 
-As we stated before one other common way of implementing generic algorithms and data structures is by using macros, however if we implement a data structure as a macro then all required instances of it and dedicated procedures working on them have to be instantiated explicitly by the user. This can lead to many hard to find bugs.
+As we stated before one other common way of implementing generic algorithms and data structures is by using \textbf{macros}, however if we implement a data structure as a macro then all required instances of it and dedicated procedures working on them have to be instantiated explicitly by the user. This can lead to many hard to find bugs.
 
-Thankfully many modern compilers are macro-aware and so if there is a compile-time bug in the program then the compiler can create a user-friendly error output (for example gcc). % TODO: create an error source
+Thankfully many modern compilers are macro-aware and so if there is a compile-time bug in the program then the compiler can create a user-friendly error output (for example GCC). % TODO: create an error source
 
 But when it comes to debugging there has to be done some nontrivial preprocessing of the source files to make it possible to use conventional debuggers (like gdb) to find bugs in macro expansions. % TODO: link something maybe?
 
@@ -60,7 +62,7 @@ We will present only slightly modified syntax of the C language which will give 
 All C types
 \fi
 
-\section{C types in Hindley-Milner context}
+\section{Modelling C Types in HM}
 
 In this section, we will specify how we will model the type system of C in the HM type system so we could extend it. We will use the $\lambda_C$ function to define the projection of C types to HM formally (we will then extend this function for expressions). The modelling is quite straightforward, but we will give our reasoning and explanation for each case after giving a formal definition.
 
@@ -116,20 +118,13 @@ Calls to the function will be modelled as applying the function to the tuple of 
 	If $s$ is a struct recognized by the C language, we will set $\lambda_C\ s := s$.
 \end{defn}
 
-Structs and Unions are each considered a different type. This approach is common among all languages based on C.
-
-\section{Type classes in C}
-
-Sometimes the same process we want to make requires different implementation of some parts of the algorithm for each type. This can be achieved either by some run-time checking or some kind of overloading, and overloading via constraint-based type classes in the context of C is proven to work as this mechanism sees heavy use in C++, for example,
-where it is simulated via partial specializations of templates.
-
-% TODO: https://mail.haskell.org/pipermail/beginners/2010-December/006057.html
+Structs and Unions are each considered a different type even if they share all of their members. This approach is common among all languages based on C.
 
 \section{Modelling C}
 
-Here we will use $\lambda_C$ to denote transformation from C to the syntax of lambda calculus extended by the haskell version of the HM type system, this transformation can be actually done in a multiple of ways and we will present only one such way, not necessarily the most efficient.
+Here we will use $\lambda_C$ introduced in the previous section to denote transformation from C to the syntax of the haskell extension of lambda calculus, this transformation can be done in a multiple of ways and we will present only one such way, not necessarily the most efficient one.
 
-And for keeping the model simple we will allow ourselves to disregard the imperative structure of the code, most notably we will ignore whether a statement is inside a block following a certain control statement, or it is outside of such block - this is not relevant for type checking nor type inference.
+For keeping the model simple we will allow ourselves to disregard the imperative structure of the code, most notably we will ignore whether a statement is inside a block following a certain control statement, or it is outside of such block - this is not relevant for type checking nor type inference.
 
 We will also allow ourselves to reorder statements as long as they are inside the same function (or in the global scope).
 
@@ -139,11 +134,17 @@ Models of some C constructs can be as follows (grammar taken from ): % TODO: htt
 
 We will model most expressions very intuitively:
 
-$\lambda_C(additive\_expression + multiplicative\_expression) = \\ plus_C (\lambda_C\ additive\_expression) (\lambda_C\ multiplicative\_expression)$
+\begin{defn}[$\lambda_C$ for binary operators]
+	$$\lambda_C(add\_expr + mul\_expr) :=\\ plus_C\ (\lambda_C\ add\_expr) (\lambda_C\ mul\_expr)$$
+	similarly for unary (and ternary) operators
+\end{defn}
 
-This example demonstrates the most simple case where where we can model the C construct "one to one", but there are more tricky examples like the following one (an initialization in a context of a function body):
 
-$\lambda_C(declaration\_specifiers\ \text{IDENTIFIER} = initializer; \dots) = \\ (\lambda\ \text{IDENTIFIER} : \lambda_C(declaration\_specifiers) .\ \lambda_C(\dots)) (\lambda_C\ initializer)$
+This example demonstrates the most simple case where we can model the C construct directly, but there are more tricky examples like the following one (an initialization in a context of a function body):
+
+\begin{defn}
+	$$\lambda_C(decl\_specs\ \text{IDENT} = init; \dots) := (\lambda\ \text{IDENT} : \lambda_C(decl\_specs) .\ \lambda_C(\dots)) (\lambda_C\ init)$$
+\end{defn}
 
 (The dots represent the rest of the function body)
 
@@ -194,3 +195,9 @@ $f = \lambda x : int . (\lambda y : int . \text{let}\ expr_1 = (=)\ x\ 10; if_1 
 Here we simplify the sequence of $\text{let}$ clauses into one $\text{let}$ clause with $;$-separated list of assignments.
 
 We can see in this example that the model doesn't necessarily preserve the order of statements, nor the imperative meaning of the code.
+
+\section{Extensions to the C language}
+
+We showed we can model the C language constructs in haskell so we can easily apply type inference and from inferred types do instantiation of generic code (we will add to the language) to its intended monotypes.
+
+We will extend the language by \emph{type classes} and \emph{type variables}, the syntax and decisions behind it will be explained in the following chapter.
