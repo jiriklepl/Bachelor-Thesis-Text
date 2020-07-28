@@ -4,7 +4,7 @@
 
 The C language is one of the main languages for system development. It is valued for its simplicity, for its transparency, and for giving the user high control over the memory management.
 
-But then C lacks any support for polymorphism and generic programming. This is often compensated by extensive use of macros and \lstinline{void *} pointers which don't offer any type safety and thus can be easily misused.
+But then C lacks any support for polymorphism and generic programming. This is often compensated by extensive use of macros and \lstinline{void *} pointers which do not offer any type safety and thus can be easily misused.
 
 \textbf{Generic (\lstinline{void *}) pointers} can point to any data and thus they can be used in some "generic" code. This makes them a very strong tool, and almost every program relies on them (for example: \lstinline{malloc}, \lstinline{free}; for some examples see \cite{organisation1999iso}). But these pointers carry no type information and so to use these pointers one has to either know the actual types when they use them, or the type has to be passed explicitly.
 
@@ -41,7 +41,7 @@ For example in this case we would clear the structure by calling
 
 Using type checking and type inference described in this thesis have effect very similar effect to instantiating definitions via macro expansion, but with the benefit of brevity, catching bugs early (due to checking the implementation when it is defined) and having fewer requirements on mindfulness of the user. All of these effect can lead to less error-prone code.
 
-Adding generic programming features to C thus can help to debug programs written in this language and to make writing generic code more user friendly and easier to maintain/expand. % FIXME: wording is evil here.
+Adding generic programming features to C thus can help in debugging programs written in this language and to make writing generic code more user friendly and easier to program in and maintain.
 
 \subsection{Why the Hindley-Milner Type System}
 
@@ -49,7 +49,7 @@ The C language has a great support for the procedural programming paradigm with 
 
 There have been many attempts of adding object-oriented features (most notable being C++).
 
-Adding the features of the HM type system doesn't change the core nature of the language, it just facilitates creating generic abstractions and with the addition of type classes it adds support for both simple and expressive ad-hoc polymorphism.
+Adding the features of the HM type system does not change the core nature of the language, it just facilitates creating generic abstractions and with the addition of type classes it adds support for both simple and expressive ad-hoc polymorphism.
 
 We will present only slightly modified syntax of the C language which will give a type-safe alternative for many cases where we would otherwise use the aforementioned \lstinline{void *} pointers or macros.
 
@@ -159,7 +159,7 @@ Apart from switch statements and assignments we can model almost everything in a
 
 We can completely ignore the structure of control statements, disassembling them into separate statements - however we can give their conditions and bodies special names.
 
-The only requirement is that the conditions have to be \emph{zero-comparable}. % FIXME: consult with Mirek
+The only requirement is that the expression in the condition have to be \emph{zero-comparable}, this implies a type class for types that have a zero (null) value (pointers, integers, booleans).
 
 \subsection{Function definitions}
 
@@ -193,7 +193,7 @@ $f = \lambda x : int . (\lambda y : int . \text{let}\ expr_1 = (=)\ x\ 10; if_1 
 
 Here we simplify the sequence of $\text{let}$ clauses into one $\text{let}$ clause with $;$-separated list of assignments.
 
-We can see in this example that the model doesn't necessarily preserve the order of statements, nor the imperative meaning of the code.
+We can see in this example that the model does not necessarily preserve the order of statements, nor the imperative meaning of the code.
 
 \section{Extensions to the C language}
 

@@ -8,9 +8,9 @@ This allows us to focus on polymorphism, type inference, and type checking inste
 
 The C language is extended by type variables so we can define polytyped functions and structures and by type classes which offer a way of controlled ad-hoc polymorphism. Type classes allow for defining specific (more efficient) implementations to generic algorithms or for restricting types of parameters.
 
-We will borrow the application of these extensions from the haskell language, however, the two languages in question are very different. In haskell there is a clear distinction between variables and non-variables and between values and types but in C we don't have this distinction grounded in the language and we want to preserve it this way as much as possible. So we will require every type variable be declared before it is used (like in the listing \ref{lst:TypeClass1}).
+We will borrow the application of these extensions from the haskell language, however, the two languages in question are very different. In haskell there is a clear distinction between variables and non-variables and between values and types but in C we do not have this distinction grounded in the language and we want to preserve it this way as much as possible. So we will require every type variable be declared before it is used (like in the listing \ref{lst:TypeClass1}).
 
-So to preserve the syntactic principles of the C language we will use a syntax similar to languages like C++, Java, C\#, etc. Those languages have become very popular and so it shouldn't be a bad choice.
+So to preserve the syntactic principles of the C language we will use a syntax similar to languages like C++, Java, C\#, etc. Those languages have become very popular and so it should not be a bad choice.
 
 \begin{listing}
 \caption{CHM Type Class with an Implicit Type Parameter}
@@ -89,7 +89,7 @@ For \textbf{structs} we will use the same syntax as we use for type classes.
 
 \subsubsection{Functions}
 
-Functions will use the very same syntax (see the listing \ref{lst:Function}), however with slightly different behavior, they don't have any type parameters and instead they have type schemes such that their qualified types (containing the predicates specified following the type declarations) are quantified over the declared types.
+Functions will use the very same syntax (see the listing \ref{lst:Function}), however with slightly different behavior, they do not have any type parameters and instead they have type schemes such that their qualified types (containing the predicates specified following the type declarations) are quantified over the declared types.
 
 \section{Parsing}
 
@@ -99,7 +99,7 @@ This project is used for the output of pretty-printed C code as well, this outpu
 
 \section{Type Inference}
 
-For the type inference, we use the thih project \cite{jones1999typing}, but using it sensibly required some modifications to be made to it as the original thih project isn't meant to be used as an efficient implementation.
+For the type inference, we use the thih project \cite{jones1999typing}, but using it sensibly required some modifications to be made to it as the original thih project is not meant to be used as an efficient implementation.
 
 Using thih required a significant pre/post-processing of the code, described in the previous chapter. % TODO: modelling
 
@@ -145,7 +145,7 @@ This approach perfectly matches the syntax of C where we know the name of the fi
 
 It is indeterminable whether the instantiation of something continues forever. We can prove this using post correspondence problem % FIXME: prove it
 
-So there is a limit of type depth set to 500 (this limit shouldn't affect any sensible program, but if need be, it can be changed using the \lstinline[language=sh]{--depth} option). If some type exceeds this limit, a compilation error will be outputted stating what the compiler tried to instantiate at that time.
+So there is a limit of type depth set to 500 (this limit should not affect any sensible program, but if need be, it can be changed using the \lstinline[language=sh]{--depth} option). If some type exceeds this limit, a compilation error will be outputted stating what the compiler tried to instantiate at that time.
 
 \subsection{Comparison to C++ template instantiation}
 

@@ -130,7 +130,7 @@ We can think of it as that the principal typing of $e$ is a typing general enoug
 
 The example just above is a great fit for showing this as for example $\lambda x . x : \sigma$ would be a possible typing, but not a principal one, because substitution $[\sigma := \alpha \rightarrow \alpha \rightarrow \alpha]$ would give use $\alpha \sim \alpha \rightarrow \alpha$, which would yield an incomputable infinite type.
 
-Principal typings will be very important later when we introduce more advanced type systems as the principal type of $e$ is the only information about $e$ we have to consider when we see $e$ again as a subterm of some term $e'$ to check $e'$' typeability (for typeability see below). % TODO: elaborate / provide source, check and correct
+Principal typings will be very important later when we introduce more advanced type systems as the principal type of $e$ is the only information about $e$ we have to consider when we see $e$ again, given it has no free variables.
 
 \subsubsection{Type Instantiation}
 
@@ -192,7 +192,7 @@ The Hindley-Milner type system is a restriction of it that allows for easy type 
 
 \subsection{Type Substitution}
 
-The definition for type substitution and type instances are the same as those for the simply-typed lambda calculus with the exception the rewriting doesn't apply to bound variables.
+The definition for type substitution and type instances are the same as those for the simply-typed lambda calculus with the exception the rewriting does not apply to bound type variables.
 
 \section{Hindley-Milner Type System}
 
@@ -208,9 +208,9 @@ Expressions in HM have the form:
 
 We skipped two more cases not important for the type system, for them see the definition \ref{defn:ifElseHM}.
 
-It differs from the syntax of lambda calculus (and that of the system F) only in the addition of the third clause, called the let statement. Meaning of this clause is the same as of $e' [x := e]$, note that this differs from a very similar construct $(\lambda x . e') e$ using abstraction instead of let in that $x$ in this latter construct cannot be polymorphic, see the next two subsections, this connects to the addition of type schemes and restriction of types, both explained later. % TODO: yeah, clarify it a little bit maybe, use shorter sentences?
+It differs from the syntax of lambda calculus (and that of the system F) only in the addition of the third clause, called the \emph{let statement}. The meaning of this clause is the same as of $e' [x := e]$, but it allows $e$ be polymorphic which is otherwise for subexpressions forbidden. A very similar construct $(\lambda x . e') e$ (using abstraction instead of \emph{let}) would result in all occurrences of $x$ in $e'$ having the same monomorphic type in this system. We will later describe definitions for typings and inference rules that will result in this behavior.
 
-Then there are two additional expressions completing the language that have no significance in the type system and thus we will not further consider them in any of the typing rules, and in the inference algorithm. They are defined as follows:
+There are two additional expressions completing the language that have no significance to the type system and thus we will not further consider them in any of the typing rules, and in the inference algorithm. They are defined as follows:
 
 \begin{defn}[If Then Else and Fix]
     \label{defn:ifElseHM}
@@ -241,10 +241,11 @@ Type schemes are defined similarly to types in the system F. This restriction me
 \begin{defn}[Type Scheme]
     \label{defn:schemeHM}
     $$\sigma ::= \tau\ |\ \forall \alpha . \tau$$
-    where the former case is a monomorphic type scheme and the latter is polymorphic
+    where the former case is a monomorphic type scheme and the latter is polymorphic.
 \end{defn}
 
 \subsubsection{Typing extensions}
+\label{sssec:typingExt}
 
 In the HM type system it is common to introduce the following type operators:
 
@@ -256,13 +257,11 @@ Typing of expressions is modified by the introduction of type schemes into assig
 
 \subsection{Type Instantiation}
 
-Type instantiation differs from that of system F slightly as well as explained  by... % TODO: Damas and Milner
+Type definition of type instantiation carries over from the system F and the simply-typed lambda calculus, but it also applies to \emph{type schemes}. \cite{damas1982principal}
 
 A notable change being an addition of an \textbf{generic instance} of a type scheme $\sigma = \forall \alpha_1, \alpha_2 \cdots \alpha_n . \tau$ which is defined as $\sigma' = \forall \beta_1, \beta_2 \cdots \beta_m . \tau'$ such that $\tau' = \tau S$ for some type substitution $S = [\alpha_1 := \tau_1, \cdots \alpha_n := \tau_n]$, where type variables $\beta_i$ are not free in $\sigma$. We then write $\sigma > \sigma'$.
 
-Note that $\sigma > \sigma'$ implies $\sigma S > \sigma' S$, however it doesn't imply $\sigma S > \sigma$.
-
-Note that... % FIXME: Damas and Milner use a different order for substitution, but we use one which is reverse to them so we are at least a little bit more consistent.
+Note that $\sigma > \sigma'$ implies $\sigma S > \sigma' S$, however it does not imply $\sigma S > \sigma$.
 
 \subsection{Inference Rules}
 
@@ -365,27 +364,24 @@ $\Gamma S \vdash e : \tau$ and furthermore $close_{\Gamma S}(\tau)$ is a princip
 
 \subsection{Extensions of the Type System}
 
-(As described in PTSfPwOaS).
-Pure HM allows for just parametric polymorphism. However without any ad-hoc polymorphism or subtyping, this means there is only one principal type for every symbol in the program and it has just one definition, this is useful in cases where an algorithm (or a function) works on parameters of any types, a good example of that could be the $K$ combinator (sometimes called `const function'). We call these algorithms generic.
+% TODO: As described in PTSfPwOaS
+Pure HM allows for just parametric polymorphism. However without any ad-hoc polymorphism or subtyping, this means there is only one principal type for every symbol in the program and just one definition, this is useful in cases where an algorithm (or a function) works on parameters of any types, a good example of that could be the $K$ combinator (sometimes called `const function'). We call these algorithms generic.
 
 The problem is some functions work only on a particular type, for example basic arithmetic functions. We would like to be able to say, that it makes sense to add two integers, or two real numbers, but not adding two boolean values.
 
-A trivial extension would be the introduction of tagged unions % TODO: see Type schemes
-But if we were to define the $+$ operator as: $(+) : Int + Real \rightarrow Int + Real \rightarrow Int + Real$ we solve the problem with booleans, one different problem comes to the surface: we would like to say that adding two integers yields an integer whereas adding two real numbers yields a real number, one more argument could also be that we would like to forbid adding integers to real numbers (maybe we want to require all data conversions be explicit).
+A trivial extension would be the introduction of tagged unions, see \emph{Typing extensions} in \ref{sssec:typingExt}. But if we were to define the $+$ operator as: $(+) : Int + Real \rightarrow Int + Real \rightarrow Int + Real$ we solve the problem with booleans, one different problem comes to the surface: we would like to say that adding two integers yields an integer whereas adding two real numbers yields a real number, one more argument could also be that we would like to forbid adding integers to real numbers (maybe we want to require all data conversions be explicit).
 
 So what we would like is some way of expressing that $(+)$ takes two parameters of a type we can perform addition on and that the function yields us a result of the same type.
 
-And an answer to this can be the introduction of \textbf{type classes}.
-% TODO maybe: note that they are combinable with tagged unions for better expressiveness
+This can be answered by introducing \textbf{type classes}.
 
-\subsubsection{Type classes}
+\subsubsection{Type Classes and their Methods and Instances}
 
 The idea of type classes (parametrized by generic types) is that we put constraints on types of some variables (or functions) we use in our algorithms. Those constraints tell us that the usage of these algorithms is valid only in the context where the constraints are satisfied (this allows us to implement otherwise impossible generic algorithms, for example sorting).
 
-And also the functions defined inside a type class (we will call them methods) can have a specialized implementation for each \emph{instance}, this was actually the main motivation for their creation: $Eq$ class with a method $==$ which needs to be specialized for each type. % TODO: reference something
+And also the functions defined inside a type class (we will call them \textbf{methods}) can have a specialized implementation for each \emph{instance}, this was actually the main motivation for their creation: $Eq$ class with a method $==$ which needs to be specialized for each type. \cite{hall1994type}
 
-\textbf{Instances} of type classes (parametrized by a type instance of the type of the corresponding type class) are what allows for ad-hoc polymorphism % TODO: add some mention of ad-hoc poly more above
-in a very well controlled matter, they are a limited (but powerful) version of classic overloading where all instances have to share a common supertype and they cannot overlap (share a common type instance - this can be proven by the unification algorithm).
+\textbf{Instances} of type classes (parametrized by a type instance of the type of the corresponding type class) are what allows for ad-hoc polymorphism in a very well controlled matter \cite{wadler1989make}, they are a limited (but powerful) version of classic overloading where all instances have to share a common supertype and they cannot overlap (share a common type instance - this can be proven by the unification algorithm).
 
 Type classes can be added to the algorithm $W$ defined above with only little changes, for example, by simplifying thih \cite{jones1999typing}.
 
@@ -395,24 +391,22 @@ Type classes can be added to the algorithm $W$ defined above with only little ch
 
 Subtyping and overloading are slightly different approaches to the same problem we discussed with specifying what types the $(+)$ function can act on.
 
-If we want to use either of those we have to constrain them somehow or they make type inference undecidable. We will demonstrate the variant defined by professor Geoffrey S. Smith \cite{smith1993polymorphic}.
+If we want to use either of those we have to constrain them somehow or they make type inference undecidable. We will consider the variant defined by professor Geoffrey S. Smith \cite{smith1993polymorphic}.
 
-Subtyping however doesn't solve that problem very well as if we specify that $Int$ is a subtype of $Real$ then we have to accept that $(+)$ applied to two real operands can still return an integer. That doesn't seem that bad from the mathematical point of view, but it can lead to implicit data conversions which can be undesirable, especially if we were to use the type system in a context of a low-level programming. % FIXME
+\textbf{Subtyping} however does not solve that problem very well as if we specify that $Int$ is a subtype of $Real$ then we have to accept that $(+)$ applied to two real operands can still return an integer. That does not seem that bad from the mathematical point of view, but it can lead to implicit data conversions which can be undesirable, especially if we were to use the type system in a context of low-level programming.
 
-Overloading constrained similarly as before in this context then makes these two approaches very similarly expressive. % TODO: check it, also
-
-For the overloading it is not only undecidable but it also contradicts the ideas of parametric polymorphism used in this thesis, where every implementation of an function can be described as a proof of a special case of a theorem described by the principal type of the function and this type is therefore valid for all its implementations. % FIXME: doesn't sound right
+\textbf{Overloading}, giving a symbol more definitions, then is not only undecidable in the context of parametric polymorphism but it also contradicts the ideas of parametric polymorphism, where a function's type should describe the function and its effect on the program (in languages like haskell or ML, the type also describes data dependencies).
 
 \section{Overloading with Type Classes}
 
 Type classes, as stated before, are good for stating an algorithm makes sense only for some types or that it requires a different implementation for different types, usually to enhance performance by writing specialized algorithms for common or critical types instead of writing a general slow algorithm, this was the main motivation behind developing those, % TODO: sounds like a contradiction
 viz different physical instructions for comparing common numeric values.
 
-Usefulness of classes can be shown on `Ord', this constraints requires that two variables of type $\alpha$ s.t. $Ord(\alpha)$, we can say `$\alpha$ is (in) Ord'. But not everything can be partially ordered, take directed graphs, for example, where the reachability of one vertex from another is in `Ord' only if the graph is a directed acyclic graph, in which case we can use algorithms expecting `Ord' on problems concerning reachability, but not otherwise.
+The usefulness of classes can be shown on `Ord', this constraints requires that two variables of type $\alpha$ s.t. $Ord(\alpha)$, we can say `$\alpha$ is (in) Ord'. But not everything can be partially ordered, take directed graphs, for example, where the reachability of one vertex from another is in `Ord' only if the graph is a directed acyclic graph, in which case we can use algorithms expecting `Ord' on problems concerning reachability, but not otherwise.
 
-`Ord' can also show how we could want different instances for different types. Let's say `Ord' has one method $<=$ of type $a \rightarrow a \rightarrow Bool$ with the expected behavior. % TODO: explain a method
+`Ord' can also show how we could want different instances for different types. Let's say `Ord' has one method $<=$ of type $a \rightarrow a \rightarrow Bool$ with the expected behavior.
 
-For two `Int's we just compare them and return whether the first is lower than the other, but if we have, let's say `Customer's, with different Id numbers as keys in some map (or dictionary) then we don't need to compare whole customers, but just their Ids.
+For two `Int's we just compare them and return whether the first is lower than the other, but if we have, let's say `Customer's, with different Id numbers as keys in some map (or dictionary) then we do not need to compare whole customers, but just their Ids.
 
 \section{Haskell Type System}
 
@@ -434,7 +428,7 @@ Then we have kinds of a form $k_1 \rightarrow k_2$ which take a type of a kind $
 
 Kinds are less complex then types as they are defined recursively only from the two rules defined in the previous two paragraphs.
 
-For example we can define a very common type constructor $List: * \rightarrow *$ which takes a type $a$ and returns a type representing a linked list of values of type $a$. We can use this type constructor to show the reason behind the notion of kinds as it wouldn't make much sense for a value to have a type just $List$ without it being applied to any type. % TODO: fix the last part (and possibly the whole subsection)
+For example, we can define a very common type constructor $List: * \rightarrow *$ which takes a type $a$ and returns a type representing a linked list of values of type $a$. We can use this type constructor to show the reason behind the notion of kinds as it would not make much sense for a value to have a type just $List$ without it being applied to any type. % TODO: fix the last part (and possibly the whole subsection)
 
 We will formally define kinds as:
 
@@ -498,16 +492,12 @@ Those rules are the same as those of the HM type system with only a trivial diff
 
 \subsection{Type Instances and Type Unification Algorithm}
 
-% FIXME: yeah there is some difference to the HM type system here... we have to check and deduce kinds
-
-The addition of type constructors and type classes does not require any change to the definition of the type unification algorithm.
+The addition of type constructors and type classes does not require any change to the definition of the type unification algorithm. The only notable fact is that unification can succeed only if the unified types share kinds.
 
 As for type instances, the definition is without any change.
 
 \subsection{The Type Inference Algorithm}
 
-The type inference algorithm has to account for the bottom-up propagation of predicates that the inferred types have to satisfy. The basis for the inference algorithm is the algorithm W \ref{w}. For the definition, see thih \cite{jones1999typing}. In thih \lstinline[language=haskell]{tiExpr} is the part of type inference that encompasses the extension of the algorithm W. The definition in thih differs slightly from what we have discussed in this chapter in that it doesn't consider just the syntax from the definition \ref{defn:syntaxHM} with the extensions we presented, but it also considers some features of the haskell language (for example pattern matching).
-
-% FIXME: FROM MIREK zhruba popsat jak to vysvihnul \citet{jones1999typing
+The type inference algorithm has to account for the bottom-up propagation of predicates that the inferred types have to satisfy. The basis for the inference algorithm is the algorithm W \ref{w}. For the definition, see thih \cite{jones1999typing}. In thih \lstinline[language=haskell]{tiExpr} is the part of type inference that encompasses the extension of the algorithm W. The definition in thih differs slightly from what we have discussed in this chapter in that it does not consider just the syntax from the definition \ref{defn:syntaxHM} with the extensions we presented, but it also considers some features of the haskell language (for example pattern matching).
 
 % TODO: FROM MIREK Teoretickej skok do budoucnosti --- mirnej review o tom jak se to ve skutecnosti dela v haskelu. Treba ukazat ze MPTCs jsou nerozhodnutelny protoze umej simulovat prolog.
