@@ -6,8 +6,7 @@ The C language is one of the main languages for system development. It is valued
 
 But then C lacks any support for polymorphism and generic programming. This is often compensated by extensive use of macros and \lstinline{void *} pointers which don't offer any type safety and thus can be easily misused.
 
-\textbf{Generic (\lstinline{void *}) pointers} can point to any data structure and thus they can be used in "generic" code to work with virtually any data. This makes them a very strong tool, and almost every program relies on them, % TODO: link malloc, free
-But these pointers carry no type information and so to use these pointers one has to either know the actual types when they use them, or the type has to be passed explicitly.
+\textbf{Generic (\lstinline{void *}) pointers} can point to any data and thus they can be used in some "generic" code. This makes them a very strong tool, and almost every program relies on them (for example: \lstinline{malloc}, \lstinline{free}; for some examples see \cite{organisation1999iso}). But these pointers carry no type information and so to use these pointers one has to either know the actual types when they use them, or the type has to be passed explicitly.
 
 One example of using void pointers can be `malloc' which without any type inference requires the user to calculate the required themselves (this can seem to be trivial to do, but it still generates some code noise and it is a possible source of bugs).
 

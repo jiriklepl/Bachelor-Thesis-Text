@@ -5,7 +5,7 @@
 
 One example where it would be useful to support polymorphic code are polymorphic lists. There are many implementations of them using macros and requiring the user to explicitly specify the instance's name or type every time they want to use it.
 
-We can encounter such lists in the linux kernel for example, the implementation defined in \emph{./include/linux/list.h}. % TODO: Torvald's git repo
+We can encounter such lists in the linux kernel for example, the implementation defined in \emph{./include/linux/list.h} (in \cite{torvalds2018linux}).
 
 However here we will focus on the standardized QUEUE library's list.
 
@@ -42,17 +42,17 @@ b *pull(b *head)
 }
 \end{lstlisting}
 
-In C we could create a similar structure using \lstinline{<queue.h>}'s standardized \lstinline{SLIST_...} macros. This requires us to create each list type instance separately and in invocations of its functions it requires us to pass additional parameters. For example SLIST's equivalent of our \lstinline{pull} function, \lstinline{SLIST_REMOVE_HEAD}, takes as an additional \lstinline{entries} argument (a structure member of the entry node that connects the elements constructed by the \lstinline{SLIST_ENTRY} macro) on top of the expected \lstinline{head} argument. % TODO: queue(3) man page
+In C we could create a similar structure using BSD \lstinline{<queue.h>}'s \cite{pages2007queue} \lstinline{SLIST_...} macros. This requires us to create each list type instance separately and in invocations of its functions it requires us to pass additional parameters. For example SLIST's equivalent of our \lstinline{pull} function, \lstinline{SLIST_REMOVE_HEAD}, takes as an additional \lstinline{entries} argument (a structure member of the entry node that connects the elements constructed by the \lstinline{SLIST_ENTRY} macro) on top of the expected \lstinline{head} argument.
 
 \section{Future work}
 
-If this project proves itself, the future work has to include extending the stl library and also it should implement a compiler which wouldn't rely on gcc and C.
+If this project proves itself, the future work has to include extending the stl library and also it should implement a compiler which wouldn't rely on GCC.
 
 The project also needs extend its support on all C types, there are only some of them (the main ones) supported currently.
 
 \subsection{Better support for record fields}
 
-The current specification of a record field of two different structures in CHM is that if they share name, they shall share the type as well (which can be ambiguous). The compiler then creates an implicit class having specializations for each structure containing the field named \lstinline{Has_<field>} which states it is possible to access `<field>' on this structure.
+The current specification of a record field of two different structures in CHM is that, if they share name, they shall share the type as well (which can be ambiguous). The compiler then creates an implicit class having specializations for each structure containing the field named \lstinline{Has_<field>} which states it is possible to access `<field>' on this structure.
 
 In the future the specification for the polymorphic fields should be that their types reflect their dependencies on the type parameters of the struct which they are fields of in the exact same order (counted from the back) to each other and for all possible types of those parameters they still share the type.
 

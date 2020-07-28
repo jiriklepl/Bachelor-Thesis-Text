@@ -4,8 +4,7 @@
 
 Understanding lambda calculus is important in both the context of type inference and in the context of (functional) programming as a whole.
 
-In this thesis we will use lambda calculus as described in Introduction to Lambda Calculus.  % TODO: insert something ABOUT LC
-
+In this thesis we will use lambda calculus as described in Introduction to Lambda Calculus.
 
 \begin{defn}[Lambda Calculus Grammar]
 $$variable ::= v\ |\ variable'$$
@@ -14,12 +13,14 @@ $$\lambda\mbox{-}term ::= variable\ |\ (\lambda\mbox{-}term\ \lambda\mbox{-}term
 
 In the $\lambda\mbox{-}term$ grammar rule, the second case is called \emph{application} and the third is called \emph{abstraction}. These two constructs correspond to passing and declaring an argument respectively.
 
+In the abstraction we call the variable $x$ \emph{bound} by the abstraction. If it is not bound we call it \emph{free}.
+
 It is a simple language in which we can formally describe any computational problem.
 
 The whole idea of evaluation of a lambda calculus program is using a simple rewriting rule, $\beta$ reduction:
 
 \begin{defn}[$\beta$ reduction]
-    $$(\lambda x . e) e' = e [x := e']$$ % TODO: Barendregt reference
+    $$(\lambda x . e) e' = e [x := e']$$ \cite{barendregt1992lambda}
 \end{defn}
 
 There is one other rewriting rule, \emph{$\alpha$ conversion}, which is used to resolve name collisions, but we will not consider it as we will consider each bound variable uniquely named.
@@ -32,25 +33,57 @@ Given a well-defined expression $e$, a subexpression is an expression $e'$ such 
 
 This definition will extend intuitively to all other syntactic systems.
 
-\section{Simply-Typed Lambda Calculus}
+\subsection{Writing Conventions}
 
-Simply-typed lambda calculus, described by Church, is one of the first % TODO: the very first? also: add some more info on church
-lambda calculi with a type system. Typing of lambda terms helps checking the validity of the program, protecting us from writing
-programs that make little sense like for example adding amperes and volts % TODO: intro to lambda
-and also it makes it easier to think about the program in the bigger picture giving us information about the usage of the typed entities
-in some code, typing $f : \alpha \rightarrow \alpha \rightarrow \alpha$, for example, tells us that $f$ is a function taking two arguments
-of some type and returning a value of the same type and from that alone we can assume that applying two parameters of the same type on it
-should be well-defined.
+Lambda calculi usually use the writing convention of applications being left-associative and abstractions being right-associative
 
-% TODO: add the stuff about variables and syntax and sh like that, also the ,\-> name and stuff, also typing
 
-\subsection{Simply-Typed Lambda Calculus Deriving Rules}
+\section{Simply-Typed Lambda Calculus }
 
-Simply-typed lambda calculus uses the following rules:
+Simply-typed lambda calculus (also $\lambda\rightarrow$), described by Church, is one of the first % TODO: add some more info on church
+lambda calculi with a type system. Typing of lambda terms helps checking the validity of the program, protecting the user from writing programs that make little sense like for example adding amperes to volts \cite{barendregt1992lambda} and also it makes it easier to think about the program in the bigger picture giving us information about the usage of the typed entities in some code, typing $f : \alpha \rightarrow \alpha \rightarrow \alpha$, for example, tells us that $f$ is a function taking two arguments of some type and returning a value of the same type and from that alone we can assume that applying two parameters of the same type on it should be well-defined.
+
+Syntactically it is not any different from the lambda calculus, considering the \emph{\`a la} Curry variant. \cite{barendregt1992lambda}
+
+\subsection{Type}
+
+We will formally define what we consider a type, first we consider a \textbf{type variable} similarly to the variables of the lambda calculus:
+
+\begin{defn}[Type Variable]
+    $$type\_variable ::= \alpha\ |\ type\_variable'$$
+\end{defn}
+
+Then the types can be formally defined:
+
+\begin{defn}[Type]
+    \label{defn:typeSTLC}
+    $$\tau ::= \alpha\ |\ \tau \rightarrow \tau'$$
+    where $\tau, \tau'$ stand for types and $\alpha$ for a type variable. $\tau \rightarrow \tau'$ is a type of a function taking an argument of a type $\tau$ and returning a value of a type $\tau'$.
+\end{defn}
+
+We can also freely add type constants (like \emph{integers} or \emph{booleans}) to the definition.
+
+\subsection{Typing}
+
+We will use the formal definition for typing as follows:
+
+\begin{defn}[Typing and Assumption]
+    $$e : \tau$$
+    where $e$ is an expression and $\tau$ is a type. If $e$ is a variable $x$ and we infer other types from it, we refer to such typing as \textbf{Assumption}.
+\end{defn}
+
+Sometimes we will write $\Gamma \vdash e : \tau$, meaning that in the context of $\Gamma$ (set of assumptions) $e$ can get the type $\tau$, more on that in the definition \ref{defn:STLCInference}.
+
+% TODO: add the stuff and sh like that
+
+\subsection{Inference Rules}
+
+Simply-typed lambda calculus uses the following rules, we present them to formally define how to determine whether a certain typing is valid:
 
 \begin{defn}[Inference rules]
+    \label{defn:STLCInference}
     $$\boxed{\begin{array}{l c}
-        \infer{\Gamma \vdash x : \tau}{x : \tau \in \Gamma} & (\text{var}) \\\\
+        \infer[(x : \tau \in \Gamma)]{\Gamma \vdash x : \tau}{} & (\text{var}) \\\\
         \infer{\Gamma \vdash e e' : \tau}{\Gamma \vdash e : \sigma \rightarrow \tau \quad \Gamma \vdash e' : \sigma} & (\text{application}) \\\\
         \infer{\Gamma \vdash \lambda x . e : \sigma \rightarrow \tau}{\Gamma, x : \sigma \vdash e : \tau} & (\text{abstraction})
     \end{array}}$$
@@ -58,64 +91,89 @@ Simply-typed lambda calculus uses the following rules:
 
 We call $\Gamma$ either a basis, a context, or a set of assumptions. These names describe pretty well its meaning, in the simply-typed lambda calculus it is a set of typings we derive the rest of typings from.
 
-The syntax of the rules describes the step-by-step derivation of types where the bottom one follows the top one. % TODO: reword
+The inference rules describe the step-by-step derivation of types where the bottom one follows the top one.
 
-% TODO: check it
 \subsubsection{Example}
 A Step by step example for $id = \lambda x . x$:
 
 \begin{enumerate}
     \item $\{\} \vdash \lambda x . x : ?$
-    \item $\{x : \tau\} \vdash x : \tau$ (var)
-    \item $\{\} \vdash \lambda x . x : \tau \rightarrow \tau$ (abstraction) from (2), this solves (1)
+    \item $\{\} \vdash \lambda x . x : \sigma \rightarrow \tau$ (abstraction) \label{enum:abs}
+    \item $\{\}, x : \sigma \vdash x : \tau$ (still abstraction; we want to infer $\tau$)
+    \item $\{x : \sigma\} \vdash x : \sigma$ (var)
+    \item $\{\} \vdash \lambda x . x : \sigma \rightarrow \sigma$ (result of abstraction in the step \ref{enum:abs})
 \end{enumerate}
 
 Notice here the context changes during the derivation process, so we can give typing to $\lambda\rightarrow$ terms without any context and they can have different typings in different contexts, also one term can have multiple possible typings.
 
 % TODO: maybe say something about church vs curry style and also unification and stuff
 
-One thing that is a problem for the simply-typed lambda calculus is that it is not turing complete, % TODO: reference a paper that says so
-because it is strongly normalizing and thus the type inference would have to solve the halting problem, this problem will be answered by the following type systems.
+\subsection{Type substitution}
+
+Substitution is a function which rewrites (simultaneously) certain type variables into different types. They will be very important for various definitions and even more importantly for type unification which will be the basis for type inference algorithms for the following type systems.
+
+\begin{defn}[Type Substitution]
+    \label{defn:substitution}
+    $$S ::= [\alpha_1 := \pi_1, \dots \alpha_n := \pi_n]$$
+    here $S$ stands for a type substitution, each $\alpha_i$ stands for a distinct type variable and $\pi_i$ for a type.
+\end{defn}
+
+We will write applying $S$ to a type $\tau$ as $\tau S$, we will also allow a simplified definition $[\overline{\alpha} := \overline{\pi}]$ meaning $[\alpha_1 := \pi_1, \dots \alpha_n := \pi_n]$.
 
 \subsection{Principal Typing}
 
-Every typeable term $e$ in simply-typed lambda calculus has principal type $\tau$ which is computable from $e$ and every other typing $e : \sigma$ in the same context is a result of some type substitution $[\overline{\alpha} := \overline{\pi}]$, here we use the overlined symbols as a shortcut for many atomic substitutions $[\alpha := \pi]$, where $\pi$ is a type and $\alpha$ a type variable, this will be very important later when we introduce more advanced type systems as the principal type of $e$ is the only information about $e$ we have to consider when we see $e$ again as a subterm of some term $e'$ to check $e'$' typeability (for typeability see below). % TODO: elaborate / provide source, check and correct, be more consistent with sigmas and stuff
+Every typeable term $e$ in the simply-typed lambda calculus has principal type $\tau$ \cite{barendregt1992lambda} which is computable from $e$ and for every other valid typing $e : \sigma$ in the same context there is a substitution $S$ such that $\sigma = \tau S$.
 
-We can think of it as that the principal typing of $e$ is a typing general enough to be substitutable into all other possible typings of $e$
-but not general enough to be substitutable into any impossible typings, this is usually simplified into "the most general type of $e$". % TODO: language and style
+We can think of it as that the principal typing of $e$ is a typing general enough to be substitutable into all other possible typings of $e$ but not general enough to be substitutable into any impossible typings, this is usually simplified into `the most general type of $e$'.
 
-The example just above % TODO: maybe use fig notation
-is great fit for showing this as for example $\lambda x . x : \sigma$ would be a possible typing, but not a principal one, because
-$\alpha \rightarrow \alpha \rightarrow \alpha$ would give use $\alpha \sim \alpha \rightarrow \alpha$, which would give us an incomputable
-infinite type.
+The example just above is a great fit for showing this as for example $\lambda x . x : \sigma$ would be a possible typing, but not a principal one, because substitution $[\sigma := \alpha \rightarrow \alpha \rightarrow \alpha]$ would give use $\alpha \sim \alpha \rightarrow \alpha$, which would yield an incomputable infinite type.
+
+Principal typings will be very important later when we introduce more advanced type systems as the principal type of $e$ is the only information about $e$ we have to consider when we see $e$ again as a subterm of some term $e'$ to check $e'$' typeability (for typeability see below). % TODO: elaborate / provide source, check and correct
 
 \subsubsection{Type Instantiation}
 
-We will call a type $\tau$ an instance of a type $\sigma$ if there is a type substitution $[\overline{\alpha} := \overline{\pi}]$
-that transforms $\sigma$ into $\tau$ % TODO: do some editing
+We will call a type $\tau$ an instance of a type $\sigma$ if there is a type substitution $S$ such that transforms $\tau = \tau S$.
 
 \subsection{Type Unification}
 
-If $\tau_1, \tau_2$ are types and $S$ is a substitution, we say that $S$ unifies $\tau_1$ and $\tau_2$ if $\tau_1 S = \tau_2 S$, then we call $S$ their unifier, and we call $\tau_1$ and $\tau_2$ unifiable. % TODO: Robinson
-
-% TODO: maybe `simplify' the name from unifier to just unification
+If $\tau_1, \tau_2$ are types and $S$ is a substitution, we say that $S$ unifies $\tau_1$ and $\tau_2$ if $\tau_1 S = \tau_2 S$, then we call $S$ their unifier, and we call $\tau_1$ and $\tau_2$ unifiable. \cite{robinson1965machine} (originally for sets of types)
 
 \subsection{Type Checking, Typeability and Type Inference}
 
-Type checking is the process of validating whether a term can have a given type whereas typeability is whether the term can be given some type. % TODO: reword this!
+Type checking is the process of validating whether a term can have a given type whereas typeability is a decision problem of whether the term can be given some type.
 
-Type inference is closely related to typeability but has an additional requirement of giving an actual type for the term, and furthermore usually what we are interested in is the principal type.
+Type inference is closely related to typeability but has an additional requirement of giving an actual type for the term, and furthermore what we usually are interested in is its principal type.
 
-Both type checking and typeability of the simply-typed lambda calculus is decidable and its type inference is computable. % TODO: add reference, check wording
+Both type checking and typeability of the simply-typed lambda calculus is decidable and its type inference is computable \cite{barendregt1992lambda}.
 
-\section{System F and Parametric Polymorphism} % TODO: TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+One thing that is a problem for the simply-typed lambda calculus is that it is not Turing complete, it is strongly normalizing \cite{barendregt1992lambda} and thus assuming it being turing complete the type inference would have to solve the halting problem, this problem will be answered by the following type systems.
 
-% TODO: add reference or I don't know
-System F, polymorphic lambda calculus, or second-order lambda calculus (from the idea of quantifying types) introduces parametric polymorphism into the lambda calculus. Here we can reuse the example of $id = \lambda x . x$ which can have many typings $id : \tau \rightarrow \tau$ which we can state by:
+\subsection{Writing Conventions for types}
 
-$id : \forall \alpha . \alpha \rightarrow \alpha$
+We will follow the convention of right-associativity of the $\rightarrow$
 
-We call terms like $id$ beginning with $\forall$ \textbf{polymorphic} (opposed by \textbf{monomorphic}).
+\section{System F and Parametric Polymorphism}
+
+System F, polymorphic lambda calculus, or second-order lambda calculus introduces parametric polymorphism into the lambda calculus.
+
+Here we can reuse the example of $id = \lambda x . x$ which, given the simply-typed lambda calculus, can have many typings ($id : \tau \rightarrow \tau$ for any $\tau$) which in this type system we can state by one typing:
+
+$$id : \forall \alpha . \alpha \rightarrow \alpha$$
+
+We call such typings (beginning with the $\forall$ quantifier) \textbf{polymorphic} (opposed by \textbf{monomorphic}).
+
+The definition of types extends the definition \ref{defn:typeSTLC} for the simply-typed lambda calculus.
+
+\subsection{Types}
+
+\begin{defn}[Type]
+    $$\tau ::= \alpha\ |\ \tau \rightarrow \tau\ |\ \forall \alpha . \tau$$
+    where $\tau$ is a type and $\alpha$ a type variable; we can also add type constants.
+\end{defn}
+
+In the last case ($\forall \alpha . \tau$) we call $\alpha$ a \emph{bound} (occurrence of a) type variable. If the variable is not bound we call it \emph{free}.
+
+\subsection{Inference Rules}
 
 \begin{defn}[Inference rules]
     System F uses the rules of the simply-typed lambda calculus, plus the following:
@@ -128,34 +186,40 @@ We call terms like $id$ beginning with $\forall$ \textbf{polymorphic} (opposed b
 
 In system F the type checking is undecidable and thus any general type inference algorithm is impossible.
 
-The Hindley-Milner type system is a restriction of it % TODO: elaborate on the undecidability of F etc.
-that allows for easy type inference algorithm we will base ours on.
+The Hindley-Milner type system is a restriction of it that allows for easy type inference algorithm we will base ours on.
+
+\subsection{Type Substitution}
+
+The definition for type substitution and type instances are the same as those for the simply-typed lambda calculus with the exception the rewriting doesn't apply to bound variables.
 
 \section{Hindley-Milner Type System}
 
-The Hindley-Milner type system, we will refer to it simply as HM, is a fairly minimalistic extension of lambda calculus, or at least syntactically, however semantically it could be seen rather as a restriction of the system F which answers the undecidability of it, see the subsection Type Schemes. % TODO: doesn't have a good sound to it
+The Hindley-Milner type system, we will refer to it simply as HM, is a fairly minimalistic extension of lambda calculus, or at least syntactically, however semantically it could be seen rather as a restriction of the system F that answers the undecidability of it, see the subsection \emph{Type Schemes}.
 
-Terms in HM have the form:
+Expressions in HM have the form:
 
-$$e ::= x\ |\ e e'\ |\ \lambda x . e\ |\ \text{let } x = e \text{ in } e'$$ % TODO: defn
+\begin{defn}[HM expressions]
+    \label{defn:syntaxHM}
+    $$e ::= x\ |\ e e'\ |\ \lambda x . e\ |\ \text{let } x = e \text{ in } e'$$
+    where $x$ stands for a variable, and $e, e'$ for expressions
+\end{defn}
 
-(where $x$ stands for a variable, and $e, e'$ for expressions)
+We skipped two more cases not important for the type system, for them see the definition \ref{defn:ifElseHM}.
 
 It differs from the syntax of lambda calculus (and that of the system F) only in the addition of the third clause, called the let statement. Meaning of this clause is the same as of $e' [x := e]$, note that this differs from a very similar construct $(\lambda x . e') e$ using abstraction instead of let in that $x$ in this latter construct cannot be polymorphic, see the next two subsections, this connects to the addition of type schemes and restriction of types, both explained later. % TODO: yeah, clarify it a little bit maybe, use shorter sentences?
 
-Then there are two additional expressions completing the language that have no significance in the type system and thus we will not further consider them in any of the typing rules, or the inference algorithm. They are defined as follows: % TODO: wording pls
+Then there are two additional expressions completing the language that have no significance in the type system and thus we will not further consider them in any of the typing rules, and in the inference algorithm. They are defined as follows:
 
-$e ::= \cdots | \text{fix } x . e | \text{if } e \text{ then } e' \text{ else } e''$ % TODO: defn
-($x$ again for a variable, and $e, e', e''$ for some expression)
+\begin{defn}[If Then Else and Fix]
+    \label{defn:ifElseHM}
+    $$e ::= \cdots\ |\ \text{fix } x . e\ |\ \text{if } e \text{ then } e' \text{ else } e''$$
+    where $x$ stands again for a variable, and $e, e', e''$ for some expression; `$\cdots$' are to denote that this extends the definition \ref{defn:syntaxHM}.
+\end{defn}
 
-The latter clause with the expected meaning, and the former being defined as the least fixed point of $\lambda x . expression$. Those two clauses can be seen as any other application using the following type schemes:
+The latter clause with the expected meaning, and the former being defined as the least fixed point of $\lambda x . expression$. In the context of type inference the two clauses can be seen as any other application using the following type schemes:
 
-$\text{fix}: \forall \alpha . ((\alpha \rightarrow \alpha) \rightarrow \alpha)$ \\
-$\text{if}: \forall \alpha . \text{ bool } \rightarrow \alpha \alpha \alpha$ % TODO: FORMAT
-
-Note that the `if' clause is completely redundant in this typing system, the church booleans would be sufficient. % TODO: this is weird
-
-% TODO: explain, also Milner 78
+$$\text{fix}: \forall \alpha . \alpha \rightarrow \alpha \rightarrow \alpha$$
+$$\text{if}: \forall \alpha . \text{ bool } \rightarrow \alpha \rightarrow \alpha \rightarrow \alpha$$
 
 \subsection{Types}
 
@@ -168,7 +232,7 @@ Types of the HM type system are restricted in that they cannot include quantific
 
 \subsection{Type Schemes}
 
-We will later introduce inference rules very similar to those of the system F with some additions, which would not sound that good (as general inference for the system F is impossible). % FIXME: sound, move below
+We will later introduce inference rules very similar to those of the system F with some additions, which would not seem that good (as general inference for the system F is impossible). % FIXME: move below
 
 Type schemes are defined just like types in the system F. This restriction means just that the type quantification, if there is any, is always at the very front of the type scheme.
 
@@ -212,14 +276,13 @@ The instantiation rule replaces the $\forall$-elimination rule of the system F a
 
 \subsection{Type Inference}
 
-We will introduce the algorithm W described by % TODO: Damas
-it produces the principal type scheme for the given program (expression).
+We will introduce the algorithm W \ref{w}. It produces the principal type scheme for the given program (expression).
 % TODO: maybe expand on it a little bit
 
 \subsubsection{Most General Unification}
 
 \begin{algorithm}[t]
-\caption{Unification Algorithm}
+\caption{Unification Algorithm \cite{robinson1965machine}}
 \label{mgu}
 \begin{algorithmic}[1]
 \Function{$mgu$}{$\tau, \tau'$}
@@ -243,16 +306,16 @@ it produces the principal type scheme for the given program (expression).
 
 One of the main parts of the type inference algorithm is the type unification, and since we are usually after principal types, the most general unification.
 
-The most general unifier of types $\tau_, \tau'$ is a unifier $S$ such that for every other unifier $U$ of $\tau$ and $\tau'$ there exists a substitution $R$ such that $U = S R$. % TODO: Damas, also maybe move to the definition of unifier
+The most general unifier of types $\tau, \tau'$ is a unifier $S$ such that for every other unifier $U$ of $\tau$ and $\tau'$ there exists a substitution $R$ such that $U = S R$. \cite{damas1982principal} % TODO: maybe move to the definition of unifier
 
 We will further require the algorithm to use only variables from $\tau$ and $\tau'$.
 
-We present an algorithm \ref{mgu} which is a variation of Robinson's unification algorithm. We will use a modification of this algorithm even in the next type system. % TODO: Robinson
+We present an algorithm \ref{mgu} which is a variation of Robinson's unification algorithm. We will use a modification of this algorithm even in the next type system.
 
 \subsubsection{The Type Assignment Algorithm W}
 
 \begin{algorithm}[t]
-\caption{The algorithm W}
+\caption{The algorithm W \cite{milner1978theory}}
 \label{w}
 \begin{algorithmic}[1]
 \Function{W}{$\Gamma, e$}
@@ -325,7 +388,7 @@ Type classes can be added to the algorithm $W$ defined above with only little ch
 
 Subtyping and overloading are slightly different approaches to the same problem we discussed with specifying what types the $(+)$ function can act on.
 
-If we want to use either of those we have to constrain them somehow or they make type inference undecidable. We will use the variant defined by % TODO Smith
+If we want to use either of those we have to constrain them somehow or they make type inference undecidable. We will demonstrate the variant defined by professor Geoffrey S. Smith \cite{smith1993polymorphic}.
 
 Subtyping however doesn't solve that problem very well as if we specify that $Int$ is a subtype of $Real$ then we have to accept that $(+)$ applied to two real operands can still return an integer. That doesn't seem that bad from the mathematical point of view, but it can lead to implicit data conversions which can be undesirable, especially if we were to use the type system in a context of a low-level programming. % FIXME
 
@@ -344,9 +407,9 @@ Usefulness of classes can be shown on `Ord', this constraints requires that two 
 
 For two `Int's we just compare them and return whether the first is lower than the other, but if we have, let's say `Customer's, with different Id numbers as keys in some map (or dictionary) then we don't need to compare whole customers, but just their Ids.
 
-\section{Haskell Type system}
+\section{Haskell Type System}
 
-For our purposes we will (limit) the haskell language significantly, ignoring any pattern-matching features and almost all syntax sugar, the only important feature for us being the type system. % TODO: find better words for this
+For our purposes we will (limit) the haskell language significantly, ignoring any pattern-matching features and almost all syntax sugar, the only important feature for us being the type system. The syntax is that of HM but extended by the possibility of giving explicit typings (with type schemes, see the definition \ref{defn:typeSchemes}) and defining/using type constructors and type classes. For the  definitions see thih \cite{jones1999typing} as it is the actual implementation we will use for the CHM compiler.
 
 \subsection{Type Constructors}
 
@@ -387,6 +450,7 @@ We will define types formally as:
 Type schemes will be defined similarly to those of the HM type system, differing only in what we consider a type and in that there can be constraints that the types have to satisfy. It should be also noted that only types of the $*$ kind can be assigned to values.
 
 \begin{defn}[Type Schemes]
+    \label{defn:typeSchemes}
     $$\sigma ::= \forall \alpha_1, \dots \alpha_n . qt\ |\ qt$$
     where $qt$ stands for a qualified type (a constrained type).
 \end{defn}
@@ -435,12 +499,8 @@ As for type instances, the definition is without any change.
 
 \subsection{The Type Inference Algorithm}
 
+The type inference algorithm has to account for the bottom-up propagation of predicates that the inferred types have to satisfy. The basis for the inference algorithm is the algorithm W \ref{w}. For the definition, see thih \cite{jones1999typing}. In thih \lstinline[language=haskell]{tiExpr} is the part of type inference that encompasses the extension of the algorithm W. The definition in thih differs slightly from what we have discussed in this chapter in that it doesn't consider just the syntax from the definition \ref{defn:syntaxHM} with the extensions we presented, but it also considers some features of the haskell language (for example pattern matching).
+
 % FIXME: FROM MIREK zhruba popsat jak to vysvihnul \citet{jones1999typing
 
-% TODO: test normalni citace: \cite{jones1999typing}.
-
 % TODO: FROM MIREK Teoretickej skok do budoucnosti --- mirnej review o tom jak se to ve skutecnosti dela v haskelu. Treba ukazat ze MPTCs jsou nerozhodnutelny protoze umej simulovat prolog.
-
-% TODO: FROM MIREK zhruba popsat jak to vysvihnul \citet{jones1999typing}.
-
-% TODO: FROM MIREK test normalni citace: \cite{jones1999typing}.

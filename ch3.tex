@@ -22,9 +22,6 @@ class Cloneable
     a *clone(a *);
 }
 \end{lstlisting}
-Here we see the part \lstinline{<a>}, declaration of the type variable \lstinline{a}, similar to C++ templates and Java generics, but in this language always preceding the rest of the definition. This part has the following grammar rule: % TODO: give it a name
-$$:= <type\_decls> | <type\_decls : constraints> | < : constraints >$$
-Where the \emph{type\_decls} is a list of declared type variables and \emph{constraints} is a list of predicates the type variables have to satisfy and new type definitions (which are very similar to typedefs).
 \end{listing}
 
 \begin{listing}
@@ -72,6 +69,16 @@ a shallow_copy(a value)
 
 % TODO: https://mail.haskell.org/pipermail/beginners/2010-December/006057.html
 
+\subsubsection{CHM Headers}
+In the listing \ref{lst:TypeClass1} we see the part \lstinline{<a>}, declaration of the type variable \lstinline{a}, similar to C++ templates and Java generics, always preceding the rest of the definition and with a scope local to the definition. This part, a \lstinline{chm_header}, has the following grammar rule:
+
+\begin{defn}[CHM header]
+    $$\text{\lstinline{chm_header}} := \text{\lstinline{<type_decls>}}\ |\ \text{\lstinline{<type_decls : constraints>}}\ |\ \text{\lstinline{< : constraints>}}$$
+    where the \lstinline{type_decls} is a list of declared type variables; \lstinline{constraints} is a list of predicates the type variables have to satisfy and new type definitions (which are very similar to typedefs).
+\end{defn}
+
+The \lstinline{constraints} follow principles similar to haskell. Notable use specific to CHM is they allow for
+
 \subsubsection{Type Classes, Their Instances and Structs}
 
 The listing \ref{lst:TypeClass1} shows how we would define a simple \textbf{type class}, here we declare only one type we use in declarations of the class's methods and so it is implicitly considered its type parameter as well. The type parameter can be specified explicitly following the name of the class which we can see in the listing \ref{lst:TypeClass2}.
@@ -82,28 +89,27 @@ For \textbf{structs} we will use the same syntax as we use for type classes.
 
 \subsubsection{Functions}
 
-Functions will use the very same syntax (see the listing \ref{lst:Function}), however with a slightly different behavior, they don't have any type parameters and instead they have type schemes such that their qualified types (containing the predicates specified following the type declarations) are quantified over the declared types.
+Functions will use the very same syntax (see the listing \ref{lst:Function}), however with slightly different behavior, they don't have any type parameters and instead they have type schemes such that their qualified types (containing the predicates specified following the type declarations) are quantified over the declared types.
 
 \section{Parsing}
 
-Parsing of the code is handled by the language-c project, originally meant for C99, which is slightly modified into language-chm to support the extensions we introduce. % TODO: visq/language-c
+Parsing of the code is handled by the language-c project \cite{visq2018language-c}, originally meant for C99 (and later for C11), which is slightly modified into language-chm to support the extensions we introduce.
 
 This project is used for the output of pretty-printed C code as well, this output is then inputted to GCC for finalizing the compilation.
 
 \section{Type Inference}
 
-For the type inference, we use the thih project, % TODO: thih
-but using it sensibly required some modifications to be made to it as the original thih project isn't meant to be used as an efficient implementation.
+For the type inference, we use the thih project \cite{jones1999typing}, but using it sensibly required some modifications to be made to it as the original thih project isn't meant to be used as an efficient implementation.
 
 Using thih required a significant pre/post-processing of the code, described in the previous chapter. % TODO: modelling
 
-All type inference principles are explained in the first chapter. The basis for the implementation is then explained in % TODO: thih
+All type inference principles are explained in the first chapter. The basis for the implementation is then explained in Typing Haskell in Haskell \cite{jones1999typing}.
 
 \section{Code Processing}
 
 The main parts of preprocessing the code are in the AST-to-THIH project, postprocessing is then in the CHM-instantiate project which also passes the code to AST-to-THIH for preprocessing. Both of these projects are specifically built for this thesis as part of the CHM compiler.
 
-\subsection{Monomorphization and Instantiation} % TODO: fix name
+\subsection{Monomorphization and Instantiation}
 
 The process of instantiation of functions begins with monotype functions and then continues recursively when we determine the monotypes of all occurrences of polytype functions called from them. Similarly for types (and namely structs).
 
@@ -117,8 +123,7 @@ Instantiation of polytyped functions is done by simply replacing the quantified 
 
 \subsection{Type Class Method Instantiation}
 
-All type classes are just language constructs, they are not manifested in the resulting code in any shape or form and thus they count as a zero abstraction feature. There are some built-in type classes, % TODO: list the type classes
-implicit type classes for each field of a structure (and a union) and then user-defined type classes, showed before in this chapter.
+All type classes are just language constructs, they are not manifested in the resulting code in any shape or form and thus they count as a zero abstraction feature. There are some built-in type classes (for example, \lstinline{Add} which states that two variables of a type that satisfies it can be added), implicit type classes for each field of a structure (and a union) and then user-defined type classes, showed before in this chapter. The implemented built-in and implicit type classes are mainly for demonstration and they are subject to change in the future.
 
 Definitions of type classes are stored in the compiler as lists of their methods. Methods act like regular polytypes until we instantiate them.
 
@@ -128,7 +133,7 @@ When a method is instantiated the compiler checks its instances and determines w
 
 \subsection{Record Fields}
 
-Implementing record fields (struct members) was challenging as the way record fields work in C has no real equivalent in the context of functional programming, although haskell's object notation or ML's records come pretty close to it. % TODO: link haskell and ML
+Implementing record fields (struct members) was challenging as the way record fields work in C has no real equivalent in the context of functional programming, although haskell's object notation or ML's records come pretty close to it. % TODO: link haskell and ML?
 
 Record fields are implemented in such a way that all fields of a certain name have to share the exact same type. This is a slightly restricted requirement of each field having a unique name.
 
@@ -140,9 +145,7 @@ This approach perfectly matches the syntax of C where we know the name of the fi
 
 It is indeterminable whether the instantiation of something continues forever. We can prove this using post correspondence problem % FIXME: prove it
 
-So there is a limit of type depth set to 500 (this limit shouldn't affect any sensible program).
-% FIXME: Changing this limit is possible by adding an option --type-depth=N to the compiler (it can be also used to make stricter constraint as well).
-If some type exceeds this limit, a compilation error will be outputted stating what the compiler tried to instantiate at that time.
+So there is a limit of type depth set to 500 (this limit shouldn't affect any sensible program, but if need be, it can be changed using the \lstinline[language=sh]{--depth} option). If some type exceeds this limit, a compilation error will be outputted stating what the compiler tried to instantiate at that time.
 
 \subsection{Comparison to C++ template instantiation}
 
