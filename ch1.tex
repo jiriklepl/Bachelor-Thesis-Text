@@ -13,7 +13,10 @@ $$\lambda\mbox{-}term ::= variable\ |\ (\lambda\mbox{-}term\ \lambda\mbox{-}term
 
 In the $\lambda\mbox{-}term$ grammar rule, the second case is called \emph{application} and the third is called \emph{abstraction}. These two constructs correspond to passing and declaring an argument respectively.
 
-In the abstraction we call the variable $x$ \emph{bound} by the abstraction. If it is not bound we call it \emph{free}.
+\begin{defn}[Bound Variable and Free Variable]
+    \label{defn:boundFree}
+    In the abstraction we call the variable $x$ (its occurrences in the abstraction) \textbf{bound} by the abstraction. If it is not bound we call it \textbf{free}.
+\end{defn}
 
 It is a simple language in which we can formally describe any computational problem.
 
@@ -68,13 +71,12 @@ We can also freely add type constants (like \emph{integers} or \emph{booleans}) 
 We will use the formal definition for typing as follows:
 
 \begin{defn}[Typing and Assumption]
+    \label{defn:typingSTLC}
     $$e : \tau$$
-    where $e$ is an expression and $\tau$ is a type. If $e$ is a variable $x$ and we infer other types from it, we refer to such typing as \textbf{Assumption}.
+    where $e$ is an expression and $\tau$ is a type. If $e$ is a variable $x$ and we infer other types from it, we refer to such typing as an \textbf{assumption} or a \textbf{judgement}.
 \end{defn}
 
 Sometimes we will write $\Gamma \vdash e : \tau$, meaning that in the context of $\Gamma$ (set of assumptions) $e$ can get the type $\tau$, more on that in the definition \ref{defn:STLCInference}.
-
-% TODO: add the stuff and sh like that
 
 \subsection{Inference Rules}
 
@@ -167,11 +169,11 @@ The definition of types extends the definition \ref{defn:typeSTLC} for the simpl
 \subsection{Types}
 
 \begin{defn}[Type]
-    $$\tau ::= \alpha\ |\ \tau \rightarrow \tau\ |\ \forall \alpha . \tau$$
-    where $\tau$ is a type and $\alpha$ a type variable; we can also add type constants.
+    $$\tau ::= \alpha\ |\ \tau \rightarrow \tau'\ |\ \forall \alpha . \tau$$
+    where $\tau, \tau'$ are types and $\alpha$ is a type variable; we can also add type constants.
 \end{defn}
 
-In the last case ($\forall \alpha . \tau$) we call $\alpha$ a \emph{bound} (occurrence of a) type variable. If the variable is not bound we call it \emph{free}.
+In the last case ($\forall \alpha . \tau$) we call $\alpha$ (its occurrence of in $\tau$) a \textbf{bound} type variable. If the variable is not bound we call it \textbf{free}.
 
 \subsection{Inference Rules}
 
@@ -181,7 +183,7 @@ In the last case ($\forall \alpha . \tau$) we call $\alpha$ a \emph{bound} (occu
         \infer{\Gamma \vdash e : \sigma [\alpha := \tau]}{\Gamma \vdash e : \forall \alpha . \sigma} & (\text{$\forall$-elimination})\\\\
         \infer{\Gamma \vdash e : \forall \alpha . \sigma}{\Gamma \vdash e : \sigma} & (\text{$\forall$-introduction})
     \end{array}}$$
-    In $(\text{$\forall$-introduction})$ the type variable $\alpha$ is not free in any any assumptions on which the premise $e : \sigma$ depends. % TODO: introduce the terms judgement, premise, assumption
+    In $(\text{$\forall$-introduction})$ the type variable $\alpha$ is not free in any any assumptions on which the premise $e : \sigma$ depends.
 \end{defn}
 
 In system F the type checking is undecidable and thus any general type inference algorithm is impossible.
@@ -216,27 +218,28 @@ Then there are two additional expressions completing the language that have no s
     where $x$ stands again for a variable, and $e, e', e''$ for some expression; `$\cdots$' are to denote that this extends the definition \ref{defn:syntaxHM}.
 \end{defn}
 
-The latter clause with the expected meaning, and the former being defined as the least fixed point of $\lambda x . expression$. In the context of type inference the two clauses can be seen as any other application using the following type schemes:
+The latter clause with the expected meaning, and the former being defined as the least fixed point of $\lambda x . expression$. In the context of type inference the two clauses can be seen as any other application using the following typings (type schemes):
 
 $$\text{fix}: \forall \alpha . \alpha \rightarrow \alpha \rightarrow \alpha$$
 $$\text{if}: \forall \alpha . \text{ bool } \rightarrow \alpha \rightarrow \alpha \rightarrow \alpha$$
 
 \subsection{Types}
 
-Types of the HM type system are restricted in that they cannot include quantification of type variables introduced in the F system.
+Types of the HM type system are restricted in that they cannot include quantification of type variables introduced in the F system:
 
 \begin{defn}[Type]
-    $$\tau ::= \alpha\ |\ \iota\ |\ \tau \rightarrow \tau$$
-    where $\tau$ stands for a type, $\alpha$ for a type variable, $\iota$ for a primitive type (type constant), and $sigma$ for a type scheme. % TODO: maybe add something to this
+    $$\tau ::= \alpha\ |\ \iota\ |\ \tau \rightarrow \tau'$$
+    where $\tau, \tau'$ stand for types, $\alpha$ for a type variable, $\iota$ for a primitive type (type constant), and $sigma$ for a type scheme.
 \end{defn}
+
+Compare this definition with the definition \ref{defn:typeSTLC}.
 
 \subsection{Type Schemes}
 
-We will later introduce inference rules very similar to those of the system F with some additions, which would not seem that good (as general inference for the system F is impossible). % FIXME: move below
-
-Type schemes are defined just like types in the system F. This restriction means just that the type quantification, if there is any, is always at the very front of the type scheme.
+Type schemes are defined similarly to types in the system F. This restriction means just that the type quantification, if there is any, is always at the very front of the type scheme.
 
 \begin{defn}[Type Scheme]
+    \label{defn:schemeHM}
     $$\sigma ::= \tau\ |\ \forall \alpha . \tau$$
     where the former case is a monomorphic type scheme and the latter is polymorphic
 \end{defn}
@@ -246,6 +249,10 @@ Type schemes are defined just like types in the system F. This restriction means
 In the HM type system it is common to introduce the following type operators:
 
 Cartesian product (tuples): $\times$; disjoint sum (tagged unions): $+$; and lists. Existence of these is not required for the type system and so we will avoid them going forward, their reintroduction is trivial.
+
+\subsection{Typing}
+
+Typing of expressions is modified by the introduction of type schemes into assigning a type scheme to a variable instead of assigning a type, see the definitions \ref{defn:typingSTLC} and \ref{defn:schemeHM}.
 
 \subsection{Type Instantiation}
 
@@ -306,7 +313,7 @@ We will introduce the algorithm W \ref{w}. It produces the principal type scheme
 
 One of the main parts of the type inference algorithm is the type unification, and since we are usually after principal types, the most general unification.
 
-The most general unifier of types $\tau, \tau'$ is a unifier $S$ such that for every other unifier $U$ of $\tau$ and $\tau'$ there exists a substitution $R$ such that $U = S R$. \cite{damas1982principal} % TODO: maybe move to the definition of unifier
+The most general unifier of types $\tau, \tau'$ is a unifier $S$ such that for every other unifier $U$ of $\tau$ and $\tau'$ there exists a substitution $R$ such that $U = S R$. \cite{damas1982principal}
 
 We will further require the algorithm to use only variables from $\tau$ and $\tau'$.
 
@@ -349,7 +356,7 @@ Before we describe the algorithm itself, we first need to define the closure of 
 \begin{defn}[$close_\Gamma(\tau)$]
     \label{defn:close}
     $$close_\Gamma(\tau) ::= \forall \alpha_1, \dots \alpha_n . \tau$$
-    where $\{\alpha_1, \dots \alpha_n\} := free(\tau) \backslash free(\Gamma)$, $free$ stands for the set of free variables. % TODO: define free variables
+    where $\{\alpha_1, \dots \alpha_n\} := free(\tau) \backslash free(\Gamma)$, $free$ stands for the set of free variables, see the definition \ref{defn:boundFree}.
 \end{defn}
 
 The algorithm \ref{w} is a function $W$ which takes a pair $(\Gamma, e)$ where $\Gamma$ is a set of assumptions and $e$ is an expression in the context of $\Gamma$. Then $W$ returns a pair $(S, \tau)$ such that:
@@ -380,7 +387,7 @@ And also the functions defined inside a type class (we will call them methods) c
 \textbf{Instances} of type classes (parametrized by a type instance of the type of the corresponding type class) are what allows for ad-hoc polymorphism % TODO: add some mention of ad-hoc poly more above
 in a very well controlled matter, they are a limited (but powerful) version of classic overloading where all instances have to share a common supertype and they cannot overlap (share a common type instance - this can be proven by the unification algorithm).
 
-Type classes can be added to the algorithm $W$ defined above with only little changes. % TODO: reference something, fix wording
+Type classes can be added to the algorithm $W$ defined above with only little changes, for example, by simplifying thih \cite{jones1999typing}.
 
 \subsubsection{Subtyping and Overloading}
 
