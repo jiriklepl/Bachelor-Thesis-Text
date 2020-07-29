@@ -52,25 +52,25 @@ Syntactically it is not any different from the lambda calculus, considering the 
 We will formally define what we consider a type, first we consider a \textbf{type variable} similarly to the variables of the lambda calculus:
 
 \begin{defn}[Type Variable]
-    $$type\_variable ::= \alpha\ |\ type\_variable'$$
+    By a type variable, we will mean a symbol defined by the following grammar rule:
+    $$type\_variable ::= tv\ |\ type\_variable'$$
+    but often, we will use $\alpha, \beta$ as aliases to arbitrary type variables
 \end{defn}
 
-Then the types can be formally defined:
-
-\begin{defn}[Type]
+\begin{defn}[Type in $\lambda\rightarrow$]
     \label{defn:typeSTLC}
-    $$\tau ::= \alpha\ |\ \tau \rightarrow \tau'$$
-    where $\tau, \tau'$ stand for types and $\alpha$ for a type variable. $\tau \rightarrow \tau'$ is a type of a function taking an argument of a type $\tau$ and returning a value of a type $\tau'$.
+    Types can be formally defined by the following grammar rule:
+    $$\tau ::= \alpha\ |\ \tau' \rightarrow \tau''$$
+    where $\tau, \tau', \tau''$ stand for types and $\alpha$ for a type variable. $\tau' \rightarrow \tau''$ is a type of a function taking an argument of the type $\tau'$ and returning a value of the type $\tau''$.
 \end{defn}
 
 We can also freely add type constants (like \emph{integers} or \emph{booleans}) to the definition.
 
 \subsection{Typing}
 
-We will use the formal definition for typing as follows:
-
-\begin{defn}[Typing and Assumption]
+\begin{defn}[Typing and Assumption in $\lambda\rightarrow$]
     \label{defn:typingSTLC}
+    Typing is an assignment of a type to an expression written as follows:
     $$e : \tau$$
     where $e$ is an expression and $\tau$ is a type. If $e$ is a variable $x$ and we infer other types from it, we refer to such typing as an \textbf{assumption} or a \textbf{judgement}.
 \end{defn}
@@ -81,7 +81,7 @@ Sometimes we will write $\Gamma \vdash e : \tau$, meaning that in the context of
 
 Simply-typed lambda calculus uses the following rules, we present them to formally define how to determine whether a certain typing is valid:
 
-\begin{defn}[Inference rules]
+\begin{defn}[Inference rules of $\lambda\rightarrow$]
     \label{defn:STLCInference}
     $$\boxed{\begin{array}{l c}
         \infer[(x : \tau \in \Gamma)]{\Gamma \vdash x : \tau}{} & (\text{var}) \\\\
@@ -95,7 +95,8 @@ We call $\Gamma$ either a basis, a context, or a set of assumptions. These names
 The inference rules describe the step-by-step derivation of types where the bottom one follows the top one.
 
 \subsubsection{Example}
-A Step by step example for $id = \lambda x . x$:
+\label{sssec:idExample}
+A Step by step example for inferring the type of $id = \lambda x . x$:
 
 \begin{enumerate}
     \item $\{\} \vdash \lambda x . x : ?$
@@ -111,15 +112,16 @@ Notice here the context changes during the derivation process and that we can gi
 
 \subsection{Type substitution}
 
-Type substitution is a process that rewrites (simultaneously) certain type variables into different types. Substitutions will be very important for various definitions and, even more importantly, for type unification, which will be the basis for type inference algorithms for the following type systems.
-
 \begin{defn}[Type Substitution]
     \label{defn:substitution}
+    Type substitution is a process that rewrites (simultaneously) certain type variables into different types. Substitutions will be very important for various definitions and, even more importantly, for type unification, which will be the basis for type inference algorithms in the following type systems.
+
+    Type substitution will be given the following syntax:
     $$S ::= [\alpha_1 := \pi_1, \dots \alpha_n := \pi_n]$$
-    here $S$ stands for a type substitution, each $\alpha_i$ stands for a distinct type variable and $\pi_i$ for a type.
+    here $S$ stands for a type substitution, each $\alpha_i$ stands for a distinct type variable that is being rewritten and $\pi_i$ for a type that replaces $\alpha_i$.
 \end{defn}
 
-We will write applying $S$ to a type $\tau$ as $\tau S$, we will also allow a simplified definition $[\overline{\alpha} := \overline{\pi}]$ meaning $[\alpha_1 := \pi_1, \dots \alpha_n := \pi_n]$.
+We will write applying $S$ to a type $\tau$ as $\tau S$ (left associative), we will also allow a simplified definition $[\overline{\alpha} := \overline{\pi}]$ meaning $[\alpha_1 := \pi_1, \dots \alpha_n := \pi_n]$.
 
 \subsection{Principal Typing}
 
@@ -127,19 +129,23 @@ Every typeable term $e$ in the simply-typed lambda calculus has principal type $
 
 The intuitive idea of principal typing of $e$ is that it is a typing general enough to be substitutable into all other possible typings of $e$ but not general enough to be substitutable into any impossible typings. This is usually simplified into `the most general type of $e$'.
 
-The example just above is a great fit for showing this as for example $\lambda x . x : \sigma$ would be a possible typing, but not a principal one, because substitution $[\sigma := \alpha \rightarrow \alpha \rightarrow \alpha]$ would give use $\alpha \sim \alpha \rightarrow \alpha$, which would yield an incomputable infinite type.
+The example in section \ref{sssec:idExample} is a great fit for showing this. $\lambda x . x : \sigma$ would be a possible typing general enough to be instantiated into any valid typing but is not a principal one because substitution $[\sigma := \alpha \rightarrow \alpha \rightarrow \alpha]$ would give use $\alpha \sim \alpha \rightarrow \alpha$, which would yield an incomputable infinite type.
 
 Principal typings will be very important later when we introduce more advanced type systems as the principal type of $e$ is the only information about $e$ we have to consider when we see $e$ again, given it has no free variables.
 
-\subsubsection{Type Instantiation}
+\subsection{Type Instantiation and Type Unification}
 
-We will call a type $\tau$ an instance of a type $\sigma$ if there is a type substitution $S$ such that transforms $\tau = \tau S$.
+\begin{defn}[Type instance]
+    \label{defn:typeInstance}
+    We will call a type $\tau$ a type instance of a type $\sigma$ if there is a type substitution $S$ such that $\tau = \sigma S$.
+\end{defn}
 
-\subsection{Type Unification}
+\begin{defn}[Type Unifier]
+    \label{defn:unifier}
+    If $\tau_1, \tau_2$ are types and $S$ is a substitution, we say that $S$ unifies $\tau_1$ and $\tau_2$ if $\tau_1 S = \tau_2 S$, then we call $S$ their unifier, and we call $\tau_1$ and $\tau_2$ unifiable. \cite{robinson1965machine} (originally for sets of types)
+\end{defn}
 
-If $\tau_1, \tau_2$ are types and $S$ is a substitution, we say that $S$ unifies $\tau_1$ and $\tau_2$ if $\tau_1 S = \tau_2 S$, then we call $S$ their unifier, and we call $\tau_1$ and $\tau_2$ unifiable. \cite{robinson1965machine} (originally for sets of types)
-
-\subsection{Type Checking, Typeability, and Type Inference}
+\subsection{Type Checking, Typeability, and Type Inference in $\lambda\rightarrow$}
 
 Type checking is the process of validating whether a term can have a given type, whereas typeability is a decision problem of whether the term can be given some type.
 
@@ -149,9 +155,9 @@ Both type checking and typeability of the simply-typed lambda calculus are decid
 
 One thing that is a problem for the simply-typed lambda calculus is that it is not Turing-complete. It is strongly normalizing \cite{barendregt1992lambda}, and thus assuming it being Turing-complete, the type inference would have to solve the halting problem. This problem will be answered by the following type systems.
 
-\subsection{Writing Conventions for types}
+\subsection{Writing Convention for Types}
 
-We will follow the convention of right-associativity of the $\rightarrow$
+We will follow the convention of right-associativity of $\rightarrow$.
 
 \section{System F and Parametric Polymorphism}
 
@@ -161,22 +167,22 @@ Here we can reuse the example of $id = \lambda x . x$ which, given the simply-ty
 
 $$id : \forall \alpha . \alpha \rightarrow \alpha$$
 
-We call such typings (beginning with the $\forall$ quantifier) \textbf{polymorphic} (opposed by \textbf{monomorphic}).
+We call such typings (with the $\forall$ quantifier) \textbf{polymorphic} (opposed by \textbf{monomorphic}).
 
 The definition of types extends the definition \ref{defn:typeSTLC} for the simply-typed lambda calculus.
 
-\subsection{Types}
+\subsection{Types in the System F}
 
-\begin{defn}[Type]
+\begin{defn}[Type in the system F] Types in this type system are defined by the following grammar rule extending the original definition \ref{defn:typeSTLC}:
     $$\tau ::= \alpha\ |\ \tau \rightarrow \tau'\ |\ \forall \alpha . \tau$$
-    where $\tau, \tau'$ are types and $\alpha$ is a type variable; we can also add type constants.
+    $\tau, \tau'$ are types and $\alpha$ is a type variable; we can also add a case $\tau ::= \iota$, where $\iota$ is a type constant (for example, \lstinline{int}).
 \end{defn}
 
-In the last case ($\forall \alpha . \tau$) we call $\alpha$ (its occurrence of in $\tau$) a \textbf{bound} type variable. If the variable is not bound we call it \textbf{free}.
+In the last case ($\forall \alpha . \tau$), we call $\alpha$ (its occurrence of in $\tau$) a \textbf{bound} type variable. If the variable is not bound, we call it \textbf{free}.
 
-\subsection{Inference Rules}
+\subsection{Inference Rules of the System F}
 
-\begin{defn}[Inference rules]
+\begin{defn}[Inference rules of the System F]
     System F uses the rules of the simply-typed lambda calculus, plus the following:
     $$\boxed{\begin{array}{l c}
         \infer{\Gamma \vdash e : \sigma [\alpha := \tau]}{\Gamma \vdash e : \forall \alpha . \sigma} & (\text{$\forall$-elimination})\\\\
@@ -185,22 +191,20 @@ In the last case ($\forall \alpha . \tau$) we call $\alpha$ (its occurrence of i
     In $(\text{$\forall$-introduction})$ the type variable $\alpha$ is not free in any any assumptions on which the premise $e : \sigma$ depends.
 \end{defn}
 
-In system F the type checking is undecidable, and thus any general type inference algorithm is impossible.
+In system F the type checking is undecidable, and thus any general type inference algorithm is impossible. The Hindley-Milner type system is a restriction of it that allows for a simple type inference algorithm on which we will base ours.
 
-The Hindley-Milner type system is a restriction of it that allows for a simple type inference algorithm on which we will base ours.
+\subsection{Type Substitution in the System F}
+\label{ssec:substitutionF}
 
-\subsection{Type Substitution}
-
-The definition for type substitution and type instances are the same as those for the simply-typed lambda calculus, with the exception that the rewriting does not apply to bound type variables.
+The definitions for type substitution and type instance are the same as those in the simply-typed lambda calculus (definitions \ref{defn:substitution} and \ref{defn:typeInstance}), with the exception that the rewriting does not apply to bound type variables.
 
 \section{Hindley-Milner Type System}
 
 The Hindley-Milner type system, we will refer to it simply as HM, is a fairly minimalistic extension of lambda calculus, or at least syntactically. Semantically it could be seen rather as a restriction of the system F that answers the undecidability of it. For that, see the subsection \emph{Type Schemes}.
 
-Expressions in HM have the form:
-
-\begin{defn}[HM expressions]
+\begin{defn}[Expression in HM]
     \label{defn:syntaxHM}
+    Expressions in HM have the form given by the following grammar rule:
     $$e ::= x\ |\ e e'\ |\ \lambda x . e\ |\ \text{let } x = e \text{ in } e'$$
     where $x$ stands for a variable, and $e, e'$ for expressions
 \end{defn}
@@ -211,58 +215,64 @@ It differs from the syntax of lambda calculus (and that of the system F) only in
 
 There are two additional expressions completing the language that have no significance to the type system and thus we will not further consider them in any of the typing rules, and in the inference algorithm. They are defined as follows:
 
-\begin{defn}[If Then Else and Fix]
+\begin{defn}[If Then Else and Fix in HM]
     \label{defn:ifElseHM}
+    Here we give the two cases omitted in definition \ref{defn:syntaxHM}:
     $$e ::= \cdots\ |\ \text{fix } x . e\ |\ \text{if } e \text{ then } e' \text{ else } e''$$
     where $x$ stands again for a variable, and $e, e', e''$ for some expression; `$\cdots$' are to denote that this extends the definition \ref{defn:syntaxHM}.
+
+    The latter clause has the expected meaning, and the former is defined as the least fixed point of $\lambda x . e$ \cite{milner1978theory}. In the context of type inference the two clauses can be seen replaced by functions (operators) with the following typings (type schemes) \cite{damas1982principal}:
+    $$\text{fix}: \forall \alpha . (\alpha \rightarrow \alpha) \rightarrow \alpha$$
+    $$\text{if}: \forall \alpha . \text{ bool } \rightarrow \alpha \rightarrow \alpha \rightarrow \alpha$$
 \end{defn}
 
-The latter clause with the expected meaning, and the former being defined as the least fixed point of $\lambda x . expression$. In the context of type inference the two clauses can be seen as any other application using the following typings (type schemes):
-
-$$\text{fix}: \forall \alpha . \alpha \rightarrow \alpha \rightarrow \alpha$$
-$$\text{if}: \forall \alpha . \text{ bool } \rightarrow \alpha \rightarrow \alpha \rightarrow \alpha$$
-
-\subsection{Types}
+\subsection{Types in HM}
 
 Types of the HM type system are restricted in that they cannot include quantification of type variables introduced in the F system:
 
-\begin{defn}[Type]
-    $$\tau ::= \alpha\ |\ \iota\ |\ \tau \rightarrow \tau'$$
-    where $\tau, \tau'$ stand for types, $\alpha$ for a type variable, $\iota$ for a primitive type (type constant), and $sigma$ for a type scheme.
+\begin{defn}[Type in HM]
+    \label{defn:typeHM}
+    Types in HM are similar to those in $\lambda\rightarrow$ (definition \ref{defn:typeSTLC}), they are defined by the following grammar rule:
+    $$\tau ::= \alpha\ |\ \iota\ |\ \tau' \rightarrow \tau''$$
+    where $\tau, \tau', \tau''$ stand for types, $\alpha$ for a type variable, $\iota$ for a primitive type (type constant), and $\tau' \rightarrow \tau''$ for a function that takes an argument of the type $\tau'$ and returns a value of the type $\tau''$.
 \end{defn}
 
-Compare this definition with the definition \ref{defn:typeSTLC}.
+\subsection{Type Schemes in HM}
 
-\subsection{Type Schemes}
-
-Type schemes are defined similarly to types in the system F. This restriction means just that the type quantification, if there is any, is always at the very front of the type scheme.
-
-\begin{defn}[Type Scheme]
+\begin{defn}[Type Scheme in HM]
     \label{defn:schemeHM}
+    Type schemes are defined similarly to types in the system F. They are introduced, so the type $\forall$ quantification, if there is any, is always at the very front of the type scheme (in the system F, it can be anywhere inside the type).
     $$\sigma ::= \tau\ |\ \forall \alpha . \tau$$
-    where the former case is a monomorphic type scheme and the latter is polymorphic.
+    where $\sigma$ is a type scheme, $\alpha$ is a type variable, and $\tau$ is a type.
+
+    The former case we call a monomorphic type scheme and the latter is polymorphic.
 \end{defn}
 
-\subsubsection{Typing extensions}
+\subsubsection{Common Typing extensions to HM}
 \label{sssec:typingExt}
 
 In the HM type system, it is common to introduce the following type operators: cartesian products (tuples): $\times$; disjoint sums (tagged unions): $+$; and lists. Existence of these is not required for the type system, and so we will avoid them going forward. Their reintroduction is trivial as they can be described as regular type constructors.
 
-\subsection{Typing}
+\subsection{Typing in HM}
 
-Typing of expressions is modified by the introduction of type schemes into assigning a type scheme to a variable instead of assigning a type. See the definitions \ref{defn:typingSTLC} and \ref{defn:schemeHM}.
+Typing of expressions is modified by the introduction of type schemes (definition \ref{defn:schemeHM}).
+\begin{defn}[Typing in HM]
+    Typing is assigning a type scheme to an expression instead of assigning a type in definition \ref{defn:typingSTLC}.
+\end{defn}
 
-\subsection{Type Instantiation}
+\subsection{Type Instantiation in HM}
 
-Type definition of type instantiation carries over from the system F and the simply-typed lambda calculus, but it also applies to \emph{type schemes}. \cite{damas1982principal}
+The definition of type instantiation carries over from the system F and the simply-typed lambda calculus (definition \ref{defn:typeInstance}), considering substitution as described in section \ref{ssec:substitutionF}, but it also applies to \emph{type schemes}.
 
-A notable change being an addition of an \textbf{generic instance} of a type scheme $\sigma = \forall \alpha_1, \alpha_2 \cdots \alpha_n . \tau$ which is defined as $\sigma' = \forall \beta_1, \beta_2 \cdots \beta_m . \tau'$ such that $\tau' = \tau S$ for some type substitution $S = [\alpha_1 := \tau_1, \cdots \alpha_n := \tau_n]$, where type variables $\beta_i$ are not free in $\sigma$. We then write $\sigma > \sigma'$.
+\begin{defn}[Generic Instance in HM]
+    A notable change to the notion of instances is the definition of a \textbf{generic instance} of a type scheme $\sigma = \forall \alpha_1, \alpha_2 \cdots \alpha_n . \tau$ which is defined as $\sigma' = \forall \beta_1, \beta_2 \cdots \beta_m . \tau'$ such that $\tau' = \tau S$ for some type substitution $S = [\alpha_1 := \tau_1, \cdots \alpha_n := \tau_n]$, where type variables $\beta_i$ are not free in $\sigma$. We then write $\sigma > \sigma'$. \cite{damas1982principal}
+\end{defn}
 
 Note that $\sigma > \sigma'$ implies $\sigma S > \sigma' S$, however it does not imply $\sigma S > \sigma$.
 
-\subsection{Inference Rules}
+\subsection{Inference Rules of HM}
 
-\begin{defn}[Inference rules]
+\begin{defn}[Inference rules of HM]
     $$\boxed{\begin{array}{l c}
         \infer[(x : \sigma \in \Gamma)]{\Gamma \vdash x : \sigma}{} & (\text{var}) \\\\
         \infer{\Gamma \vdash e e' : \tau}{\Gamma \vdash e : \tau' \rightarrow \tau \quad \Gamma \vdash e' : \tau'} & (\text{application}) \\\\
@@ -276,9 +286,9 @@ Note that $\sigma > \sigma'$ implies $\sigma S > \sigma' S$, however it does not
 
 The \emph{instantiation} rule replaces the $\forall$-elimination rule of the system F. Apart from that, the \emph{let polymorphism} rule is the only real extension of the rules, balancing the type restriction introduced before.
 
-\subsection{Type Inference}
+\subsection{Type Inference in HM}
 
-We will introduce the algorithm W \ref{w}. It produces the principal type scheme for the given program (expression).
+We will introduce the algorithm W \ref{w}. It produces the \emph{principal type scheme} for the given program (expression). But before we describe the algorithm, we need to introduce the unification algorithm which is used in its definition.
 
 \subsubsection{Most General Unification}
 
@@ -307,7 +317,9 @@ We will introduce the algorithm W \ref{w}. It produces the principal type scheme
 
 One of the main parts of the type inference algorithm is the type unification, and since we are usually after principal types, the most general unification.
 
-The most general unifier of types $\tau, \tau'$ is a unifier $S$ such that for every other unifier $U$ of $\tau$ and $\tau'$ there exists a substitution $R$ such that $U = S R$. \cite{damas1982principal}
+\begin{defn}[Most General Unifier]
+    The most general unifier of types $\tau, \tau'$ is a unifier $S$ such that for every other unifier $U$ of $\tau$ and $\tau'$ there exists a substitution $R$ such that $U = S \circ R$. \cite{damas1982principal}
+\end{defn}
 
 We will further require the algorithm to use only variables from $\tau$ and $\tau'$.
 
@@ -328,7 +340,7 @@ We present an algorithm \ref{mgu}, which is a variation of Robinson's unificatio
     \State $(S_2, \tau_2) \gets W(\Gamma S_1, e_2)$
     \State let $\beta$ be a \emph{new} type variable
     \State $S_3 \gets mgu (\tau_1 S_2, \tau_2 \rightarrow \beta)$
-    \State $(S, \tau) \gets (S_1 S_2 S_3, \beta S_3)$
+    \State $(S, \tau) \gets (S_1 \circ S_2 \circ S_3, \beta S_3)$
     \ElsIf{$e$ \textbf{matches} $\lambda x . e_1$}
     \State let $\beta$ be \emph{new} type variable
     \State $(S, \tau_1) \gets W(\Gamma_x \cup \{x : \beta\}, e_1)$
@@ -336,7 +348,7 @@ We present an algorithm \ref{mgu}, which is a variation of Robinson's unificatio
     \ElsIf{$e$ \textbf{matches} $\text{let } x = e_1 \text{ in } e_2$}
     \State $(S_1, \tau_1) \gets W(\Gamma, e_1)$
     \State $(S_2, \tau) \gets W(\Gamma_x S_1 \cup \{close_{\Gamma S_1}(\tau_1)\}, e_2)$
-    \State $S = S_1 S_2$
+    \State $S = S_1 \circ S_2$
     \Else
     \State Terminate with an error stating that $e$ is not typeable
     \EndIf
@@ -349,35 +361,33 @@ Before we describe the algorithm itself, we first need to define the closure of 
 
 \begin{defn}[$close_\Gamma(\tau)$]
     \label{defn:close}
-    $$close_\Gamma(\tau) ::= \forall \alpha_1, \dots \alpha_n . \tau$$
-    where $\{\alpha_1, \dots \alpha_n\} := free(\tau) \backslash free(\Gamma)$, $free$ stands for the set of free variables, see the definition \ref{defn:boundFree}.
+    $$close_\Gamma(\tau) := \forall \alpha_1, \dots \alpha_n . \tau$$
+    where $\{\alpha_1, \dots \alpha_n\} := free(\tau) \setminus free(\Gamma)$, $free$ stands for the set of free variables, see the definition \ref{defn:boundFree}.
 \end{defn}
 
 The algorithm \ref{w} is a function $W$ which takes a pair $(\Gamma, e)$ where $\Gamma$ is a set of assumptions and $e$ is an expression in the context of $\Gamma$. Then $W$ returns a pair $(S, \tau)$ such that:
 
 $\Gamma S \vdash e : \tau$ and furthermore $close_{\Gamma S}(\tau)$ is a principal type scheme of $e$ under $\Gamma S$.
 
-\subsection{Extensions of the Type System}
+\subsection{Extensions of the HM Type System}
 
 Pure HM allows for just parametric polymorphism. However, without any ad-hoc polymorphism or subtyping, this means there is only one principal type for every symbol in the program and just one definition. This is useful in cases where an algorithm (or a function) works on parameters of arbitrary types. A good example of that could be the $K$ combinator (sometimes called `const function'). We call these algorithms generic.
 
-The problem is some functions work only on a particular type, for example, basic arithmetic functions. We would like to be able to say that it makes sense to add two integers, or two real numbers, but not adding two boolean values.
+The problem is that some functions work only on a particular type, for example, basic arithmetic functions. For that reason, we would like to be able to say that it makes sense to add two integers, or two real numbers, but not adding two boolean values.
 
 A trivial extension would be the introduction of tagged unions, see \emph{Typing extensions} in \ref{sssec:typingExt}. But if we were to define the $+$ operator as $(+) : Int + Real \rightarrow Int + Real \rightarrow Int + Real$ we solve the problem with booleans, one different problem comes to the surface: we would like to say that adding two integers yields an integer whereas adding two real numbers yields a real number, one more argument could also be that we would like to forbid adding integers to real numbers (maybe we want to require all data conversions be explicit).
 
-So what we would like is some way of expressing that $(+)$ takes two parameters of a type we can perform addition on and that the function yields us a result of the same type.
-
-This can be answered by introducing \textbf{type classes}.
+So what we would like is some way of expressing that $(+)$ takes two parameters of a type we can perform addition on and that the function yields us a result of the same type. This can be achieved by \textbf{type classes}.
 
 \subsubsection{Type Classes and their Methods and Instances}
 
-The idea of type classes (parametrized by generic types) is that we put constraints on types of some variables (or functions) we use in our algorithms. Those constraints tell us that the usage of these algorithms is valid only in the context where the constraints are satisfied (this allows us to implement otherwise impossible generic algorithms, for example, sorting).
+The idea of type classes (parametrized by generic types) is that we put constraints on types of some variables (or functions) we use in our algorithms. Those constraints tell us that the usage of these algorithms is valid only in the context where the constraints are satisfied (this allows us to implement otherwise impossible generic algorithms, for example, sorting, that would be nonsensical for some types).
 
 And also, the functions defined inside a type class (we will call them \textbf{methods}) can have a specialized implementation for each \emph{instance}, this was actually the main motivation for their creation: $Eq$ class with a method $==$ which needs to be specialized for each type. \cite{hall1994type}
 
-\textbf{Instances} of type classes (parametrized by a type instance of the type of the corresponding type class) are what allows for ad-hoc polymorphism in a very well controlled manner \cite{wadler1989make}, they are a limited (but powerful) version of classic overloading (we will describe overloading shortly). It differs from classic overloading in that all instances have to share a common supertype and they are not allowed to overlap (share a common type instance - this can be proven by the unification algorithm) - this "no overlapping" rule will be important for instantiation (generating code with concrete monotypes: overlapping would mean having, for the given parameters, two implementations simultaneously).
+\textbf{Instances} of type classes (parametrized by a type instance of the type of the corresponding type class) are what allows for ad-hoc polymorphism in a very well controlled manner \cite{wadler1989make}, they are a limited (but powerful) alternative to classic overloading (we will describe overloading shortly). It differs from classic overloading in that all instance \emph{methods} have to have typings which are instances of the principal typing of the generic definition. Furthermore, the types of instances are not allowed to overlap (share a common type instance - this can be proven by the unification algorithm) - this "no overlapping" rule will be important for instantiation (generating code with concrete monotypes: overlapping would mean having, for the given parameters, two implementations simultaneously).
 
-Type classes can be added to the algorithm $W$ defined above with only little changes, for example, by simplifying thih \cite{jones1999typing}.
+Type classes can be added to the algorithm \ref{w} $W$ with only little changes, for example, a simplified version of thih \cite{jones1999typing}.
 
 \subsubsection{Subtyping and Overloading}
 
@@ -407,7 +417,13 @@ For our purposes, we will (limit) the Haskell language significantly, ignoring a
 
 Haskell generalizes the HM type system and the HM syntax mostly via the notion of type constructors. If they take no type arguments, we call them nullary. Those are the ones we already call \emph{types} in the HM type system. We call a type constructor n-ary when it takes exactly $n$ type arguments to form a (nullary) value type. For example, the type constructor $(\rightarrow)$ is binary, and it constructs the type of a function.
 
-We can formally define type constructors similarly to functions.
+We can formally define type constructors similarly to function applications:
+
+\begin{defn}[Type Constructor in the Haskell Type System]
+    A type constructor is a pair $TC : k$, where $TC$ is the name of the type constructor, and $k$ is its \emph{kind}. But we usually refer to them only by their name.
+
+    We will perform application on them. This application has a special semantic meaning for each applied type constructor, for example: $\text{list } a$ is a list of variables of the type $a$, and $a \rightarrow b$ ($\rightarrow$ is used in the \emph{infix} notation) is a function taking an argument of the type $a$ and returning a value of the type $b$.
+\end{defn}
 
 \subsection{Kinds}
 
@@ -421,27 +437,27 @@ Kinds are less complex then types as they are defined recursively only from the 
 
 For example, we can define a very common type constructor $List: * \rightarrow *$ which takes a type $a$ and constructs a type representing a linked list of values of type $a$. We can use this type constructor to show the reason behind the notion of kinds as it would not make much sense for a value to have a type just $List$ without it being applied to any type: "a list of what?"
 
-We will formally define kinds as:
-
-\begin{defn}[kinds]
+\begin{defn}[Kinds]
+    Kinds are grammatically defined as follows:
     $$k ::= *\ |\ k' \rightarrow k''$$
     where $k, k', k''$ are kinds.
 \end{defn}
 
-\subsection{Types}
+\subsection{Types in the Haskell Type System}
 
 We will define types formally as:
 
-\begin{defn}[Type]
-    $$\tau ::= x\ |\ c : k\ |\ \tau \tau'$$
-    where $\tau, \tau'$ are types, $x$ is a type variable, $c$ is a type constant, and $k$ is a kind. We will, for example consider the $(\rightarrow)$ type constructor a regular type of the kind $* \rightarrow * \rightarrow *$.
+\begin{defn}[Type in the Haskell Type System]
+    The types are defined, quite similarly to the definition \ref{defn:typeHM}, by the following grammar rule:
+    $$\tau ::= x\ |\ c : k\ |\ \tau' \tau''$$
+    where $\tau, \tau', \tau''$ are types, $x$ is a type variable, $c$ is a type constructor (or a type constant), and $k$ is its kind. We will, for example, consider the $(\rightarrow)$ type constructor a regular type of the kind $* \rightarrow * \rightarrow *$.
 \end{defn}
 
-\subsection{Type Schemes}
+\subsection{Type Schemes in the Haskell Type System}
 
 Type schemes will be defined similarly to those of the HM type system, differing only in what we consider a type and in that there can be constraints that the types have to satisfy. It should also be noted that only types of the $*$ kind can be assigned to values.
 
-\begin{defn}[Type Scheme]
+\begin{defn}[Type Scheme in the Haskell Type System]
     \label{defn:typeSchemes}
     $$\sigma ::= \forall \alpha_1, \dots \alpha_n . qt\ |\ qt$$
     where $qt$ stands for a qualified type (a constrained type) and $\alpha_i$ stand for distinct type variables
@@ -452,21 +468,22 @@ Type schemes will be defined similarly to those of the HM type system, differing
 A qualified type is a type with an added set of predicates every instance of it has to satisfy.
 
 \begin{defn}[Qualified Types and Predicates]
+    Qualified types are defined by the following grammar rule:
     $$qt ::= \{\beta_1 \in C_1, \beta_2 \in C_2, \dots \beta_m \in C_m\} \Rightarrow \tau\ |\ \tau$$
-    where $\beta_j$ name type variables such that $\{\beta_1, \dots \beta_m\} \subseteq \{\alpha_1, \dots \alpha_n\}$ ($\alpha_1 \dots \alpha_n$ from the definition \ref{defn:typeSchemes}, qualified types occur always in the context of type schemes), $C_j$ names a type class, and $\tau$ names a type. We call the pair $\beta_j \in C_j$ a \textbf{predicate (constraint)}
+    $qt$ is the qualified type. $\beta_j$ are type variables such that $\{\beta_1, \dots \beta_m\} \subseteq \{\alpha_1, \dots \alpha_n\}$ ($\alpha_1 \dots \alpha_n$ are taken from the definition \ref{defn:typeSchemes}, qualified types occur always in the context of type schemes), $C_j$ are names type classes (not necessarily distinct), and $\tau$ is the type. We call the pair $\beta_j \in C_j$ a \textbf{predicate (constraint)}, it means the requirement that $C_j$ has an instance for $\beta_j$.
 \end{defn}
 
 Going forward, we will allow the following forms for type schemes $\forall \{\}. qt = qt$ and for qualified types $\{\} \Rightarrow \tau = \tau$ to simplify other definitions so we do not need to consider separate cases.
 
-\subsection{Type substitution}
+\subsection{Type substitution in the Haskell Type System}
 
 With the introduction of qualified types, we should explicitly state that the type substitution applies to qualified types, just like if the type parameters of the predicates were a part of the type itself.
 
-\subsection{Type Inference Rules}
+\subsection{Type Inference Rules of the Haskell Type System}
 
 The type inference rules for the Haskell type system are almost the same as the type inference rules for the HM type system, but we have to add rules for the inference of the type class constraints:
 
-\begin{defn}[Inference rules]
+\begin{defn}[Inference rules of the Haskell Type System]
     $$\boxed{\begin{array}{l c}
         \infer[(x : \sigma \in \Gamma)]{\Gamma \vdash x : \sigma}{} & (\text{var}) \\\\
         \infer{\Gamma \vdash e e' : \mathbf{P} \cup \mathbf{P'}  \Rightarrow \tau}{\Gamma \vdash e : \mathbf{P} \Rightarrow \tau' \rightarrow \tau & \Gamma \vdash e' : \mathbf{P'} \Rightarrow \tau'} & (\text{application}) \\\\
@@ -487,6 +504,6 @@ The addition of type constructors and type classes does not require any change t
 
 As for type instances, the definition is without any change.
 
-\subsection{The Type Inference Algorithm}
+\subsection{The Type Inference Algorithm for the Haskell Type System}
 
-The type inference algorithm has to account for the bottom-up propagation of predicates that the inferred types have to satisfy. The basis for the inference algorithm is the algorithm W \ref{w}. For the definition, see thih \cite{jones1999typing}. In thih \lstinline[language=haskell]{tiExpr} is the part of type inference that encompasses the extension of the algorithm W. The definition in thih differs slightly from what we have discussed in this chapter in that it does not consider just the syntax from the definition \ref{defn:syntaxHM} with the extensions we presented, but it also considers some features of the Haskell language (for example pattern matching).
+The type inference algorithm has to account for the bottom-up propagation of predicates that the inferred types have to satisfy. The basis for the inference algorithm is the algorithm W \ref{w}. For the definition, see thih \cite{jones1999typing}. In thih, \lstinline[language=haskell]{tiExpr} is the part of type inference that encompasses the extension of the algorithm W. The definition in thih differs slightly from what we have discussed in this chapter in that it does not consider just the syntax from the definition \ref{defn:syntaxHM} with the extensions we presented, but it also considers some features of the Haskell language (for example pattern matching).
