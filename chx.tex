@@ -1,43 +1,65 @@
-\chapter{XXX}
+\chapter{The CHM Language Grammar}
 
-\section{CHM specification}
+This is the grammar for the CHM language, the meaning of all constructs define here is defined in the chapter \ref{chap:compilerCHM} (\emph{CHM Compiler}).
 
-\subsection{CHM headers}
+\section{CHM headers}
 
 Polymorphic functions and structures are constructed using special annotations (called CHM headers) following grammar:
 
 \begin{lstlisting}
-chm_head := '<' new_typevar_list '>' | '<' new_typevar_list ':' constraint_list '>'| '<' constraint_list '>'
+chm_header = '<' type_decls '>'
+           | '<' type_decls ':' constraints '>'
+           | '<' constraints '>'
 
-new_typevar_list := new_typevar | new_typevar_list ',' new_typevar
-new_typevar := IDENT
+type_decls = type_decl
+           | type_decls ',' IDENT
 
-constraint_list := constraint | constraint_list ',' constraint
-constraint := unification | predicate
+constraints = constraint
+            | constraints ',' constraint
+constraint = new_type
+           | predicate
 
-unification := IDENT '~' type
+new_type = IDENT '~' type
+predicate = CLASS '<' type '>'
 
-predicate := CLASS '<' type_list '>'
-type_list := DECLARATION | type_list ',' DECLARATION
+type = DECLARATOR
+     | DECLARATOR ':' '<' types '>'
+types = DECLARATOR
+      | types ',' DECLARATOR
 \end{lstlisting}
 
-This is a simplified version of a piece of the actual grammar used in the implementation,
-where we used all-caps for tokens that are not local to the scope of chm heads: `IDENT' means a new variable,
-`CLASS' is a name of a type-class, % TODO: link
-`DECLARATION' is as described in the C standard.
+This is a simplified version of a piece of the actual grammar used in the implementation
 
-token \lstinline{new_typevar} syntactically behaves as defining a new typedef.
+\begin{itemize}
+    \item `IDENT' is a new identifier
+    \item `CLASS' is the name of a type class
+    \item `DECLARATOR' is a declarator from the C language (a type)
+\end{itemize}
 
-A unification provides a way of creating a type alias akin to typedefs (syntactically equal) with the benefit of being local to the definition
-it precedes, but without creating an actual typedef which would interfere with any following code.
+\section{Classes and Their Instances}
 
-\subsection{Classes}
-
-The other addition CHM brings to C are classes.
-
-They are defined (simplified version) as follows:
+The other addition CHM brings to C are classes. They are defined (simplified version) as follows:
 
 \begin{lstlisting}
-    class := 'class' IDENT chm_head '{' EXT_DECLARATIONS '}'
-    instance := 'instance' IDENT '<' type_list '>' '{' EXT_DECLARATIONS '}'
+class = chm_head 'class' IDENT '{' ext_decls '}'
+      | chm_head 'class' IDENT < typevar > '{' ext_decls '}'
+
+instance = 'instance' IDENT '<' type '>'
+               '{' ext_decls '}'
+           chm_head 'instance' IDENT '<' type '>'
+               '{' ext_decls '}'
 \end{lstlisting}
+
+\lstinline{ext_decls} are declarations and definitions which would be legal in the global scope. But it is not allowed to put declarations in instances, and all their definitions have to be first declared in the matching classes.
+
+\section{Polymorphic Functions and Structures}
+
+Those are defined as regular C constructs preceded by \emph{CHM headers}:
+
+\begin{lstlisting}
+CHM_function_definition  = chm_header function_definition
+CHM_function_declaration = chm_header function_declaration
+CHM_struct_definition    = chm_header struct_definition
+\end{lstlisting}
+
+Similarly for \textbf{unions}, but a lot of grammars considers them syntactically equivalent to structs.

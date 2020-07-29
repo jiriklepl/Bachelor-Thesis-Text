@@ -1,4 +1,5 @@
 \chapter{Type inference and polymorphism for C}
+\label{chap:infPolyC}
 
 \section{Reasons for Polymorphism Features}
 
@@ -12,15 +13,15 @@ One example of using void pointers can be `malloc' which without any type infere
 
 As we stated before one other common way of implementing generic algorithms and data structures is by using \textbf{macros}, however if we implement a data structure as a macro then all required instances of it and dedicated procedures working on them have to be instantiated explicitly by the user. This can lead to many hard to find bugs.
 
-Thankfully many modern compilers are macro-aware and so if there is a compile-time bug in the program then the compiler can create a user-friendly error output (for example GCC). % TODO: create an error source
+Thankfully many modern compilers are macro-aware and so if there is a compile-time bug in the program then the compiler can create a user-friendly error output (for example GCC). % TODO: MAYBE create an error source
 
-But when it comes to debugging there has to be done some nontrivial preprocessing of the source files to make it possible to use conventional debuggers (like gdb) to find bugs in macro expansions. % TODO: link something maybe?
+% But when it comes to debugging there has to be done some nontrivial preprocessing of the source files to make it possible to use conventional debuggers (like gdb) to find bugs in macro expansions. % HACK: link something maybe?
 
-The lack of any type checking in context of macros makes the possible bugs manifest only when the implementations are actually used in some code, and sometimes only in certain contexts, as the compiler should even assume a macro is supposed to represent a code.
+The lack of any type checking in the context of macros makes the possible bugs manifest only when the implementations are actually used in some code, and sometimes only in certain contexts, as the compiler should even assume a macro is supposed to represent a code.
 
-And as for generic pointers a bug usually becomes apparent only in the runtime and that by corruption of the memory.
+And as for generic pointers a bug usually becomes apparent only during runtime and that by the corruption of the memory.
 
-One real-life example of making "generic" data structures via macros is klib's \lstinline{__KHASH_TYPE} macro (in `./khash.h'): % TODO: https://github.com/attractivechaos/klib
+One real-life example of making "generic" data structures via macros is klib's \lstinline{__KHASH_TYPE} macro (in `./khash.h') \cite{attractivechaos2020klib}:
 
 \begin{lstlisting}
 #define __KHASH_TYPE(name, khkey_t, khval_t) \
@@ -39,27 +40,19 @@ This approach also requires explicit mention of the instance in the correspondin
 For example in this case we would clear the structure by calling
 \lstinline{void kh_clear_<name>(const kh_<name>_t *h);} where \lstinline{<name>} stands for the name we have given for the instance. So if we were to refactor a part of the program and change the type of something, we would have to change the name as well, and sometimes create a new instance by hand or delete the old one if it is no longer useful - which we would have to investigate ourselves. In large projects this can cause a lot of problems in case of even a little miscommunication.
 
-Using type checking and type inference described in this thesis have effect very similar effect to instantiating definitions via macro expansion, but with the benefit of brevity, catching bugs early (due to checking the implementation when it is defined) and having fewer requirements on mindfulness of the user. All of these effect can lead to less error-prone code.
+Using type checking and type inference described in this thesis have an effect very similar to the effect of instantiating definitions via macro expansion, but with the benefit of brevity, catching bugs early (due to checking the implementation when it is defined) and having fewer requirements on mindfulness of the user. All of these effects can lead to less error-prone code.
 
 Adding generic programming features to C thus can help in debugging programs written in this language and to make writing generic code more user friendly and easier to program in and maintain.
 
 \subsection{Why the Hindley-Milner Type System}
 
-The C language has a great support for the procedural programming paradigm with records and data are clearly separated from computation in the C code.
+The C language has great support for the procedural programming paradigm with records and data are clearly separated from computation in the C code.
 
 There have been many attempts of adding object-oriented features (most notable being C++).
 
 Adding the features of the HM type system does not change the core nature of the language, it just facilitates creating generic abstractions and with the addition of type classes it adds support for both simple and expressive ad-hoc polymorphism.
 
 We will present only slightly modified syntax of the C language which will give a type-safe alternative for many cases where we would otherwise use the aforementioned \lstinline{void *} pointers or macros.
-
-\iffalse
-\section{C99 types}
-
-% TODO: http://www.open-std.org/jtc1/sc22/WG14/www/docs/n1256.pdf speaks about them
-
-All C types
-\fi
 
 \section{Modelling C Types in HM}
 
@@ -73,7 +66,7 @@ In this section, we will specify how we will model the type system of C in the H
 
 All main C integral types (like \lstinline{int} or \lstinline{char}) can be trivially modelled as type constants, we can model signed and unsigned versions as either two separate types or by using \lstinline{unsigned} and \lstinline{signed} type constructors. Though to make the system as consistent as possible in this matter we propose considering sequences of type specifiers like for example \lstinline{unsigned long long int} as single type constants. This means that type specifier sequences containing \lstinline{unsigned} would be illegal if they are illegal in C (same for the other type specifiers).
 
-This is not considered by the compiler proposed by this thesis as it not an important issue for the demonstration of the effect of the HM type system and polymorphism on the C language. % TODO: side note
+As a side note, this is not considered by the CHM compiler proposed in this thesis as it not an important issue for the demonstration of the effect of the HM type system and polymorphism on the C language.
 
 \subsection{Pointers}
 
@@ -94,7 +87,7 @@ One problem with C types in the context of the HM type system is that C uses the
 
 We propose that \lstinline{const} has to be handled separately from the type system and so we will omit the \lstinline{const} specifier in this thesis and leave it for future work.
 
-One reason for the incompatibility is that we can assign type `a' to `a' and also `const a' to `a', but not the other way around in the latter case. Keeping this behavior, and considering \lstinline{const a} a type, would imply introducing subtyping to the type system (\lstinline{const a} being a subtype of \lstinline{a}) and this has its own issues described in % FIXME: reference subtyping
+One reason for the incompatibility is that we can assign type `a' to `a' and also `const a' to `a', but not the other way around in the latter case. Keeping this behavior, and considering \lstinline{const a} a type, would imply introducing subtyping to the type system (\lstinline{const a} being a subtype of \lstinline{a}) and this has its own issues \cite{palsberg2012overloading}.
 
 Handling the \lstinline{const} specifier similarly to the way we handle pointers (this would mean explicit conversion when assigning from \lstinline{const} types) would make a trivial assignment of \lstinline{const} type to a non-\lstinline{const} unnecessarily verbose (which is usually considered a bad language design). Then we would need to prevent assigning \lstinline{const} to another \lstinline{const} of the same type which brings even more issues either making the code even more verbose or checking it during instantiation, which is the thing we want to avoid by type checking.
 
@@ -121,16 +114,16 @@ Structs and Unions are each considered a different type even if they share all o
 
 \section{Modelling C}
 
-Here we will use $\lambda_C$ introduced in the previous section to denote transformation from C to the syntax of the haskell extension of lambda calculus, this transformation can be done in a multiple of ways and we will present only one such way, not necessarily the most efficient one.
+Here we will use $\lambda_C$ introduced in the previous section to denote transformation from C to the syntax of the Haskell extension of lambda calculus, this transformation can be done in a multiple of ways and we will present only one such way, not necessarily the most efficient one.
 
 For keeping the model simple we will allow ourselves to disregard the imperative structure of the code, most notably we will ignore whether a statement is inside a block following a certain control statement, or it is outside of such block - this is not relevant for type checking nor type inference.
 
 We will also allow ourselves to reorder statements as long as they are inside the same function (or in the global scope).
 
-Models of some C constructs can be as follows (grammar taken from ): % TODO: http://www.quut.com/c/ANSI-C-grammar-y.html
+Models of some C constructs can be as follows (grammar taken from ): \cite{organisation1999iso}
 
 \subsection{Expressions and Statements}
-
+\label{ssec:exprStat}
 We will model most expressions very intuitively:
 
 \begin{defn}[$\lambda_C$ for binary operators]
@@ -141,7 +134,7 @@ We will model most expressions very intuitively:
 
 This example demonstrates the most simple case where we can model the C construct directly, but there are more tricky examples like the following one (an initialization in a context of a function body):
 
-\begin{defn}
+\begin{defn}[$\lambda_C$ for binary initializations]
 	$$\lambda_C(decl\_specs\ \text{IDENT} = init; \dots) := (\lambda\ \text{IDENT} : \lambda_C(decl\_specs) .\ \lambda_C(\dots)) (\lambda_C\ init)$$
 \end{defn}
 
@@ -149,9 +142,9 @@ This example demonstrates the most simple case where we can model the C construc
 
 Initialization creates binding (as stated before) so we have to model that by creating a new abstraction and put the whole part of the function's body that follows this initialization (this in effect means that all the return values of these nested functions will share the same type as the function which contains them - the function the assignment appears in).
 
-This contrasts with assignment which just requires the parameters be of the same type (this will be the type of its return value as well). This means that all initializations have to be represented as abstractions (or equivalently to that) while all assignments are the trivial case.
+This contrasts with the assignment operation which just requires the parameters be of the same type (this will be the type of its return value as well). This means that all initializations have to be represented as abstractions (or equivalently to that) while all assignments are the trivial case.
 
-A similar thing are switch statements where the switch "call" can be modeled as an initialization to an anonymous variable and the single case statements as equality comparisons to this variable.
+A similar thing are switch statements where the switch "call" can be modeled as initialization to an anonymous variable and the single case statements as equality comparisons to this variable.
 
 Apart from switch statements and assignments we can model almost everything in a similar fashion to the first example. One notable exception being return statements, which will be handled separately.
 
@@ -169,7 +162,7 @@ We will model those functions as an abstraction of a sequences of nested $\text{
 
 Then we will generalize this definition for the function where there are some inner initializations:
 
-First we move all initializations before all other statements and then we model them as shown in % TODO: Expressions and Statements
+First, we move all initializations before all other statements and then we model them as shown in the section \ref{ssec:exprStat}.
 
 \subsubsection{Example}
 
@@ -197,6 +190,6 @@ We can see in this example that the model does not necessarily preserve the orde
 
 \section{Extensions to the C language}
 
-We showed we can model the C language constructs in haskell so we can easily apply type inference and from inferred types do instantiation of generic code (we will add to the language) to its intended monotypes.
+We showed we can model the C language constructs in Haskell so we can easily apply type inference and from inferred types do instantiation of generic code (we will add to the language) to its intended monotypes.
 
 We will extend the language by \emph{type classes} and \emph{type variables}, the syntax and decisions behind it will be explained in the following chapter.

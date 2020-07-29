@@ -1,4 +1,5 @@
 \chapter{CHM compiler}
+\label{chap:compilerCHM}
 
 Our implementation of the CHM compiler uses preprocessing and postprocessing by the GCC compiler with the intermediate representation being the C language. GCC runs the preprocessor and then compiles the fully instantiated code.
 
@@ -8,7 +9,7 @@ This allows us to focus on polymorphism, type inference, and type checking inste
 
 The C language is extended by type variables so we can define polytyped functions and structures and by type classes which offer a way of controlled ad-hoc polymorphism. Type classes allow for defining specific (more efficient) implementations to generic algorithms or for restricting types of parameters.
 
-We will borrow the application of these extensions from the haskell language, however, the two languages in question are very different. In haskell there is a clear distinction between variables and non-variables and between values and types but in C we do not have this distinction grounded in the language and we want to preserve it this way as much as possible. So we will require every type variable be declared before it is used (like in the listing \ref{lst:TypeClass1}).
+We will borrow the application of these extensions from the Haskell language, however, the two languages in question are very different. In Haskell there is a clear distinction between variables and non-variables and between values and types but in C we do not have this distinction grounded in the language and we want to preserve it this way as much as possible. So we will require every type variable be declared before it is used (like in the listing \ref{lst:TypeClass1}).
 
 So to preserve the syntactic principles of the C language we will use a syntax similar to languages like C++, Java, C\#, etc. Those languages have become very popular and so it should not be a bad choice.
 
@@ -77,9 +78,9 @@ In the listing \ref{lst:TypeClass1} we see the part \lstinline{<a>}, declaration
     where the \lstinline{type_decls} is a list of declared type variables; \lstinline{constraints} is a list of predicates the type variables have to satisfy and new type definitions (which are very similar to typedefs).
 \end{defn}
 
-The \lstinline{constraints} follow principles similar to haskell. Notable use specific to CHM is they allow for
+The predicate \lstinline{constraints} follow principles similar to Haskell. Notable use specific to CHM is they allow for member accessors, see the section \ref{ssec:recordFieldsCHM} \emph{record fields}.
 
-\subsubsection{Type Classes, Their Instances and Structs}
+\subsubsection{Type Classes, Their Instances, and Structs}
 
 The listing \ref{lst:TypeClass1} shows how we would define a simple \textbf{type class}, here we declare only one type we use in declarations of the class's methods and so it is implicitly considered its type parameter as well. The type parameter can be specified explicitly following the name of the class which we can see in the listing \ref{lst:TypeClass2}.
 
@@ -101,7 +102,7 @@ This project is used for the output of pretty-printed C code as well, this outpu
 
 For the type inference, we use the thih project \cite{jones1999typing}, but using it sensibly required some modifications to be made to it as the original thih project is not meant to be used as an efficient implementation.
 
-Using thih required a significant pre/post-processing of the code, described in the previous chapter. % TODO: modelling
+Using thih required a significant pre/post-processing of the code, described in the previous chapter.
 
 All type inference principles are explained in the first chapter. The basis for the implementation is then explained in Typing Haskell in Haskell \cite{jones1999typing}.
 
@@ -129,69 +130,27 @@ Definitions of type classes are stored in the compiler as lists of their methods
 
 When a method is instantiated the compiler checks its instances and determines which one (and if any) matches the inferred type. Then it instantiates this one method instance just as if it was the only definition, note that type class instances are required not to overlap because of this step of instantiation.
 
-% FIXME: continue from here...
-
 \subsection{Record Fields}
+\label{ssec:recordFieldsCHM}
 
-Implementing record fields (struct members) was challenging as the way record fields work in C has no real equivalent in the context of functional programming, although haskell's object notation or ML's records come pretty close to it. % TODO: link haskell and ML?
+Implementing record fields (struct members) was challenging as the way record fields work in C has no real equivalent in the context of functional programming, although Haskell's object notation or ML's records come pretty close to it.
 
 Record fields are implemented in such a way that all fields of a certain name have to share the exact same type. This is a slightly restricted requirement of each field having a unique name.
 
 The reason for such requirements is that accessing a field is a function taking the record and returning the field. The record has to have this field, which is easily solved by a type class (parametrized by the record's type and named after the field) the compiler implicitly generates when the field is defined. This type class has exactly one method which is the accessor of the given field.
 
-This approach perfectly matches the syntax of C where we know the name of the field and the variable which is supposed to have such a field. The field's type is not specified when we access it so it has to be inferable from the variable alone. And the easiest way to satisfy that is to require each field have a unique name (this is how it is implemented in haskell and ML, for example).
+This approach perfectly matches the syntax of C where we know the name of the field and the variable which is supposed to have such a field. The field's type is not specified when we access it so it has to be inferable from the variable alone. And the easiest way to satisfy that is to require each field have a unique name (this is how it is implemented in Haskell and ML, for example).
 
 \subsection{Recursion limits}
 
-It is indeterminable whether the instantiation of something continues forever. We can prove this using post correspondence problem % FIXME: prove it
+It is indeterminable whether the instantiation of something continues forever. We can prove this using Post correspondence problem. % FIXME: prove it
 
 So there is a limit of type depth set to 500 (this limit should not affect any sensible program, but if need be, it can be changed using the \lstinline[language=sh]{--depth} option). If some type exceeds this limit, a compilation error will be outputted stating what the compiler tried to instantiate at that time.
 
-\subsection{Comparison to C++ template instantiation}
-
-One could say this project just mirrors template instantiation from C++, but any such resemblance is just superficial, C++ template instantiation is not strict in type signatures and different instances can have
-non-matching types.
-
-One example of this would be:
-
-% FIXME: continue from here
-
-\begin{lstlisting}
-template<typename>
-struct function_type;
-
-template<>
-struct function_type<int> { using return_type = int; using parameter_type = int; };
-
-template<>
-struct function_type<int*> { using return_type = int; using parameter_type = int*; };
-
-template<>
-struct function_type<int**> { using return_type = int*; using parameter_type = int; };
-
-template<typename T>
-typename function_type<T>::return_type function(typename function_type<T>::parameter_type);
-
-template<>
-int function<int>(int value) { return value; }
-
-template<>
-int function<int*>(int *value) { return *value; }
-
-template<>
-int *function<int**>(int value) { return &value; }
-\end{lstlisting}
-
-C++ allows different instances to have the same type signature which can make any type inference or type deduction impossible.
-
-One more difference is that C++ allows function overloading. % TODO: write about the paper linked by mirek
-
-The instantiation in CHM follows inferred types by the HM type system.
-
 \section{Code output}
 
-The CHM compiler outputs gcc-compilable code which interprets the CHM code without any runtime overhead. % TODO: or at least I hope so
+The CHM compiler implementation outputs a GCC-compilable code which interprets the CHM code without any runtime overhead.
 
-There are options allowing the user to see the inner haskell representation of the CHM code (it blurs some of the semantics unnecessary for type inference and leaves others to facilitate the readability of it), this can be used for debugging the compiler implementations. % FIXME: list the options (unimplemented yet)
+The user can use the \lstinline[language=sh]{--inner} to see the inner Haskell representation of the CHM code (it blurs some of the semantics unnecessary for type inference and leaves others to facilitate the readability of it), this can be used for debugging the compiler implementations.
 
 It should be noted that names of symbols of polytype functions actually used in the C interpretation of the CHM code do not match their CHM counterparts which currently complicates debugging of CHM programs (this however can be solved easily on the debugger side).

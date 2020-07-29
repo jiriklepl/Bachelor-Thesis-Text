@@ -43,8 +43,7 @@ Lambda calculi usually use the writing convention of applications being left-ass
 
 \section{Simply-Typed Lambda Calculus }
 
-Simply-typed lambda calculus (also $\lambda\rightarrow$), described by Church, is one of the first % TODO: add some more info on church
-lambda calculi with a type system. Typing of lambda terms helps checking the validity of the program, protecting the user from writing programs that make little sense like for example adding amperes to volts \cite{barendregt1992lambda} and also it makes it easier to think about the program in the bigger picture giving us information about the usage of the typed entities in some code, typing $f : \alpha \rightarrow \alpha \rightarrow \alpha$, for example, tells us that $f$ is a function taking two arguments of some type and returning a value of the same type and from that alone we can assume that applying two parameters of the same type on it should be well-defined.
+Simply-typed lambda calculus (also $\lambda\rightarrow$), described by Church, is one of the first lambda calculi with a type system. Typing of lambda terms helps in checking the validity of the program, protecting the user from writing programs that make little sense like for example adding amperes to volts \cite{barendregt1992lambda} and also it makes it easier to think about the program in the bigger picture giving us information about the usage of the typed entities in some code, typing $f : \alpha \rightarrow \alpha \rightarrow \alpha$, for example, tells us that $f$ is a function taking two arguments of some type and returning a value of the same type and from that alone we can assume that applying two parameters of the same type on it should be well-defined.
 
 Syntactically it is not any different from the lambda calculus, considering the \emph{\`a la} Curry variant. \cite{barendregt1992lambda}
 
@@ -108,7 +107,7 @@ A Step by step example for $id = \lambda x . x$:
 
 Notice here the context changes during the derivation process, so we can give typing to $\lambda\rightarrow$ terms without any context and they can have different typings in different contexts, also one term can have multiple possible typings.
 
-% TODO: maybe say something about church vs curry style and also unification and stuff
+% TODO: maybe say something about church vs curry style
 
 \subsection{Type substitution}
 
@@ -148,7 +147,7 @@ Type inference is closely related to typeability but has an additional requireme
 
 Both type checking and typeability of the simply-typed lambda calculus is decidable and its type inference is computable \cite{barendregt1992lambda}.
 
-One thing that is a problem for the simply-typed lambda calculus is that it is not Turing complete, it is strongly normalizing \cite{barendregt1992lambda} and thus assuming it being turing complete the type inference would have to solve the halting problem, this problem will be answered by the following type systems.
+One thing that is a problem for the simply-typed lambda calculus is that it is not Turing-complete, it is strongly normalizing \cite{barendregt1992lambda} and thus assuming it being Turing-complete the type inference would have to solve the halting problem, this problem will be answered by the following type systems.
 
 \subsection{Writing Conventions for types}
 
@@ -265,7 +264,6 @@ Note that $\sigma > \sigma'$ implies $\sigma S > \sigma' S$, however it does not
 
 \subsection{Inference Rules}
 
-% TODO: instantiation
 \begin{defn}[Inference rules]
     $$\boxed{\begin{array}{l c}
         \infer[(x : \sigma \in \Gamma)]{\Gamma \vdash x : \sigma}{} & (\text{var}) \\\\
@@ -278,12 +276,11 @@ Note that $\sigma > \sigma'$ implies $\sigma S > \sigma' S$, however it does not
     Here $\Gamma$ stands for the context, $\sigma$ stands for a type scheme, $\tau, \tau'$ for some types, $\alpha$ for a type variable, $x$ for a regular variable, and $e, e'$ for expressions. $\Gamma_x$ stands for the context $\Gamma$ with any assumption about $x$ removed.
 \end{defn}
 
-The instantiation rule replaces the $\forall$-elimination rule of the system F and apart from that the let polymorphism rule is the only real extension of the rules, it balances the type restriction introduced before.
+The \emph{instantiation} rule replaces the $\forall$-elimination rule of the system F. Apart from that the \emph{let polymorphism} rule is the only real extension of the rules, balancing the type restriction introduced before.
 
 \subsection{Type Inference}
 
 We will introduce the algorithm W \ref{w}. It produces the principal type scheme for the given program (expression).
-% TODO: maybe expand on it a little bit
 
 \subsubsection{Most General Unification}
 
@@ -364,7 +361,6 @@ $\Gamma S \vdash e : \tau$ and furthermore $close_{\Gamma S}(\tau)$ is a princip
 
 \subsection{Extensions of the Type System}
 
-% TODO: As described in PTSfPwOaS
 Pure HM allows for just parametric polymorphism. However without any ad-hoc polymorphism or subtyping, this means there is only one principal type for every symbol in the program and just one definition, this is useful in cases where an algorithm (or a function) works on parameters of any types, a good example of that could be the $K$ combinator (sometimes called `const function'). We call these algorithms generic.
 
 The problem is some functions work only on a particular type, for example basic arithmetic functions. We would like to be able to say, that it makes sense to add two integers, or two real numbers, but not adding two boolean values.
@@ -381,26 +377,23 @@ The idea of type classes (parametrized by generic types) is that we put constrai
 
 And also the functions defined inside a type class (we will call them \textbf{methods}) can have a specialized implementation for each \emph{instance}, this was actually the main motivation for their creation: $Eq$ class with a method $==$ which needs to be specialized for each type. \cite{hall1994type}
 
-\textbf{Instances} of type classes (parametrized by a type instance of the type of the corresponding type class) are what allows for ad-hoc polymorphism in a very well controlled matter \cite{wadler1989make}, they are a limited (but powerful) version of classic overloading where all instances have to share a common supertype and they cannot overlap (share a common type instance - this can be proven by the unification algorithm).
+\textbf{Instances} of type classes (parametrized by a type instance of the type of the corresponding type class) are what allows for ad-hoc polymorphism in a very well controlled manner \cite{wadler1989make}, they are a limited (but powerful) version of classic overloading (we will describe overloading shortly). It differs from classic overloading in that all instances have to share a common supertype and they are not allowed to overlap (share a common type instance - this can be proven by the unification algorithm) - this "no overlapping" rule will be important for instantiation (generating code with concrete monotypes: overlapping would mean having, for the given parameters, two implementations simultaneously).
 
 Type classes can be added to the algorithm $W$ defined above with only little changes, for example, by simplifying thih \cite{jones1999typing}.
 
 \subsubsection{Subtyping and Overloading}
 
-% FIXME: this is just weird
-
 Subtyping and overloading are slightly different approaches to the same problem we discussed with specifying what types the $(+)$ function can act on.
 
 If we want to use either of those we have to constrain them somehow or they make type inference undecidable. We will consider the variant defined by professor Geoffrey S. Smith \cite{smith1993polymorphic}.
 
-\textbf{Subtyping} however does not solve that problem very well as if we specify that $Int$ is a subtype of $Real$ then we have to accept that $(+)$ applied to two real operands can still return an integer. That does not seem that bad from the mathematical point of view, but it can lead to implicit data conversions which can be undesirable, especially if we were to use the type system in a context of low-level programming.
+\textbf{Subtyping} however does not solve that problem very well as if we specify that $Int$ is a subtype of $Real$ then we have to accept that $(+)$ applied to two real operands can still return an integer. That does not seem that bad from the mathematical point of view, but it can lead to implicit data conversions which can be undesirable, especially if we were to use the type system in the context of low-level programming.
 
-\textbf{Overloading}, giving a symbol more definitions, then is not only undecidable in the context of parametric polymorphism but it also contradicts the ideas of parametric polymorphism, where a function's type should describe the function and its effect on the program (in languages like haskell or ML, the type also describes data dependencies).
+\textbf{Overloading}, giving a symbol more definitions, then is not only undecidable in the context of parametric polymorphism of HM but it also completely contradicts the ideas of parametric polymorphism, where a function's type should describe the function and its effect on the program (in languages like Haskell or ML, the type also describes data dependencies). \cite{palsberg2012overloading}
 
 \section{Overloading with Type Classes}
 
-Type classes, as stated before, are good for stating an algorithm makes sense only for some types or that it requires a different implementation for different types, usually to enhance performance by writing specialized algorithms for common or critical types instead of writing a general slow algorithm, this was the main motivation behind developing those, % TODO: sounds like a contradiction
-viz different physical instructions for comparing common numeric values.
+Type classes, as stated before, are good for stating an algorithm makes sense only for some types or that it can have a different implementation for each type, usually to enhance performance by writing specialized algorithms for common or critical types instead of writing a generic slow algorithm.
 
 The usefulness of classes can be shown on `Ord', this constraints requires that two variables of type $\alpha$ s.t. $Ord(\alpha)$, we can say `$\alpha$ is (in) Ord'. But not everything can be partially ordered, take directed graphs, for example, where the reachability of one vertex from another is in `Ord' only if the graph is a directed acyclic graph, in which case we can use algorithms expecting `Ord' on problems concerning reachability, but not otherwise.
 
@@ -410,17 +403,17 @@ For two `Int's we just compare them and return whether the first is lower than t
 
 \section{Haskell Type System}
 
-For our purposes we will (limit) the haskell language significantly, ignoring any pattern-matching features and almost all syntax sugar, the only important feature for us being the type system. The syntax is that of HM but extended by the possibility of giving explicit typings (with type schemes, see the definition \ref{defn:typeSchemes}) and defining/using type constructors and type classes. For the  definitions see thih \cite{jones1999typing} as it is the actual implementation we will use for the CHM compiler.
+For our purposes we will (limit) the Haskell language significantly, ignoring any pattern-matching features and almost all syntax sugar, the only important feature for us being the type system. The syntax is that of HM but extended by the possibility of giving explicit typings (with type schemes, see the definition \ref{defn:typeSchemes}) and defining/using type constructors and type classes. For the  definitions see thih \cite{jones1999typing} as it is the actual implementation we will use for the CHM compiler.
 
 \subsection{Type Constructors}
 
-The haskell generalizes the HM type system and the HM syntax mostly via the notion of type constructors. If they take no type arguments then we call them nullary, those are the ones we already call \emph{types} in the HM type system. We call a type constructor n-ary when it takes exactly n type arguments, for example the type constructor $(\rightarrow)$ is binary and constructs the type of a function. % TODO: rewrite it slightly
+Haskell generalizes the HM type system and the HM syntax mostly via the notion of type constructors. If they take no type arguments then we call them nullary, those are the ones we already call \emph{types} in the HM type system. We call a type constructor n-ary when it takes exactly $n$ type arguments to form a (nullary) value type, for example the type constructor $(\rightarrow)$ is binary and constructs the type of a function.
 
 We can formally define type constructors similarly to functions.
 
 \subsection{Kinds}
 
-The next thing the haskell type system adds to the HM type system is the notion of kinds, kinds are used for classification of type constructors and for checking the validity of their usage in the program.
+The next thing the Haskell type system adds to the HM type system is the notion of kinds, kinds are used for classification of type constructors and for checking the validity of their usage in the program.
 
 Kinds reflect the nature of functions and they follow their syntactic rules, but applied to type constructors instead of values. The most simple kind $*$ (star) represents all types capable of having a value: all legal types from the classic HM type system fall to this category.
 
@@ -428,7 +421,7 @@ Then we have kinds of a form $k_1 \rightarrow k_2$ which take a type of a kind $
 
 Kinds are less complex then types as they are defined recursively only from the two rules defined in the previous two paragraphs.
 
-For example, we can define a very common type constructor $List: * \rightarrow *$ which takes a type $a$ and returns a type representing a linked list of values of type $a$. We can use this type constructor to show the reason behind the notion of kinds as it would not make much sense for a value to have a type just $List$ without it being applied to any type. % TODO: fix the last part (and possibly the whole subsection)
+For example, we can define a very common type constructor $List: * \rightarrow *$ which takes a type $a$ and constructs a type representing a linked list of values of type $a$. We can use this type constructor to show the reason behind the notion of kinds as it would not make much sense for a value to have a type just $List$ without it being applied to any type: "a list of what?"
 
 We will formally define kinds as:
 
@@ -441,7 +434,7 @@ We will formally define kinds as:
 
 We will define types formally as:
 
-\begin{defn}[types]
+\begin{defn}[Type]
     $$\tau ::= x\ |\ c : k\ |\ \tau \tau'$$
     where $\tau, \tau'$ are types, $x$ is a type variable, $c$ is a type constant, and $k$ is a kind. We will, for example consider the $(\rightarrow)$ type constructor a regular type of the kind $* \rightarrow * \rightarrow *$.
 \end{defn}
@@ -450,10 +443,10 @@ We will define types formally as:
 
 Type schemes will be defined similarly to those of the HM type system, differing only in what we consider a type and in that there can be constraints that the types have to satisfy. It should be also noted that only types of the $*$ kind can be assigned to values.
 
-\begin{defn}[Type Schemes]
+\begin{defn}[Type Scheme]
     \label{defn:typeSchemes}
     $$\sigma ::= \forall \alpha_1, \dots \alpha_n . qt\ |\ qt$$
-    where $qt$ stands for a qualified type (a constrained type).
+    where $qt$ stands for a qualified type (a constrained type) and $\alpha_i$ stand for distinct type variables
 \end{defn}
 
 \subsubsection{Qualified Types and Predicates}
@@ -462,18 +455,18 @@ A qualified type is a type with an added set of predicates every instance of it 
 
 \begin{defn}[Qualified Types and Predicates]
     $$qt ::= \{\beta_1 \in C_1, \beta_2 \in C_2, \dots \beta_m \in C_m\} \Rightarrow \tau\ |\ \tau$$
-    where $\alpha_i, \beta_j$ name type variables and $\{\beta_1, \dots \beta_m\} \subseteq \{\alpha_1, \dots \alpha_n\}$, $C_j$ names a type class, and $\tau$ names a type. We call the pair $\beta_j \in C_j$ a \textbf{predicate (constraint)} % TODO: check those betas
+    where $\beta_j$ name type variables such that $\{\beta_1, \dots \beta_m\} \subseteq \{\alpha_1, \dots \alpha_n\}$ ($\alpha_1 \dots \alpha_n$ from the definition \ref{defn:typeSchemes}, qualified types occur always in the context of type schemes), $C_j$ names a type class, and $\tau$ names a type. We call the pair $\beta_j \in C_j$ a \textbf{predicate (constraint)}
 \end{defn}
 
-Going forward we will assume $\forall \{\}. qt = qt$ and $\{\} \Rightarrow \tau = \tau$ for simplifying other definitions, this requires only a trivial transformation. % TODO: fix this
+Going forward we will allow the following forms for type schemes $\forall \{\}. qt = qt$ and for qualified types $\{\} \Rightarrow \tau = \tau$ to simplify other definitions so we do not need to consider separate cases.
 
 \subsection{Type substitution}
 
-With the introduction of qualified types, we should explicitly state that the type substitution applies to qualified types just like as if the type parameters of the predicates were a part of the type itself.
+With the introduction of qualified types, we should explicitly state that the type substitution applies to qualified types just like if the type parameters of the predicates were a part of the type itself.
 
 \subsection{Type Inference Rules}
 
-The type inference rules for the haskell type system are almost the same as the type inference rules for the HM type system, but we have to add rules for the inference of the type class constraints:
+The type inference rules for the Haskell type system are almost the same as the type inference rules for the HM type system, but we have to add rules for the inference of the type class constraints:
 
 \begin{defn}[Inference rules]
     $$\boxed{\begin{array}{l c}
@@ -498,6 +491,4 @@ As for type instances, the definition is without any change.
 
 \subsection{The Type Inference Algorithm}
 
-The type inference algorithm has to account for the bottom-up propagation of predicates that the inferred types have to satisfy. The basis for the inference algorithm is the algorithm W \ref{w}. For the definition, see thih \cite{jones1999typing}. In thih \lstinline[language=haskell]{tiExpr} is the part of type inference that encompasses the extension of the algorithm W. The definition in thih differs slightly from what we have discussed in this chapter in that it does not consider just the syntax from the definition \ref{defn:syntaxHM} with the extensions we presented, but it also considers some features of the haskell language (for example pattern matching).
-
-% TODO: FROM MIREK Teoretickej skok do budoucnosti --- mirnej review o tom jak se to ve skutecnosti dela v haskelu. Treba ukazat ze MPTCs jsou nerozhodnutelny protoze umej simulovat prolog.
+The type inference algorithm has to account for the bottom-up propagation of predicates that the inferred types have to satisfy. The basis for the inference algorithm is the algorithm W \ref{w}. For the definition, see thih \cite{jones1999typing}. In thih \lstinline[language=haskell]{tiExpr} is the part of type inference that encompasses the extension of the algorithm W. The definition in thih differs slightly from what we have discussed in this chapter in that it does not consider just the syntax from the definition \ref{defn:syntaxHM} with the extensions we presented, but it also considers some features of the Haskell language (for example pattern matching).
