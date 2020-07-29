@@ -1,13 +1,13 @@
 
 \chapter{Results and discussion}
 
-The CHM compiler as it is currently implemented serves only demonstrative purposes, its implementation is partially incomplete and not fit for any use in development, but all code examples in this thesis are correctly parsed and interpreted based on the definitions in the prior chapters.
+The CHM compiler, as it is currently implemented, serves only demonstrative purposes. Its implementation is partially incomplete and not fit for any use in development. Yet, all code examples in this thesis are correctly parsed and interpreted based on the definitions in the previous chapters.
 
 \section{Examples of Use in System Development}
 
 Here we will show the usefulness of this language in some existing code from popular system development projects.
 
-One example where it would be useful to support polymorphic code are polymorphic data structures, we have discussed their implementation in C using mainly macros and a possibility of alternative CHM type-safe implementations in the chapter \ref{chap:infPolyC}. A concrete example of this are polymorphic lists.
+One example where it would be useful to support polymorphic code is polymorphic data structures. We have discussed their implementation in C using mainly macros and a possibility of alternative CHM type-safe implementations in chapter \ref{chap:infPolyC}. A concrete example of this is polymorphic lists.
 
 We can encounter such lists, for example, in the linux kernel, their implementation defined in \emph{./include/linux/list.h} \cite{torvalds2018linux}.
 
@@ -48,45 +48,45 @@ In C we could create a similar structure using BSD \lstinline{<queue.h>}'s \cite
 
 \section{Future work}
 
-If this project proves itself, future work should extend the stl library and also a new compiler should be implemented which would not rely on GCC.
+If this project proves itself, future work should extend the stl library, and also a new compiler should be implemented, which would not rely on GCC.
 
-The project also needs to extend its support on all C types, there are only some of them (the main ones) supported currently as their support is not detrimental for the demonstration and it was not possible to make a complete implementation in time. Some more constructs unsupported by the current compiler are typedefs, enums, and type-checking of zero-comparability in (control statement) conditions. All of those should be implemented in a usable compiler. \emph{Typedefs} are just type aliases that were not implemented because of the time limitation, enums are just a syntactic sugar used for naming literals (not important for the demonstration). The type checking of zero-comparability of conditions was not implemented only because the implementation of it, albeit trivial, would create unnecessary noise in the code intended for demonstration.
+The project also needs to extend its support on all C types. There are only some of them (the main ones) supported currently as their support is not detrimental for the demonstration, and it was not possible to make a complete implementation in time. Some more constructs unsupported by the current compiler are typedefs, enums, and type-checking of zero-comparability in (control statement) conditions. All of those should be implemented in a usable compiler. \emph{Typedefs} are just type aliases. They were not implemented because of the time limitation. Enums are just a syntactic sugar used for naming literals (not important for the demonstration). The type checking of zero-comparability of conditions was not implemented because the implementation of it, albeit trivial, would create unnecessary noise in the code intended for demonstration.
 
 \subsection{Compiler Errors}
 
-The current implementation outputs error messages stating the reason behind the error and the location in the code that was the source of the error. This is not the case for errors that happen during the type inference phase of compilation as the thih \cite{jones1999typing} project would need some more changes to the definition of expressions (that model the code) to know where in the code they originate from. This would break the modular nature of the compiler as the locations are implemented in the language-chm project (language-c, see \cite{visq2018language-c}) and it would require extensive refactoring of the structure.
+The current implementation outputs error messages stating the reason behind the error and the location in the code that was the source of the error. That is not the case for errors that happen during the type inference phase of compilation as the thih \cite{jones1999typing} project would need some more changes to the definition of expressions (that model the code) to know from where in the code they originate. But without some extensive rework of the compiler, such an implementation would break the compiler's modular nature as the locations are implemented in the language-chm project (language-c, see \cite{visq2018language-c}).
 
-Future implementations of the compiler should massively refactor the code, change the representation of the compiled code and make the errors more readable and more specific.
+Future implementations of the compiler should massively refactor the code, change the representation of the compiled code, and make the errors more readable and more specific.
 
 \subsection{Quality of Life Changes}
 
-In the current implementation of the compiler, we allow declaration of type variables only at the chm headers of the various definitions, this is enough for demonstration, but in a more convenient to use implementation the language should allow declaration of local type variables even in function definitions and also it should provide a notion of anonymous/implicit type variables (similar to C++'s \lstinline[language=c++]{auto}).
+In the current implementation of the compiler, we allow declaration of type variables only at the chm headers of the various definitions. This is enough for demonstration, but in a more convenient to use implementation, the language should allow declaration of local type variables even in function definitions, and also, it should provide a notion of anonymous/implicit type variables (similar to C++'s \lstinline[language=c++]{auto}).
 
 \subsection{Better support for record fields}
 
 The current specification of record fields in CHM is that if two record fields of different records have the same name, they shall have the same type as well (which can be ambiguous), see the section \ref{ssec:recordFieldsCHM} \emph{Record Fields}.
 
-In the future language specification the specification for the polymorphic fields should be that their types are equally dependent on the type parameters of the struct which they are fields of and for all possible types of those parameters they still share the type (example: if one field has a type that is the last type parameter of the parent struct, every other field sharing its name have to be typed after the last type parameter of its parent struct as well, ditto for second to last, etc.; and similarly for all composite types).
+In the future language specification, the specification for the polymorphic fields should be that their types are equally dependent on the type parameters of the struct which they are fields of and for all possible types of those parameters, they still share the type (example: if one field has a type that is the last type parameter of the parent struct, every other field sharing its name have to be typed after the last type parameter of its parent struct as well, ditto for second to last, etc.; and similarly for all composite types).
 
-There should be a compiler option that would forbid fields from sharing their names completely and another that would just trigger a warning.
+There should be a compiler option that would forbid fields from sharing their names, at all, and another one that would just trigger a warning unless the compiler is not able to determine which one to use in a certain context.
 
 Then another sharing of names of fields should be defining fields in type family definitions, where all specializations would have these fields without any warning or error even under the effect of the option stated above. Different specializations would then still be able to add their own field on the top of the shared ones. The implicit \lstinline{Has_<field>} class would apply here as well.
 
 \subsection{Modules}
 
-Having a lot of structures with even more of fields and procedures would create a problem of having many names being already in use. The "include" system from the C language then becomes an issue for larger projects or even smaller ones wanting to use some foreign code.
+Having a lot of structures with even more fields and procedures would create a problem of having many names being already in use. The "include" system from the C language then becomes an issue for larger projects or even smaller ones wanting to use some foreign code.
 
-And therefore this language could prosper from having a module system akin to many modern languages, like Haskell, where it would be possible to export only parts of the code we want to export or to give them qualified types (both to avoid name collisions).
+And therefore, this language could prosper from having a module system akin to many modern languages, like Haskell, where it would be possible to export only parts of the code we want to export or to give them qualified types (both to avoid name collisions).
 
 \subsection{Data type specializations}
 
-Data type specialization is not currently supported, but a great candidate matching the current nature of the language would be type families (for example used in Haskell).
+Data type specialization is not currently supported, but a great candidate matching the current nature of the language would be type families (for example, used in Haskell).
 
-Their addition would be hugely beneficial for the language just like partial specialization of struct templates is for C++ as those mechanisms can be considered equivalent in many cases of use.
+Their addition would be hugely beneficial for the language, just like the partial specialization of struct templates is for C++, as those mechanisms can be considered equivalent in many cases of use.
 
 Their use would be especially helpful for optimizing implementations, for example:
 
-If we want to remember arbitrary integral numbers with repetition, we could use a map from numbers to their counts, however for some very limited ranges (or for booleans) we could implement the semantically equivalent data structure using static arrays few counters.
+If we want to remember arbitrary integral numbers with repetition, we could use a map from numbers to their counts, however for some very limited ranges (or for booleans), we could implement the semantically equivalent data structure using static arrays few counters.
 
 % TODO: FROM MIREK: Celkove shrnout ze na to je potreba naimplementovat ten uplnej constraint-solving typesystem z haskelu, coz je mimo scope. :D
 
@@ -96,8 +96,8 @@ If we want to remember arbitrary integral numbers with repetition, we could use 
 
 \subsection{Comparison to C++ Template Instantiation}
 
-One could say this project just mirrors template instantiation from C++, but any such resemblance is just superficial, C++ template instantiation is not strict in type signatures and different instances can have non-matching types (not having a principal typing for the API of the instances that all of the instance types would be type instances of). This goes against parametric polymorphism.
+One could say this project just mirrors template instantiation from C++, but any such resemblance is just superficial. C++ template instantiation is not strict in type signatures, and different instances can have non-matching types (not having a principal typing for the API of the instances that all of the instance types would be type instances of). This goes against parametric polymorphism.
 
-C++ also allows different instances to have the same type signature which can make any type inference or type deduction impossible.
+C++ also allows different instances to have the same type signature, which can make any type inference or type deduction impossible.
 
 The instantiation in CHM follows inferred types by the HM type system.
