@@ -54,13 +54,13 @@ The project also needs to extend its support on all C types. There are only some
 
 \subsection{Compiler Errors}
 
-The current implementation outputs error messages stating the reason behind the error and the location in the code that was the source of the error. That is not the case for errors that happen during the type inference phase of compilation as the thih \cite{jones1999typing} project would need some more changes to the definition of expressions (that model the code) to know from where in the code they originate. But without some extensive rework of the compiler, such an implementation would break the compiler's modular nature as the locations are implemented in the language-chm project (language-c, see \cite{visq2018language-c}).
+The current implementation outputs error messages stating the reason behind the error and the location in the code that was the source of the error. That is not the case for errors that happen during the type inference phase of compilation as the THIH \cite{jones1999typing} project would need some more changes to the definition of expressions (that model the code) to know from where in the code they originate. But without some extensive rework of the compiler, such an implementation would break the compiler's modular nature as the locations are implemented in the language-chm project (language-c, see \cite{visq2018language-c}).
 
 Future implementations of the compiler should massively refactor the code, change the representation of the compiled code, and make the errors more readable and more specific.
 
 \subsection{Quality of Life Changes}
 
-In the current implementation of the compiler, we allow declaration of type variables only at the chm headers of the various definitions. This is enough for demonstration, but in a more convenient to use implementation, the language should allow declaration of local type variables even in function definitions, and also, it should provide a notion of anonymous/implicit type variables (similar to C++'s \lstinline[language=c++]{auto}).
+In the current implementation of the compiler, we allow declaration of type variables only at the CHM headers of the various definitions. This is enough for demonstration, but in a more convenient to use implementation, the language should allow declaration of local type variables even in function definitions, and also, it should provide a notion of anonymous/implicit type variables (similar to C++'s \lstinline[language=c++]{auto}).
 
 \subsection{Better support for record fields}
 
