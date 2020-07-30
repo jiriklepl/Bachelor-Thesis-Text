@@ -1,17 +1,26 @@
 
-\chapter{Results and discussion}
+\chapter{Conclusion and Future Work}
+
+\section{Conclusion}
+
+We have shown that it is possible to efficiently model the type system of the C language, and to model most of the language's constructs in the language of the lambda calculus variant derived from Haskell.
+
+Section \ref{ex:list} then showcases a code that might be used in some projects using the CHM language. See appendix \ref{stl} for more code examples that implement some common standard library features (functions we can encounter in the C++ standard library, for example).
+
+The implementation of the CHM compiler provides several test files, each beginning with a description stating what the file tests and what is the expected behavior of the program.
 
 The CHM compiler, as it is currently implemented, serves only demonstrative purposes. Its implementation is partially incomplete and not fit for any use in software development. Yet, all code examples in this thesis are correctly parsed and interpreted based on the definitions in the previous chapters.
 
-\section{Examples of Use in System Development}
+\section{Possible Use in System Development}
+\label{ex:list}
 
 Here we will show the usefulness of this language in some existing code from popular system development projects.
 
-One example where it would be useful to support polymorphic code is polymorphic data structures. We have discussed their implementation in C using mainly macros and a possibility of alternative CHM type-safe implementations in chapter \ref{chap:infPolyC}. A concrete example of this is polymorphic lists.
+One area where it would be especially useful to support polymorphic code is \emph{polymorphic data structures}. We have discussed their implementation in C using mainly macros and a possibility of alternative CHM type-safe implementations in chapter \ref{chap:infPolyC}. A concrete example of this is polymorphic lists.
 
-We can encounter such lists, for example, in the linux kernel, their implementation defined in \emph{./include/linux/list.h} \cite{torvalds2018linux}.
+We can encounter such lists, for example, in the linux kernel, their implementation is defined in \emph{./include/linux/list.h} \cite{torvalds2018linux}.
 
-Simple polymorphic lists can be implemented as follows (note this implementation is simplified and the push function is suboptimal for nontrivial data):
+Simple polymorphic lists can be implemented as follows (note that this implementation is simplified and the push function is suboptimal for nontrivial data):
 
 \begin{lstlisting}
 <a : b ~ struct List : <a> >
@@ -29,7 +38,7 @@ Then we can implement its functions as follows:
 b *push(b *head, a value)
 {
     b *item = new();
-    // new() is an stl function behaving like malloc(sizeof(b))
+    // new() is an STL function behaving like malloc(sizeof(b))
     item->value = value;
     item->next = head;
     return item;
@@ -46,23 +55,31 @@ b *pull(b *head)
 
 In C we could create a similar structure using BSD \lstinline{<queue.h>}'s \cite{pages2007queue} \lstinline{SLIST_} macros, which is yet another example, quite commonly used. Using this library requires us to create each list type instance separately and in invocations of its functions it requires us to pass additional parameters. For example SLIST's equivalent of our \lstinline{pull} function, \lstinline{SLIST_REMOVE_HEAD}, takes as an additional \lstinline{entries} argument (a structure member of the entry node that connects the elements constructed by the \lstinline{SLIST_ENTRY} macro) on top of the expected \lstinline{head} argument.
 
-\section{Future work}
+\section{Future Work}
 
-If this project proves itself, future work should extend the stl library, and also a new compiler should be implemented, which would not rely on GCC.
+If this project gain popularity, future work should extend the STL library, and also a new compiler should be implemented, which would not rely on GCC. This would make it easier to implement new features and to optimize the process of compilation.
 
-The project also needs to extend its support on all C types. There are only some of them (the main ones) supported currently as their support is not detrimental for the demonstration, and it was not possible to make a complete implementation in time. Some more constructs unsupported by the current compiler are typedefs, enums, and type-checking of zero-comparability in (control statement) conditions. All of those should be implemented in a usable compiler. \emph{Typedefs} are just type aliases. They were not implemented because of the time limitation. Enums are just a syntactic sugar used for naming literals (not important for the demonstration). The type checking of zero-comparability of conditions was not implemented because the implementation of it, albeit trivial, would create unnecessary noise in the code intended for demonstration.
+\paragraph{Incomplete Implementation}
 
-\subsection{Compiler Errors}
+The provided CHM compiler implements the features crucial for the demonstration of the effect type inference and polymorphism would have on development in C. Those features are (generic) functions, pointers, structs, control statements, and almost all expressions.
 
-The current implementation outputs error messages stating the reason behind the error and the location in the code that was the source of the error. That is not the case for errors that happen during the type inference phase of compilation as the THIH \cite{jones1999typing} project would need some more changes to the definition of expressions (that model the code) to know from where in the code they originate. But without some extensive rework of the compiler, such an implementation would break the compiler's modular nature as the locations are implemented in the language-chm project (language-c, see \cite{visq2018language-c}).
+There are currently implemented only some of the built-in types (the main ones) as their support is not detrimental for the demonstration, and it was not possible to make a complete implementation in time.
+
+Some more notable constructs not implemented by the current compiler are: typedefs, enums, and type-checking of zero-comparability in (control statement) conditions. All of those should be implemented in future implementations of the compiler.
+
+\paragraph{Compiler Errors}
+
+The current implementation of the CHM compiler outputs error messages stating the reason behind the error and the location in the code that was the source of the error. That is not the case for errors that happen during the type inference phase of compilation as the THIH \cite{jones1999typing} project would need some more changes to the definition of expressions (that model the code) to know from where in the code they originate. But without some extensive rework of the compiler, such an implementation would break the compiler's modular nature as the locations are implemented in the language-chm project (language-c, see \cite{visq2018language-c}).
 
 Future implementations of the compiler should massively refactor the code, change the representation of the compiled code, and make the errors more readable and more specific.
 
-\subsection{Quality of Life Changes}
+\subsection{Future Features}
 
-In the current implementation of the compiler, we allow declaration of type variables only at the CHM headers of the various definitions. This is enough for demonstration, but in a more convenient to use implementation, the language should allow declaration of local type variables even in function definitions, and also, it should provide a notion of anonymous/implicit type variables (similar to C++'s \lstinline[language=c++]{auto}).
+\paragraph{Quality of Life Changes}
 
-\subsection{Better support for record fields}
+In the current implementation of the compiler, we allow declaration of type variables only at the CHM headers of the various definitions. This is enough for demonstration, but in a more convenient to use implementation, the language should allow declaration of local type variables even inside function definitions, and also, it should provide a notion of anonymous/implicit type variables (similar to C++'s \lstinline[language=c++]{auto}) which would decrease the verbosity of the code in many cases.
+
+\paragraph{Better support for record fields}
 
 The current specification of record fields in CHM is that if two record fields of different records have the same name, they shall have the same type as well (which can be ambiguous), see the section \ref{ssec:recordFieldsCHM} \emph{Record Fields}.
 
@@ -72,13 +89,13 @@ There should be a compiler option that would forbid fields from sharing their na
 
 Then another sharing of names of fields should be defining fields in type family definitions, where all specializations would have these fields without any warning or error even under the effect of the option stated above. Different specializations would then still be able to add their own field on the top of the shared ones. The implicit \lstinline{Has_<field>} class would apply here as well.
 
-\subsection{Modules}
+\paragraph{}{Modules}
 
 Having a lot of structures with even more fields and procedures would create a problem of having many names being already in use. The "include" system from the C language then becomes an issue for larger projects or even smaller ones wanting to use some foreign code.
 
 And therefore, this language could prosper from having a module system akin to many modern languages, like Haskell, where it would be possible to export only parts of the code we want to export or to give them qualified types (both to avoid name collisions).
 
-\subsection{Data type specializations}
+\paragraph{Data type specializations}
 
 Data type specialization is not currently supported, but a great candidate matching the current nature of the language would be type families (for example, used in Haskell).
 
@@ -87,17 +104,3 @@ Their addition would be hugely beneficial for the language, just like the partia
 Their use would be especially helpful for optimizing implementations, for example:
 
 If we want to remember arbitrary integral numbers with repetition, we could use a map from numbers to their counts, however for some very limited ranges (or for booleans), we could implement the semantically equivalent data structure using static arrays few counters.
-
-% TODO: FROM MIREK: Celkove shrnout ze na to je potreba naimplementovat ten uplnej constraint-solving typesystem z haskelu, coz je mimo scope. :D
-
-\section{Related Work}
-
-\subsection{Rust Language}
-
-\subsection{Comparison to C++ Template Instantiation}
-
-One could say this project just mirrors template instantiation from C++, but any such resemblance is just superficial. C++ template instantiation is not strict in type signatures, and different instances can have non-matching types (not having a principal typing for the API of the instances that all of the instance types would be type instances of). This goes against parametric polymorphism.
-
-C++ also allows different instances to have the same type signature, which can make any type inference or type deduction impossible.
-
-The instantiation in CHM follows inferred types by the HM type system.

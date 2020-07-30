@@ -68,8 +68,6 @@ a shallow_copy(a value)
 
 \subsection{Polytyped Definitions}
 
-% TODO: https://mail.haskell.org/pipermail/beginners/2010-December/006057.html
-
 \subsubsection{CHM Headers}
 In the listing \ref{lst:TypeClass1} we see the part \lstinline{<a>}, declaration of the type variable \lstinline{a}, similar to C++ templates and Java generics, always preceding the rest of the definition and with a scope local to the definition. This part, a \lstinline{chm_header}, has the following grammar rule:
 
@@ -122,13 +120,18 @@ We run the type inference algorithm on this rewritten definition, and then if we
 
 Instantiation of polytyped functions is done by simply replacing the quantified type variables with the inferred types. From there, the process repeats for each new instance as if the instance was a regular monomorphic function. Type class methods are an exception to this, which we will discuss in the very next part, but the only difference is that there is one more step before we instantiate them.
 
-\subsection{Type Class Method Instantiation}
+\subsubsection{Type Class Method Instantiation}
 
 All type classes are just language constructs, they are not manifested in the resulting code in any shape or form, and thus they count as a zero abstraction feature. There are some built-in type classes (for example, \lstinline{Add} which states that two variables of a type that satisfies it can be added), implicit type classes for each field of a structure (and a union), and then user-defined type classes, showed before in this chapter. The implemented built-in and implicit type classes are mainly for demonstration, and they are subject to change in the future.
 
 Definitions of type classes are stored in the compiler as lists of their methods. Methods act like regular polytypes until we instantiate them.
 
 When a method is instantiated, the compiler checks its instances and determines which one (and if any) matches the inferred type. Then it instantiates this one method instance just as if it was the only definition. Note that type class instances are required not to overlap because of this step of instantiation.
+
+
+\subsubsection{Comparison to C++ Template Instantiation}
+
+One could say this project just mirrors template instantiation from C++, but any such resemblance is just superficial. C++ template instantiation is not strict in type signatures, and different instances can have non-matching types (not having a principal typing for the API of the instances). This goes against parametric polymorphism. C++ type system, on the other hand, has its own advantages, for example, variadic templates, which are impossible to implement in the HM type system.
 
 \subsection{Record Fields}
 \label{ssec:recordFieldsCHM}

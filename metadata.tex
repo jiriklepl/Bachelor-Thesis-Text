@@ -39,21 +39,26 @@
 
 % Study programme and specialization
 \def\StudyProgramme{Computer Science}
-\def\StudyBranch{\xxx{study branch}}
+\def\StudyBranch{General Computer Science}
 
 \def\Dedication{%
-Dedication. \xxx{It is nice to say thanks to supervisors, friends, family, book authors and food providers.}
+I would like to thank my supervisor, RNDr. Miroslav Kratochvíl, for his guidance and active support during my work on this thesis, and for introducing me to functional programming.
 }
 
 \def\Abstract{%
-\xxx{Abstracts are an abstract form of art. Use the most precise, shortest sentences that state what problem the thesis addresses, how it is approached, pinpoint the exact result achieved, and describe the applications and significance of the results. Highlight anything novel that was discovered or improved by the thesis. Maximum length is 200 words, but try to fit into 120. Abstracts are often used for deciding if a reviewer will be suitable for the thesis; a well-written abstract thus increases the probability of getting a reviewer who will like the thesis.}
-% ABSTRACT IS NOT A COPY OF YOUR THESIS ASSIGNMENT!
+The C languages, despite its age, is one of the main languages in systems development. It is valued for giving the user almost complete control over the memory management and the computations a program written in it performs.
+
+A large portion of criticism of C arises from the lack of generic programming features. C compensates that by macros which are prone to user errors.
+
+This problem has been addressed in the early stages of the C++ language, but many systems developers refuse C++ because of its complexity and non-transparency of the code.
+
+We propose a simpler solution by applying the Hindley-Milner type system extended by Haskell type classes and type constructors. We will show that this approach is viable even with minimal changes to C, giving it much higher expressiveness.
 }
 
 % 3 to 5 keywords (recommended), each enclosed in curly braces.
 % Keywords are useful for indexing and searching for the theses by topic.
 \def\Keywords{%
-\xxx{{key} {words}}
+{C} {Hindley} {Milner} {Polymorphism} {Type-Inference}
 }
 
 % If your abstracts are long and do not fit in the infopage, you can make the
