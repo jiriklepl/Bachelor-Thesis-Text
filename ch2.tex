@@ -8,7 +8,7 @@ The C language is one of the main languages for system development. It is valued
 
 But then C lacks any support for polymorphism and generic programming. This is often compensated by extensive use of macros and \lstinline{void *} pointers, which do not offer any type safety and thus can be easily misused.
 
-\textbf{Generic (\lstinline{void *}) pointers} can point to any data, and thus they can be used in some "generic" code. This makes them a very strong tool, and almost every program relies on them (for example: \lstinline{malloc}, \lstinline{free}; for some examples see \cite{organisation1999iso}). But these pointers carry no type information and so to use these pointers. This means that either the user has to know the actual types when they use them, or the type has to be passed explicitly.
+\textbf{Generic (\lstinline{void *}) pointers} can point to any data, and thus they can be used in some "generic" code. This makes them a very strong tool, and almost every program relies on them (for example: \lstinline{malloc}, \lstinline{free}; for some examples see \cite{organisation1999iso}). However, these pointers carry no type information and so to use these pointers. This means that either the user has to know the actual types when they use them, or the type has to be passed explicitly.
 
 One example of using void pointers can be `malloc', which, without any type inference, requires the user to calculate the required themselves (this can seem to be trivial to do, but it still generates some code noise, and that is a possible source of bugs).
 
@@ -16,11 +16,9 @@ As we stated before, one other common way of implementing generic algorithms and
 
 Thankfully many modern compilers are macro-aware, and so if there is a compile-time bug in the program, the compiler can create a user-friendly error output (for example, GCC). % TODO: MAYBE create an error source
 
-% But when it comes to debugging, there has to be done some nontrivial preprocessing of the source files to make it possible to use conventional debuggers (like gdb) to find bugs in macro expansions. % HACK: link something maybe?
+The lack of any type checking in the context of macros makes the possible bugs manifest only when their implementations are actually used in some code, and sometimes only in certain contexts, as the compiler, otherwise, should not even assume a macro represents a code.
 
-The lack of any type checking in the context of macros makes the possible bugs manifest only when the implementations are actually used in some code, and sometimes only in certain contexts, as the compiler should even assume a macro is supposed to represent a code.
-
-And as for generic pointers, a bug usually becomes apparent only during runtime and that by the corruption of the memory.
+As for generic pointers, a bug usually becomes apparent only during runtime and that by the corruption of the memory.
 
 One real-life example of making "generic" data structures via macros is klib's \lstinline{__KHASH_TYPE} macro (in `./khash.h') \cite{attractivechaos2020klib}:
 
@@ -76,7 +74,7 @@ As a side note, this is not considered by the CHM compiler proposed in this thes
     where $(*)$ is the pointer type constructor.
 \end{defn}
 
-We argued that certain sequences of type specifiers (naming integral types) should be considered as single type constants. But pointers do not fit this mindset, and we want to use type constructors for them. That is because, whereas \lstinline{unsigned long long int} and \lstinline{long long int} can be considered unrelated types, we want to easily dereference pointers and a generic dereference function would be impossible if we considered types of pointers unrelated to their value types.
+We argued that certain sequences of type specifiers (naming integral types) should be considered as single type constants. But pointers do not fit this mindset, and we want to use type constructors for them. That is because, whereas \lstinline{unsigned long long int} and \lstinline{long long int} can be considered unrelated types, we want to dereference pointers easily and a generic dereference function would be impossible if we considered types of pointers unrelated to their value types.
 
 We will model the pointers by applying $(*)$ type constructor applying to the types of values they point to (\lstinline{int *} will be modeled as \lstinline{(*) int}).
 

@@ -1,12 +1,12 @@
 
 \chapwithtoc{Introduction}
 
-We will propose a new programming language CHM (C with the Hindley-Milner type system), a simple extension of the C programming language. This extension will try to answer the overuse of macros and generic \lstinline{void *} pointers which can be prone to user errors. Both macros and \lstinline{void *} pointers provide no type safety and their misuse can be difficult to debug.
+We will propose a new programming language, CHM (C with the Hindley-Milner type system), a simple extension of the C programming language. This extension will try to answer the overuse of macros and generic \lstinline{void *} pointers, which are prone to user errors. Both macros and \lstinline{void *} pointers provide no type safety, and their misuse can be difficult to debug.
 
-The type safety will be achieved by using type inference and type checking of the Hindley-Milner type system, or more exactly the Haskell type system based on it.
+The type safety will be achieved by using type inference and type checking of the Hindley-Milner type system, or more precisely, the Haskell type system based on it.
 
-We will use lambda calculus as an internal representation of the code in the type inference stage as the theory of these type systems is described on in.
+We will use lambda calculus as an internal representation of the code in the type inference stage as the theory of these type systems is described on it.
 
-Choosing lambda calculus, or its derivatives might seem counterintuitive at first because it is not very efficient in expressing imperative ideas like mutability for example, but for purposes of type inference we do not need to know the actual meaning of the code (like for example if a loop stops), we can just limit ourselves to modeling type dependencies in the program and everything on top of that is just for human readability, debugging purposes, demonstration and for possible extension.
+Choosing lambda calculus, or its derivatives might seem counterintuitive at first because it is not very efficient in expressing imperative ideas like mutability, for example, but for purposes of type inference, we do not need to know the actual meaning of the code (like for example if a loop stops), we focus on modeling type dependencies in the program. Everything on top of that is just for human readability, debugging purposes, demonstration and for possible extension.
 
-Lambda calculus can quite easily model any C program, but one has to be careful at distinguishing between initialization and assignment as initialization creates binding (in lambda calculus expressed as a substitution for a bound variable in an abstraction) and assignment is a function that takes two expressions of the same type and returns the first (here we demonstrate that we do not need to model the whole behavior of the program, because copying of the value does not have any effect on the types of the arguments).
+Lambda calculus can quite easily model any C program, but one has to be careful at distinguishing between initialization and assignment as initialization creates binding (in lambda calculus, expressed as a substitution for a bound variable in an abstraction), and assignment is a function that takes two expressions of the same type and returns the first (here we demonstrate that we do not need to model the whole behavior of the program as copying of the value does not have any effect on the types of the arguments).

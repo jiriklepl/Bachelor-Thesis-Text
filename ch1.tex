@@ -145,7 +145,7 @@ Principal typings will be very important later when we introduce more advanced t
 
 Type checking is the process of validating whether a term can have a given type, whereas typeability is a decision problem of whether the term can be given some type.
 
-Type inference is closely related to typeability but has an additional requirement of giving an actual type for the term, and furthermore, what we usually are interested in is its principal type.
+Type inference is closely related to typeability but has an additional requirement of giving an actual type for the term, and what we usually are interested in is its principal type.
 
 Both type checking and typeability of the simply-typed lambda calculus are decidable, and its type inference is computable \cite{barendregt1992lambda}.
 
@@ -273,7 +273,7 @@ Note that $\sigma > \sigma'$ implies $\sigma S > \sigma' S$, however it does not
 
 The \emph{instantiation} rule replaces the $\forall$-elimination rule of the system F. Apart from that, the \emph{let polymorphism} rule is the only real extension of the rules, balancing the type restriction introduced before.
 
-We will introduce the algorithm W \ref{w}. It produces the \emph{principal type scheme} for the given program (expression). But before we describe the algorithm, we need to introduce the unification algorithm which is used in its definition.
+We will introduce the algorithm W \ref{w}. It produces the \emph{principal type scheme} for the given program (expression). But before we describe the algorithm, we need to introduce the type unification algorithm, which is used in its definition.
 
 \subsubsection{Most General Unification}
 
@@ -360,7 +360,7 @@ Pure HM allows for just parametric polymorphism. However, without any ad-hoc pol
 
 The problem is that some functions work only on a particular type, for example, basic arithmetic functions. For that reason, we would like to be able to say that it makes sense to add two integers, or two real numbers, but not adding two boolean values.
 
-A trivial extension would be the introduction of tagged unions, see \emph{Typing extensions} in \ref{sssec:typingExt}. But if we were to define the $+$ operator as $(+) : Int + Real \rightarrow Int + Real \rightarrow Int + Real$ we solve the problem with booleans, one different problem comes to the surface: we would like to say that adding two integers yields an integer whereas adding two real numbers yields a real number, one more argument could also be that we would like to forbid adding integers to real numbers (maybe we want to require all data conversions be explicit).
+A trivial extension would be the introduction of tagged unions, see \emph{Typing extensions} in \ref{sssec:typingExt}. If we were to define the $+$ operator as $(+) : Int + Real \rightarrow Int + Real \rightarrow Int + Real$, we solve the problem with booleans, but one different problem comes to the surface: we would like to say that adding two integers yields an integer whereas adding two real numbers yields a real number, one more argument could also be that we would like to forbid adding integers to real numbers (maybe we want to require all data conversions be explicit).
 
 So what we would like is some way of expressing that $(+)$ takes two parameters of a type we can perform addition on and that the function yields us a result of the same type. This can be achieved by \textbf{type classes}.
 
@@ -368,9 +368,9 @@ So what we would like is some way of expressing that $(+)$ takes two parameters 
 
 The idea of type classes (parametrized by generic types) is that we put constraints on types of some variables (or functions) we use in our algorithms. Those constraints tell us that the usage of these algorithms is valid only in the context where the constraints are satisfied (this allows us to implement otherwise impossible generic algorithms, for example, sorting, that would be nonsensical for some types).
 
-And also, the functions defined inside a type class (we will call them \textbf{methods}) can have a specialized implementation for each \emph{instance}, this was actually the main motivation for their creation: $Eq$ class with a method $==$ which needs to be specialized for each type. \cite{hall1994type}
+And also, the functions defined inside a type class (we will call them \textbf{methods}) can have a specialized implementation for each \emph{instance}. This was the main motivation for their creation: $Eq$ class with a method $==$ which needs to be specialized for each type. \cite{hall1994type}
 
-\textbf{Instances} of type classes (parametrized by a type instance of the type of the corresponding type class) are what allows for ad-hoc polymorphism in a very well controlled manner \cite{wadler1989make}, they are a limited (but powerful) alternative to classic overloading (we will describe overloading shortly). It differs from classic overloading in that all instance \emph{methods} have to have typings which are instances of the principal typing of the generic definition. Furthermore, the types of instances are not allowed to overlap (share a common type instance - this can be proven by the unification algorithm) - this "no overlapping" rule will be important for instantiation (generating code with concrete monotypes: overlapping would mean having, for the given parameters, two implementations simultaneously).
+\textbf{Instances} of type classes (parametrized by a type instance of the type of the corresponding type class) are what allows for ad-hoc polymorphism in a very well controlled manner \cite{wadler1989make}, they are a limited (but powerful) alternative to classic overloading (we will describe overloading shortly). It differs from classic overloading in that all instance \emph{methods} have to have typings that are instances of the principal typing of the generic definition. Furthermore, the types of instances are not allowed to overlap (share a common type instance - this can be proven by the unification algorithm) - this "no overlapping" rule will be important for instantiation (generating code with concrete monotypes: overlapping would mean having, for the given parameters, two implementations simultaneously).
 
 Type classes can be added to the algorithm \ref{w} $W$ with only little changes, for example, a simplified version of the implementation presented in Typing Haskell in Haskell (THIH) \cite{jones1999typing}.
 
@@ -390,13 +390,13 @@ Type classes, as stated before, are good for stating an algorithm makes sense on
 
 The usefulness of classes can be shown on `Ord'. This constraint requires that two variables of type $\alpha$ s.t. $Ord(\alpha)$, we can say `$\alpha$ is (in) Ord'. But not everything can be partially ordered, take directed graphs, for example, where the reachability of one vertex from another is in `Ord' only if the graph is a directed acyclic graph, in which case we can use algorithms expecting `Ord' on problems concerning reachability, but not otherwise.
 
-`Ord' can also show how we could want different instances for different types. Let's say `Ord' has one method $<=$ of type $a \rightarrow a \rightarrow Bool$ with the expected behavior.
+`Ord' can also show how we could want different instances for different types. Let us say `Ord' has one method $<=$ of type $a \rightarrow a \rightarrow Bool$ with the expected behavior.
 
-For two `Int's we just compare them and return whether the first is lower than the other, but if we have, let's say `Customer's, with different Id numbers as keys in some map (or dictionary), then we do not need to compare whole customers, but just their Ids.
+For two `Int's we just compare them and return whether the first is lower than the other, but if we have, let us say `Customer's, with different Id numbers as keys in some map (or dictionary), then we do not need to compare whole customers, but just their Ids.
 
 \section{Haskell Type System}
 
-In this section, we will describe an older version of Haskell, as presented in THIH \cite{jones1999typing}, without any pattern-matching, and other features not relevant to the type system. The currently used Haskell type system is significantly more complicated and based on constraint solvers to support various new type system features that are not relevant for the goals of this thesis.
+In this section, we will describe an older version of Haskell, as presented in THIH \cite{jones1999typing}, without any pattern-matching and other features not relevant to the type system. The currently used Haskell type system is significantly more complicated and based on constraint solvers to support various new type system features that are not relevant for the goals of this thesis.
 
 The syntax is that of HM but extended by the possibility of giving explicit typings (with type schemes, see the definition \ref{defn:typeSchemes}) and defining/using type constructors and type classes. See THIH \cite{jones1999typing} for an actual implementation we will use in the CHM compiler (C with Hindley-Milner).
 
@@ -422,7 +422,7 @@ Then we have kinds of a form $k_1 \rightarrow k_2$ which take a type of a kind $
 
 Kinds are less complex then types as they are defined recursively only from the two rules defined in the previous two paragraphs.
 
-For example, we can define a very common type constructor $List: * \rightarrow *$ which takes a type $a$ and constructs a type representing a linked list of values of type $a$. We can use this type constructor to show the reason behind the notion of kinds as it would not make much sense for a value to have a type just $List$ without it being applied to any type: "a list of what?"
+For example, we can define a very common type constructor $List: * \rightarrow *$, which takes a type $a$ and constructs a type representing a linked list of values of type $a$. We can use this type constructor to show the reason behind the notion of kinds as it would not make much sense for a value to have a type just $List$ without it being applied to any type: "a list of what?"
 
 \begin{defn}[Kinds]
     For kinds $k', k''$ a kinds $k$ is grammatically defined as follows:
@@ -463,7 +463,7 @@ Going forward, we will allow the following form for type scheme: $\forall \{\}. 
 
 \paragraph{Type Substitution in the Haskell Type System}
 
-With the introduction of qualified types, we should explicitly state that the type substitution applies to qualified types, just like if the type parameters of the predicates were a part of the type itself.
+With the introduction of qualified types, we should explicitly state that the type substitution applies to qualified types, just as if the predicates' type parameters were a part of the type itself.
 
 \paragraph{Type Unification in the Haskell Type System}
 

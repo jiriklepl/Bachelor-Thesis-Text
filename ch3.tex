@@ -3,7 +3,7 @@
 
 Our implementation of the CHM compiler uses preprocessing and postprocessing by the GCC compiler, with the intermediate representation being the C language. GCC runs the preprocessor and then compiles the fully instantiated code.
 
-This allows us to focus on polymorphism, type inference, and type checking instead of dealing with actually interpreting the code, but that brings its toll on the efficiency of the whole process, and a slightly different approach should be considered in future works.
+Using GCC for parsing and the "second stage" of the compilation allows us to focus on polymorphism, type inference, and type checking instead of dealing with actually interpreting the code, but that brings its toll on the efficiency of the whole process, and a slightly different approach should be considered in future works.
 
 \section{Language extensions}
 
@@ -100,7 +100,7 @@ This project is used for the output of a pretty-printed C code as well. This out
 
 For the type inference, we use the THIH project \cite{jones1999typing}, but using it sensibly required some modifications to be made to it as the original THIH project is not meant to be used as an efficient implementation.
 
-Using THIH required a significant pre/postprocessing of the code, described in the previous chapter.
+Using THIH required a significant pre/postprocessing of the code described in the previous chapter.
 
 All type inference principles are explained in the first chapter. The basis for the implementation is then explained in Typing Haskell in Haskell \cite{jones1999typing}.
 
@@ -156,4 +156,4 @@ The CHM compiler implementation outputs a GCC-compilable code that interprets th
 
 The user can use the \lstinline[language=sh]{--inner} to see the inner Haskell representation of the CHM code (it blurs some of the semantics unnecessary for type inference and leaves others to facilitate the readability of it). This can be used for debugging the compiler implementations.
 
-It should be noted that names of symbols of polytype functions actually used in the C interpretation of the CHM code do not match their CHM counterparts, which currently complicates debugging of CHM programs (this however, can be solved easily on the debugger side).
+It should be noted that names of symbols of polytype functions used in the C interpretation of the CHM code do not match their CHM counterparts as the names are mangled, which currently complicates debugging of CHM programs (this, however, can be solved easily on the debugger side).

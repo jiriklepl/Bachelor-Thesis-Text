@@ -3,11 +3,11 @@
 
 \section{Conclusion}
 
-We have shown that it is possible to efficiently model the type system of the C language, and to model most of the language's constructs in the language of the lambda calculus variant derived from Haskell.
+We have shown that it is possible to efficiently model the type system of the C language and to model most of the language's constructs in the language of the lambda calculus variant derived from Haskell.
 
 Section \ref{ex:list} then showcases a code that might be used in some projects using the CHM language. See appendix \ref{stl} for more code examples that implement some common standard library features (functions we can encounter in the C++ standard library, for example).
 
-The implementation of the CHM compiler provides several test files, each beginning with a description stating what the file tests and what is the expected behavior of the program.
+The implementation of the CHM compiler provides several test files, each beginning with a description stating what the file tests and what is the program's expected behavior.
 
 The CHM compiler, as it is currently implemented, serves only demonstrative purposes. Its implementation is partially incomplete and not fit for any use in software development. Yet, all code examples in this thesis are correctly parsed and interpreted based on the definitions in the previous chapters.
 
@@ -57,7 +57,7 @@ In C we could create a similar structure using BSD \lstinline{<queue.h>}'s \cite
 
 \section{Future Work}
 
-If this project gain popularity, future work should extend the STL library, and also a new compiler should be implemented, which would not rely on GCC. This would make it easier to implement new features and to optimize the process of compilation.
+If this project gains popularity, future work should extend the STL library, and a new compiler should be implemented, which would not rely on GCC. That would make it easier to implement new features and optimize the process of compilation.
 
 \paragraph{Incomplete Implementation}
 
@@ -65,7 +65,7 @@ The provided CHM compiler implements the features crucial for the demonstration 
 
 There are currently implemented only some of the built-in types (the main ones) as their support is not detrimental for the demonstration, and it was not possible to make a complete implementation in time.
 
-Some more notable constructs not implemented by the current compiler are: typedefs, enums, and type-checking of zero-comparability in (control statement) conditions. All of those should be implemented in future implementations of the compiler.
+Some more notable constructs not implemented by the current compiler are typedefs, enums, and type-checking of zero-comparability in (control statement) conditions. All of those should be implemented in future implementations of the compiler.
 
 \paragraph{Compiler Errors}
 
@@ -77,7 +77,7 @@ Future implementations of the compiler should massively refactor the code, chang
 
 \paragraph{Quality of Life Changes}
 
-In the current implementation of the compiler, we allow declaration of type variables only at the CHM headers of the various definitions. This is enough for demonstration, but in a more convenient to use implementation, the language should allow declaration of local type variables even inside function definitions, and also, it should provide a notion of anonymous/implicit type variables (similar to C++'s \lstinline[language=c++]{auto}) which would decrease the verbosity of the code in many cases.
+In the current implementation of the compiler, we allow declaration of type variables only at the CHM headers of the various definitions. Which is enough for demonstration, but in a more convenient-to-use implementation, the language should allow declaration of local type variables even inside function definitions. Also, it should provide a notion of anonymous/implicit type variables (similar to C++'s \lstinline[language=c++]{auto}) which would decrease the verbosity of the code in many cases.
 
 \paragraph{Better support for record fields}
 
@@ -91,9 +91,9 @@ Then another sharing of names of fields should be defining fields in type family
 
 \paragraph{}{Modules}
 
-Having a lot of structures with even more fields and procedures would create a problem of having many names being already in use. The "include" system from the C language then becomes an issue for larger projects or even smaller ones wanting to use some foreign code.
+Having many structures with even more fields and procedures would create a high probability of name collisions. The "include" system from the C language then becomes an issue for larger projects or even smaller ones wanting to use some foreign code.
 
-And therefore, this language could prosper from having a module system akin to many modern languages, like Haskell, where it would be possible to export only parts of the code we want to export or to give them qualified types (both to avoid name collisions).
+And therefore, this language could prosper from having a module system akin to many modern languages (like Haskell), which would make it possible to export only parts of the code we want to export or give them qualified types (both to avoid the name collisions).
 
 \paragraph{Data type specializations}
 
