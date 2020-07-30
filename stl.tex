@@ -1,0 +1,70 @@
+\chapter{The stl Library}
+
+In every language. there are many functions and patterns used in almost every program. We can expect the same happening to the CHM language if it becomes popular.
+
+We present a demonstrative \emph{stl} library implementation which should give an example of how some functions provided by it might look. This library is implicitly linked with every program.
+
+The \emph{stl} library is split into two files \lstinline[language=sh]{stl.h},which can be included to CHM sources, and \lstinline[language=sh]{stl.c}, which implements some IO functions currently unimplementable in the CHM language.
+
+
+\section{Functions Facilitating Memory Management}
+
+Here we will present functions \lstinline{new} and \lstinline{delete} for polymorphic memory allocation and disposal, respectively; and a function \lstinline{nullptr} which serves as polymorphic \lstinline{NULL} pointer.
+
+The following code is taken from \lstinline[language=sh]{stl.h}:
+
+\begin{lstlisting}
+extern void *malloc(size_t);
+extern void free(void *ptr);
+
+<a>
+a *nullptr()
+{
+    return (a *)NULL;
+}
+
+<a>
+a *new()
+{
+    return (a *)malloc(sizeof(a));
+}
+
+<a>
+void delete(a *where)
+{
+    return free((void *)where);
+}
+\end{lstlisting}
+
+\section{Functions Facilitating IO}
+
+Here we show how the \emph{stl} library could implement a generic \lstinline{print} function. It is a method of the \lstinline{Print} type class as every type requires a specific implementation of how it should be printed.
+
+The implementation shown here takes the object that is to be printed by a pointer which shouldn't matter for trivial types, as the functions will likely be inlined by GCC, but for larger objects (requiring a nontrivial implementation of printing), passing the object by value might cause unwanted overhead.
+
+The following code is again taken from \lstinline[language=sh]{stl.h}:
+
+\begin{lstlisting}
+// the following two functions implemented in stl.c
+extern void __print_char(char);
+extern void __print_int(int);
+
+<a>
+class Print {
+    void print(a *);
+}
+
+instance Print<char> {
+    void print(char *a)
+    {
+        __print_char(*a);
+    }
+}
+
+instance Print<int> {
+    void print(int *a)
+    {
+        __print_int(*a);
+    }
+}
+\end{lstlisting}

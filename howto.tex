@@ -1,45 +1,44 @@
-\chapter{Using CoolThesisSoftware}
+\chapter{Using the CHM Compiler}
 
-Use this appendix to tell the readers (specifically the reviewer) how to use your software. A very reduced example follows; expand as necessary. Description of the program usage (e.g., how to process some example data) should be included as well.
+In this appendix, we will discuss how to use the demonstration implementation of the CHM compiler.
 
-To compile and run the software, you need dependencies XXX and YYY and a C compiler. On Debian-based Linux systems (such as Ubuntu), you may install these dependencies with APT:
-\begin{Verbatim}
-apt-get install \
-  libsuperdependency-dev \
-  libanotherdependency-dev \
-  build-essential
-\end{Verbatim}
+\section{Getting the Compiler}
 
-To unpack and compile the software, proceed as follows:
-\begin{Verbatim}
-unzip coolsoft.zip
-cd coolsoft
-./configure
-make
-\end{Verbatim}
+Its source code can be viewed and downloaded via Github \cite{jiriklepl2020chmcompiler}.
 
+Note that the compiler requires all its submodules to be up-to-date. That can be achieved using the following command to clone the repository:
 
-\begin{Verbatim}
-cd demo/
-./bin/cool_process_data data/demo1
-\end{Verbatim}
-
-After the program starts, control the data avenger with standard \verb-WSAD- controls.
-
-\begin{listing}
-\begin{lstlisting}
-#include <CoolSoft.h>
-#include <iostream>
-
-int main() {
-	int i;
-	if(i = cool::ProcessAllData()) // returns 0 on error
-		std::cout << i << std::endl;
-	else
-		std::cerr << "error!" << std::endl;
-	return 0;
-}
+\begin{lstlisting}[language=sh]
+	git clone --recursive https://github.com/jiriklepl/Bachelor-Thesis
 \end{lstlisting}
-\caption{Example program.}
-\label{lst:ex}
-\end{listing}
+
+\section{Build Dependencies}
+
+The main dependencies of the compiler are \emph{ghc} (at least version 8.10) and \emph{cabal-install} (at least version 3.2). It depends on many packages automatically acquirable via \emph{cabal-install} which can be found in each sub-project's \lstinline{.cabal} file.
+
+\section{Building}
+
+The package can be built with either of the following commands:
+
+\begin{lstlisting}[language=sh]
+	make build
+
+	# or
+	cabal new-build all
+\end{lstlisting}
+
+
+\section{Usage}
+
+The compiler can be run by either of the following commands (note that \lstinline[language=sh]{<arguments>} stands for the arguments passed to the compiler):
+
+\begin{lstlisting}[language=sh]
+	./run.sh <arguments>
+
+	# or
+	cabal new-run CHM-main <arguments>
+\end{lstlisting}
+
+The first one might require adjusting the read and execution permissions on the \lstinline[language=sh]{run.sh} file.
+
+The implementation is for testing and development of the language and thus the directory it is run in has to contain the files \lstinline[language=sh]{stl.c} and  \lstinline[language=sh]{stl.h}, which implement the \emph{stl} library implicitly linked with every program.
