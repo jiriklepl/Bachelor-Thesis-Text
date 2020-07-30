@@ -9,7 +9,7 @@ Its source code can be viewed and downloaded via Github \cite{jiriklepl2020chmco
 Note that the compiler requires all its submodules to be up-to-date. That can be achieved using the following command to clone the repository:
 
 \begin{lstlisting}[language=sh]
-	git clone --recursive https://github.com/jiriklepl/Bachelor-Thesis
+    git clone --recursive https://github.com/jiriklepl/Bachelor-Thesis
 \end{lstlisting}
 
 \section{Build Dependencies}
@@ -21,10 +21,10 @@ The main dependencies of the compiler are \emph{ghc} (at least version 8.10) and
 The package can be built with either of the following commands:
 
 \begin{lstlisting}[language=sh]
-	make build
+    make build
 
-	# or
-	cabal new-build all
+    # or
+    cabal new-build all
 \end{lstlisting}
 
 
@@ -33,10 +33,10 @@ The package can be built with either of the following commands:
 The compiler can be run by either of the following commands (note that \lstinline[language=sh]{<arguments>} stands for the arguments passed to the compiler):
 
 \begin{lstlisting}[language=sh]
-	./run.sh <arguments>
+    ./run.sh <arguments>
 
-	# or
-	cabal new-run CHM-main <arguments>
+    # or
+    cabal new-run CHM-main <arguments>
 \end{lstlisting}
 
 The first one might require adjusting the read and execution permissions on the \lstinline[language=sh]{run.sh} file.

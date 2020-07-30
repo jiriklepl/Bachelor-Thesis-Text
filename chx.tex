@@ -1,6 +1,6 @@
 \chapter{The CHM Language Grammar}
 
-This is the grammar for the CHM language, the meaning of all constructs define here is defined in the chapter \ref{chap:compilerCHM} (\emph{CHM Compiler}).
+This is the grammar for the CHM language. The meaning of all constructs define here is defined in chapter \ref{chap:compilerCHM} (\emph{CHM Compiler}).
 
 \section{CHM headers}
 
@@ -28,7 +28,7 @@ types = DECLARATOR
       | types ',' DECLARATOR
 \end{lstlisting}
 
-This is a simplified version of a piece of the actual grammar used in the implementation
+This is a simplified version of a piece of the actual grammar used in the implementation.
 
 \begin{itemize}
     \item `IDENT' is a new identifier
@@ -50,11 +50,11 @@ instance = 'instance' IDENT '<' type '>'
                '{' ext_decls '}'
 \end{lstlisting}
 
-\lstinline{ext_decls} are declarations and definitions which would be legal in the global scope. But it is not allowed to put declarations in instances, and all their definitions have to be first declared in the matching classes.
+\lstinline{ext_decls} are declarations and definitions which would be legal in the global scope. However, it is not allowed to put declarations in instances, and all their definitions have to be first declared in the matching classes.
 
 \section{Polymorphic Functions and Structures}
 
-Those are defined as regular C constructs preceded by \emph{CHM headers}:
+Polymorphic Functions and Structures are defined as regular C constructs preceded by \emph{CHM headers}:
 
 \begin{lstlisting}
 CHM_function_definition  = chm_header function_definition
@@ -62,4 +62,4 @@ CHM_function_declaration = chm_header function_declaration
 CHM_struct_definition    = chm_header struct_definition
 \end{lstlisting}
 
-Similarly for \textbf{unions}, but a lot of grammars considers them syntactically equivalent to structs.
+We omit \textbf{unions} as a lot of grammars (including ours) consider them syntactically equivalent to structs.

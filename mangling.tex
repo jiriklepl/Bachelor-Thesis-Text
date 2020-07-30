@@ -1,10 +1,10 @@
 \chapter{Mangling of Types, Structs, and Functions}
 
-The CHM compiler creates a precompiled source code, which is then compiled by GCC. The precompilation process involves instantiation of polymorphic language constructs which leads to multiple occurrences of certain definitions in the precompiled code (but with different typings).
+The CHM compiler creates a precompiled source code, which is then compiled by GCC. The precompilation process involves instantiation of polymorphic language constructs, which leads to multiple occurrences of certain definitions in the precompiled code (each with a different typing).
 
-We know which of the symbols with the same name are connected to which (again, determined by having the same typings). To encode those connections into the precompiled code, we use a mangling of names by appending reversible textual representations of the typings.
+We know which of the symbols with the same name are connected to which (again, determined by having the same typing). To encode those connections into the precompiled code, we use a mangling of names by appending reversible textual representations of the typings.
 
-Choosing this approach, over a simple numbering of the instances, facilitates both the implementation (as we don't need to propagate the mangled names in the compiler) and possible debugging and reverse-engineering of the resulting precompiled code. A downside is that this approach significantly inflates the code.
+Choosing this approach, over a simple numbering of the instances, facilitates both the implementation (as we do not need to propagate the mangled names in the compiler) and possible debugging and reverse-engineering of the resulting precompiled code. A downside is that this approach significantly inflates the code.
 
 Note that we have to apply the mangling function only to instances of polymorphic symbols.
 

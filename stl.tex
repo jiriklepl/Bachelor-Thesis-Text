@@ -1,9 +1,9 @@
 \chapter{The STL Library}
 \label{stl}
 
-In every language. there are many functions and patterns used in almost every program. We can expect the same happening to the CHM language if it becomes popular.
+In every language, there are many functions and patterns used in almost every program. We can expect the same happening to the CHM language if it becomes popular.
 
-We present a demonstrative \emph{STL} library implementation which should give an example of how some functions provided by it might look. This library is implicitly linked with every program.
+We present a demonstrative \emph{STL} library implementation, which should give an example of how some functions provided by it might look. This library is implicitly linked with every program.
 
 The \emph{STL} library is split into two files \lstinline[language=sh]{stl.h},which can be included to CHM sources, and \lstinline[language=sh]{stl.c}, which implements some IO functions currently unimplementable in the CHM language.
 
@@ -38,9 +38,9 @@ void delete(a *where)
 
 \section{Functions Facilitating IO}
 
-Here we show how the \emph{STL} library could implement a generic \lstinline{print} function. It is a method of the \lstinline{Print} type class as every type requires a specific implementation of how it should be printed.
+Here we show how the \emph{STL} library could implement a generic \lstinline{print} function. It is a method of the \lstinline{Print} type class, as every type requires a specific implementation of how it should be printed.
 
-The implementation shown here takes the object that is to be printed by a pointer which shouldn't matter for trivial types, as the functions will likely be inlined by GCC, but for larger objects (requiring a nontrivial implementation of printing), passing the object by value might cause unwanted overhead.
+The implementation shown here takes the object that is to be printed by a pointer, which should not matter for trivial types, as the functions will likely be inlined by GCC, but for larger objects (requiring a nontrivial implementation of printing), passing the object by value might cause unwanted overhead.
 
 The following code is again taken from \lstinline[language=sh]{stl.h}:
 
