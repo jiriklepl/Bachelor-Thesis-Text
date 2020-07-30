@@ -36,7 +36,7 @@ If we were to create an instance of this structure where \lstinline{khkey_t=int}
 
 This approach also requires an explicit mention of the instance in the corresponding function calls.
 
-For example, in this case, we would clear the structure by calling
+For example, in this case, we would clear the structure by calling \\
 \lstinline{void kh_clear_<name>(const kh_<name>_t *h);} where \lstinline{<name>} stands for the name we have given for the instance. So if we were to refactor a part of the program and change the type of something, we would have to change the name as well, and sometimes create a new instance by hand or delete the old one if it is no longer useful - which we would have to investigate ourselves. In large projects, this can cause a lot of problems in case of even a little miscommunication.
 
 Using type checking and type inference described in this thesis has an effect very similar to the effect of instantiating definitions via macro expansion, but with the benefit of brevity, catching bugs early (due to checking the implementation when it is defined) and having fewer requirements on mindfulness of the user. All of these effects can lead to less error-prone code.
@@ -134,7 +134,7 @@ Models of some C constructs can be as follows (grammar is taken from \cite{organ
 This example demonstrates the most simple case where we can model the C construct directly, but there are more tricky examples like the following one (an initialization in a context of a function body):
 
 \begin{defn}[$\lambda_C$ for binary initializations]
-    $$\lambdac{decl\_specs\ \text{IDENT} = init; \dots} = (\lambda\ \text{IDENT} : \lambdac{decl\_specs} . \lambdac{\dots}) \lambdac{init}$$
+    $$\lambdac{decl\_specs\ \text{ID} =init; \dots} = (\lambda\ \text{ID} : \lambdac{decl\_specs} . \lambdac{\dots}) \lambdac{init}$$
 \end{defn}
 
 (The dots represent the rest of the function body)
@@ -162,30 +162,6 @@ We will model those functions as an abstraction of a sequences of nested $\text{
 Then we will generalize this definition for the function where there are some inner initializations:
 
 First, we move all initializations before all other statements, and then we model them as shown in section \ref{ssec:exprStat}.
-
-\subsubsection{Example}
-
-We would model the function:
-
-\begin{lstlisting}
-int f(int x)
-{
-    x = 10;
-    int y = x - 5;
-
-    if (y) return y;
-
-    return x;
-}
-\end{lstlisting}
-
-as:
-
-$f = \lambda x : int . (\lambda y : int . \text{let}\ expr_1 = (=)\ x\ 10; if_1 = \text{is\_zero}\ y\ \text{in}\ \text{return}\ x\ (\text{return}\ y\ (c : int))) ((-)\ x\ 5)$
-
-Here we simplify the sequence of $\text{let}$ clauses into one $\text{let}$ clause with $;$-separated list of assignments.
-
-We can see in this example that the model does not necessarily preserve the order of statements, nor the imperative meaning of the code.
 
 \section{Extensions to the C language}
 

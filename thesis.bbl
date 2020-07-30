@@ -1,0 +1,402 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.1 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\datalist[entry]{nty/global//global/global}
+  \entry{attractivechaos2020klib}{misc}{}
+    \name{author}{1}{}{%
+      {{hash=ACM}{%
+         family={Attractive\bibnamedelima Chaos},
+         familyi={A\bibinitperiod\bibinitdelim C\bibinitperiod},
+         given={MIT},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{ACM1}
+    \strng{fullhash}{ACM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{A}
+    \field{sortinithash}{A}
+    \field{note}{Github Repository}
+    \field{title}{Klib: a Generic Library in C}
+    \verb{url}
+    \verb https://github.com/attractivechaos/klib
+    \endverb
+    \field{year}{2020}
+  \endentry
+
+  \entry{barendregt1992lambda}{article}{}
+    \name{author}{1}{}{%
+      {{hash=BHP}{%
+         family={Barendregt},
+         familyi={B\bibinitperiod},
+         given={Henk\bibnamedelima P},
+         giveni={H\bibinitperiod\bibinitdelim P\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Oxford: Clarendon Press}%
+    }
+    \strng{namehash}{BHP1}
+    \strng{fullhash}{BHP1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{B}
+    \field{sortinithash}{B}
+    \field{title}{Lambda calculi with types}
+    \field{year}{1992}
+  \endentry
+
+  \entry{damas1982principal}{inproceedings}{}
+    \name{author}{2}{}{%
+      {{hash=DL}{%
+         family={Damas},
+         familyi={D\bibinitperiod},
+         given={Luis},
+         giveni={L\bibinitperiod},
+      }}%
+      {{hash=MR}{%
+         family={Milner},
+         familyi={M\bibinitperiod},
+         given={Robin},
+         giveni={R\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{DLMR1}
+    \strng{fullhash}{DLMR1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{D}
+    \field{sortinithash}{D}
+    \field{booktitle}{Proceedings of the 9th ACM SIGPLAN-SIGACT symposium on
+  Principles of programming languages}
+    \field{pages}{207\bibrangedash 212}
+    \field{title}{Principal type-schemes for functional programs}
+    \field{year}{1982}
+  \endentry
+
+  \entry{hall1994type}{inproceedings}{}
+    \name{author}{4}{}{%
+      {{hash=HC}{%
+         family={Hall},
+         familyi={H\bibinitperiod},
+         given={Cordelia},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=HK}{%
+         family={Hammond},
+         familyi={H\bibinitperiod},
+         given={Kevin},
+         giveni={K\bibinitperiod},
+      }}%
+      {{hash=JSP}{%
+         family={Jones},
+         familyi={J\bibinitperiod},
+         given={Simon\bibnamedelima Peyton},
+         giveni={S\bibinitperiod\bibinitdelim P\bibinitperiod},
+      }}%
+      {{hash=WP}{%
+         family={Wadler},
+         familyi={W\bibinitperiod},
+         given={Philip},
+         giveni={P\bibinitperiod},
+      }}%
+    }
+    \list{organization}{1}{%
+      {Springer}%
+    }
+    \strng{namehash}{HC+1}
+    \strng{fullhash}{HCHKJSPWP1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{H}
+    \field{sortinithash}{H}
+    \field{booktitle}{European Symposium On Programming}
+    \field{pages}{241\bibrangedash 256}
+    \field{title}{Type classes in Haskell}
+    \field{year}{1994}
+  \endentry
+
+  \entry{visq2018language-c}{misc}{}
+    \true{moreauthor}
+    \true{morelabelname}
+    \name{author}{1}{}{%
+      {{hash=HB}{%
+         family={Huber},
+         familyi={H\bibinitperiod},
+         given={Benedikt},
+         giveni={B\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{HB+1}
+    \strng{fullhash}{HB+1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{H}
+    \field{sortinithash}{H}
+    \field{note}{Github Repository}
+    \field{title}{Language.C}
+    \verb{url}
+    \verb https://github.com/visq/language-c
+    \endverb
+    \field{year}{2020}
+  \endentry
+
+  \entry{jones1999typing}{book}{}
+    \name{author}{1}{}{%
+      {{hash=JMP}{%
+         family={Jones},
+         familyi={J\bibinitperiod},
+         given={Mark\bibnamedelima P},
+         giveni={M\bibinitperiod\bibinitdelim P\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{JMP1}
+    \strng{fullhash}{JMP1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{J}
+    \field{sortinithash}{J}
+    \field{booktitle}{Haskell workshop}
+    \field{title}{Typing haskell in haskell}
+    \field{volume}{7}
+    \field{year}{1999}
+  \endentry
+
+  \entry{jiriklepl2020chmcompiler}{misc}{}
+    \name{author}{1}{}{%
+      {{hash=KJ}{%
+         family={Klepl},
+         familyi={K\bibinitperiod},
+         given={Jiří},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{KJ1}
+    \strng{fullhash}{KJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{K}
+    \field{sortinithash}{K}
+    \field{note}{Github Repository}
+    \field{title}{CHM Compiler}
+    \verb{url}
+    \verb https://github.com/jiriklepl/Bachelor-Thesis
+    \endverb
+    \field{year}{2020}
+  \endentry
+
+  \entry{milner1978theory}{article}{}
+    \name{author}{1}{}{%
+      {{hash=MR}{%
+         family={Milner},
+         familyi={M\bibinitperiod},
+         given={Robin},
+         giveni={R\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Elsevier}%
+    }
+    \strng{namehash}{MR1}
+    \strng{fullhash}{MR1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{M}
+    \field{sortinithash}{M}
+    \field{number}{3}
+    \field{pages}{348\bibrangedash 375}
+    \field{title}{A theory of type polymorphism in programming}
+    \field{volume}{17}
+    \field{journaltitle}{Journal of computer and system sciences}
+    \field{year}{1978}
+  \endentry
+
+  \entry{organisation1999iso}{misc}{}
+    \name{author}{1}{}{%
+      {{hash=OI}{%
+         family={Organisation},
+         familyi={O\bibinitperiod},
+         given={IS},
+         giveni={I\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {American National Standards Institute, New York}%
+    }
+    \strng{namehash}{OI1}
+    \strng{fullhash}{OI1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{O}
+    \field{sortinithash}{O}
+    \field{title}{ISO/IEC 9899: 1999 Programming Languages-C}
+    \field{year}{1999}
+  \endentry
+
+  \entry{pages2007queue}{misc}{}
+    \name{author}{1}{}{%
+      {{hash=PFHM}{%
+         family={Pages},
+         familyi={P\bibinitperiod},
+         given={FreeBSD Hypertext\bibnamedelima Man},
+         giveni={F\bibinitperiod\bibinitdelim H\bibinitperiod\bibinitdelim
+  M\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {June}%
+    }
+    \strng{namehash}{PFHM1}
+    \strng{fullhash}{PFHM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{P}
+    \field{sortinithash}{P}
+    \field{title}{QUEUE}
+    \field{year}{2007}
+  \endentry
+
+  \entry{palsberg2012overloading}{incollection}{}
+    \name{author}{1}{}{%
+      {{hash=PJ}{%
+         family={Palsberg},
+         familyi={P\bibinitperiod},
+         given={Jens},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Springer}%
+    }
+    \strng{namehash}{PJ1}
+    \strng{fullhash}{PJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{P}
+    \field{sortinithash}{P}
+    \field{booktitle}{Logic and Program Semantics}
+    \field{pages}{204\bibrangedash 218}
+    \field{title}{Overloading is NP-complete}
+    \field{year}{2012}
+  \endentry
+
+  \entry{robinson1965machine}{article}{}
+    \name{author}{1}{}{%
+      {{hash=RJA}{%
+         family={Robinson},
+         familyi={R\bibinitperiod},
+         given={John\bibnamedelima Alan},
+         giveni={J\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {ACM New York, NY, USA}%
+    }
+    \strng{namehash}{RJA1}
+    \strng{fullhash}{RJA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{R}
+    \field{sortinithash}{R}
+    \field{number}{1}
+    \field{pages}{23\bibrangedash 41}
+    \field{title}{A machine-oriented logic based on the resolution principle}
+    \field{volume}{12}
+    \field{journaltitle}{Journal of the ACM (JACM)}
+    \field{year}{1965}
+  \endentry
+
+  \entry{smith1993polymorphic}{inproceedings}{}
+    \name{author}{1}{}{%
+      {{hash=SGS}{%
+         family={Smith},
+         familyi={S\bibinitperiod},
+         given={Geoffrey\bibnamedelima S},
+         giveni={G\bibinitperiod\bibinitdelim S\bibinitperiod},
+      }}%
+    }
+    \list{organization}{1}{%
+      {Springer}%
+    }
+    \strng{namehash}{SGS1}
+    \strng{fullhash}{SGS1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{S}
+    \field{sortinithash}{S}
+    \field{booktitle}{Colloquium on Trees in Algebra and Programming}
+    \field{pages}{671\bibrangedash 685}
+    \field{title}{Polymorphic type inference with overloading and subtyping}
+    \field{year}{1993}
+  \endentry
+
+  \entry{torvalds2018linux}{misc}{}
+    \true{moreauthor}
+    \true{morelabelname}
+    \name{author}{1}{}{%
+      {{hash=TL}{%
+         family={Torvalds},
+         familyi={T\bibinitperiod},
+         given={Linux},
+         giveni={L\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{TL+1}
+    \strng{fullhash}{TL+1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{T}
+    \field{sortinithash}{T}
+    \field{note}{Github Repository}
+    \field{title}{Linux kernel source tree}
+    \verb{url}
+    \verb https://github.com/torvalds/linux
+    \endverb
+    \field{year}{2020}
+  \endentry
+
+  \entry{wadler1989make}{inproceedings}{}
+    \name{author}{2}{}{%
+      {{hash=WP}{%
+         family={Wadler},
+         familyi={W\bibinitperiod},
+         given={Philip},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=BS}{%
+         family={Blott},
+         familyi={B\bibinitperiod},
+         given={Stephen},
+         giveni={S\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{WPBS1}
+    \strng{fullhash}{WPBS1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{W}
+    \field{sortinithash}{W}
+    \field{booktitle}{Proceedings of the 16th ACM SIGPLAN-SIGACT symposium on
+  Principles of programming languages}
+    \field{pages}{60\bibrangedash 76}
+    \field{title}{How to make ad-hoc polymorphism less ad hoc}
+    \field{year}{1989}
+  \endentry
+\enddatalist
+\endinput

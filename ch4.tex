@@ -38,7 +38,7 @@ Then we can implement its functions as follows:
 b *push(b *head, a value)
 {
     b *item = new();
-    // new() is an STL function behaving like malloc(sizeof(b))
+    // new() is an STL function returning malloc(sizeof(b))
     item->value = value;
     item->next = head;
     return item;

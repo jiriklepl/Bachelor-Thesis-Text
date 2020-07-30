@@ -1,0 +1,181 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Introduction}{5}{chapter*.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {1}Functional programming with Types}{7}{chapter.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.1}Lambda Calculus}{7}{section.1.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.1.1}Subexpression}{8}{subsection.1.1.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{Writing Conventions}{8}{section*.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.2}Simply-Typed Lambda Calculus }{8}{section.1.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.2.1}Types and Typing}{8}{subsection.1.2.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.2.2}Inference Rules}{9}{subsection.1.2.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{Example}{10}{section*.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.2.3}Type Substitution, Instantiation and Unification}{10}{subsection.1.2.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.2.4}Principal Typing}{11}{subsection.1.2.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.2.5}Type Checking, Typeability, and Type Inference in $\lambda \rightarrow $}{11}{subsection.1.2.5}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.3}System F and Parametric Polymorphism}{11}{section.1.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.3.1}Types, Type Substitution, and Type Instantiation in the System F }{12}{subsection.1.3.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.3.2}Inference Rules of the System F}{12}{subsection.1.3.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.4}Hindley-Milner Type System}{13}{section.1.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.4.1}Types, Types Schemes, and Typing in HM}{13}{subsection.1.4.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{Common Typing extensions to HM}{14}{section*.5}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.4.2}Type Instantiation in HM}{14}{subsection.1.4.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.4.3}Type Inference in HM}{15}{subsection.1.4.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{Most General Unification}{15}{section*.6}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{The Type Assignment Algorithm W}{16}{section*.7}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.4.4}Extensions of the HM Type System}{16}{subsection.1.4.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{Type Classes and their Methods and Instances}{18}{section*.8}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{Subtyping and Overloading}{18}{section*.9}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.5}Overloading with Type Classes}{19}{section.1.5}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.6}Haskell Type System}{19}{section.1.6}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.6.1}Type Constructors}{20}{subsection.1.6.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.6.2}Kinds}{20}{subsection.1.6.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.6.3}Types and Type Schemes in the Haskell Type System}{21}{subsection.1.6.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{Qualified Types and Predicates}{21}{section*.10}%
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{Type Substitution in the Haskell Type System}{22}{section*.11}%
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{Type Unification in the Haskell Type System}{22}{section*.12}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.6.4}Type Inference Rules of the Haskell Type System}{22}{subsection.1.6.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.6.5}The Type Inference Algorithm for the Haskell Type System}{23}{subsection.1.6.5}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {2}Type inference and polymorphism for C}{25}{chapter.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.1}Reasons for Polymorphism Features}{25}{section.2.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.1.1}Why the Hindley-Milner Type System}{27}{subsection.2.1.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.2}$\lambda _C$ Modelling C Types in HM}{27}{section.2.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.2.1}Integral Types}{27}{subsection.2.2.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.2.2}Pointers}{28}{subsection.2.2.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.2.3}Const specifiers}{28}{subsection.2.2.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.2.4}Functions}{28}{subsection.2.2.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.2.5}Structs and Unions}{29}{subsection.2.2.5}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.3}Modelling C}{29}{section.2.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.3.1}Expressions and Statements}{29}{subsection.2.3.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{Control Statements}{30}{section*.13}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.3.2}Function definitions}{30}{subsection.2.3.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.4}Extensions to the C language}{31}{section.2.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {3}CHM compiler}{33}{chapter.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.1}Language extensions}{33}{section.3.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.1.1}Polytyped Definitions}{35}{subsection.3.1.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{CHM Headers}{35}{section*.14}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{Type Classes, Their Instances, and Structs}{35}{section*.15}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{Functions}{35}{section*.16}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.2}Parsing}{35}{section.3.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.3}Type Inference}{36}{section.3.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.4}Code Processing}{36}{section.3.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.4.1}Monomorphization and Instantiation}{36}{subsection.3.4.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{Type Class Method Instantiation}{37}{section*.17}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{Comparison to C++ Template Instantiation}{37}{section*.18}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.4.2}Record Fields}{37}{subsection.3.4.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.4.3}Recursion limits}{38}{subsection.3.4.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.5}Code output}{38}{section.3.5}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {4}Conclusion and Future Work}{39}{chapter.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.1}Conclusion}{39}{section.4.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.2}Possible Use in System Development}{39}{section.4.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.3}Future Work}{40}{section.4.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{Incomplete Implementation}{40}{section*.19}%
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{Compiler Errors}{41}{section*.20}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.3.1}Future Features}{41}{subsection.4.3.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{Quality of Life Changes}{41}{section*.21}%
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{Better support for record fields}{41}{section*.22}%
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{}{42}{section*.23}%
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{Data type specializations}{42}{section*.24}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Bibliography}{43}{chapter*.25}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {A}The CHM Language Grammar}{45}{appendix.A}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {A.1}CHM headers}{45}{section.A.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {A.2}Classes and Their Instances}{46}{section.A.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {A.3}Polymorphic Functions and Structures}{46}{section.A.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {B}Mangling of Types, Structs, and Functions}{47}{appendix.B}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {B.1}The Mangling Function}{47}{section.B.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {C}The STL Library}{49}{appendix.C}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {C.1}Functions Facilitating Memory Management}{49}{section.C.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {C.2}Functions Facilitating IO}{50}{section.C.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {D}Using the CHM Compiler}{51}{appendix.D}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {D.1}Getting the Compiler}{51}{section.D.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {D.2}Build Dependencies}{51}{section.D.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {D.3}Building}{51}{section.D.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {D.4}Usage}{52}{section.D.4}%

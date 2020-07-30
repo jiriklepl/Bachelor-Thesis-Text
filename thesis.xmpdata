@@ -1,7 +1,7 @@
 % Metadata to be stored in PDF, see documentation of the pdfx package for more details.
 
-\Author{Name Surname}
-\Title{Thesis title}
-\Keywords{keywords\sep more such\sep yet another}
-\Subject{Abstract of thesis}
+\Author{Jiří Klepl}
+\Title{Type Inference and Polymorphism for C}
+\Keywords{compilers\sep programming languages\sep type systems}
+\Subject{The C language, despite its age, is one of the main languages in systems development. It is valued for giving the user almost complete control over the memory management and the computations the program written in it performs. However, a large portion of criticism of C arises from the lack of generic programming features. C compensates that by utilizing preprocessor macros, which are prone to user errors. This problem has been addressed in the early stages of the development of the C++ language, but many systems developers refuse C++ because of its complexity and non-transparency of the code. We propose a simpler solution by applying the Hindley-Milner type system extended by Haskell type classes and type constructors. We will show that this approach is viable even with minimal changes to the syntax of C, but giving it much higher expressiveness.}
 \Publisher{Charles University}
