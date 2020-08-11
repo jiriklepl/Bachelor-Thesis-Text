@@ -89,7 +89,7 @@ There should be a compiler option that would forbid fields from sharing their na
 
 Then another sharing of names of fields should be defining fields in type family definitions, where all specializations would have these fields without any warning or error even under the effect of the option stated above. Different specializations would then still be able to add their own field on the top of the shared ones. The implicit \lstinline{Has_<field>} class would apply here as well.
 
-\paragraph{}{Modules}
+\paragraph{Modules}
 
 Having many structures with even more fields and procedures would create a high probability of name collisions. The "include" system from the C language then becomes an issue for larger projects or even smaller ones wanting to use some foreign code.
 

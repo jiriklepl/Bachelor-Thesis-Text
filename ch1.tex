@@ -26,7 +26,7 @@ The whole idea of evaluation of a lambda calculus program is using a simple rewr
     $$(\lambda x . e) e' = e [x := e']$$ \cite{barendregt1992lambda}
 \end{defn}
 
-There is one other rewriting rule, \emph{$\alpha$ conversion}, which is used to resolve name collisions, but we will not consider it as we will consider each bound variable uniquely named ().
+There is one other rewriting rule, \emph{$\alpha$ conversion}, which is used to resolve name collisions, but we will not consider it as we will consider each bound variable uniquely named.
 
 \subsection{Subexpression}
 
@@ -40,7 +40,7 @@ This definition will extend intuitively to all other syntactic systems.
 
 Lambda calculi usually use the writing conventions of applications being left-associative, abstractions being right-associative, and the $\rightarrow$ operator (which will be used in typed lambda calculi to denote functions) being right-associative as well.
 
-\section{Simply-Typed Lambda Calculus }
+\section{Simply-Typed Lambda Calculus}
 
 Simply-typed lambda calculus (also $\lambda\rightarrow$), described by Church, is one of the first lambda calculi with a type system. Typing of lambda terms helps in checking the validity of the program, protecting the user from writing programs that make little sense like for example, adding amperes to volts \cite{barendregt1992lambda} and also it makes it easier to think about the program in the bigger picture giving us information about the usage of the typed entities in some code, typing $f : \alpha \rightarrow \alpha \rightarrow \alpha$, for example, tells us that $f$ is a function taking two arguments of some type and returning a value of the same type. From that alone, we can assume that applying it to two parameters of the same type should be well-defined.
 
